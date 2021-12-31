@@ -1,0 +1,44 @@
+# yamllint disable rule:line-length
+# SPDX-FileNotice: 🅭🄍1.0 This file was dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021)
+# yamllint enable
+
+
+%YAML 1.2
+---
+repos:
+    -
+        repo: https://github.com/adrienverge/yamllint
+        rev: v1.26.3
+        hooks:
+            - id: yamllint
+    -
+        repo: https://github.com/pre-commit/pre-commit-hooks
+        rev: v4.1.0
+        hooks:
+            - id: check-case-conflict
+            - id: end-of-file-fixer
+            - id: mixed-line-ending
+            - id: trailing-whitespace
+    -
+        repo: https://github.com/jumanjihouse/pre-commit-hooks
+        rev: 2.1.5
+        hooks:
+            -
+                id: forbid-space-in-indent
+                # YAML requires spaces for indentation. See:
+                # <https://yaml.org/spec/1.2.2/#61-indentation-spaces>
+                exclude: '.*\.yaml$'
+                # This is a workaround the following issue:
+                # <https://github.com/jumanjihouse/pre-commit-hooks/issues/69>
+                types: ['text']
+    -
+        repo: https://github.com/igorshubovych/markdownlint-cli
+        rev: v0.30.0
+        hooks:
+            - id: markdownlint
+    -
+        repo: https://pagure.io/jasons-copying-information-checker.git
+        rev: 0.1.0
+        hooks:
+            - id: jcic
