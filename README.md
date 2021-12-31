@@ -7,6 +7,11 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021)
 
 This repo holds what will eventually become my Web site.
 
+## Hints for contributors
+
+- Every file should declare its own copying information. See the comment at the
+top of `COPYING.md` for an example.
+
 ## Copying
 
 See [COPYING.md](./COPYING.md).
