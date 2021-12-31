@@ -3,5 +3,7 @@ SPDX-FileNotice: 🅭🄍1.0 This file was dedicated to the public domain using 
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021)
 -->
 
+# Copying Information for Jason’s Web Site
 
-This project uses [SPDX file tags](https://spdx.github.io/spdx-spec/file-tags/) to declare its copying information.
+This project uses [SPDX file tags](https://spdx.github.io/spdx-spec/file-tags/)
+to declare its copying information.
