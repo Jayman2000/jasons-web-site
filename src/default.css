@@ -10,14 +10,14 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 
 :root
 {
-	--notice-width: 30ch;
-	font-family: 'Noto Serif', serif;
+    --notice-width: 30ch;
+    font-family: 'Noto Serif', serif;
 }
 
 iframe
 {
-	border-radius: 1ch;
-	border-style: solid;
-	height: 25ch;
-	width: var(--notice-width);
+    border-radius: 1ch;
+    border-style: solid;
+    height: 25ch;
+    width: var(--notice-width);
 }

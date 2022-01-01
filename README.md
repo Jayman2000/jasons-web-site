@@ -26,6 +26,7 @@ contributions. Follow [these instructions](https://pre-commit.com/#quick-start)
 to get started (skip the part about creating a `.pre-commit-config.yaml` file).
 - Every file should declare its own copying information. See the comment at the
 top of `COPYING.md` for an example.
+- Use 4 spaces for indentation.
 
 ## Copying
 

@@ -4,21 +4,21 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 {% endcomment %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta http-equiv="content-type" content="text/html;charset=utf-8">
-		{% if page.data.site_in_title %}
-			<title>{{ page.title }} — {{ site.title }}</title>
-		{% else %}
-			<title>{% assign title = page.title %}</title>
-		{% endif %}
-		{% comment %}
-		TODO: add CSP
-		TODO: add integrity attribute
-		{% endcomment %}
-		<link href="/default.css" rel="stylesheet" type="text/css;charset=utf-8">
-		{{ page.data.additional_head_content }}
-	</head>
-	<body>
-		{{ body }}
-	</body>
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        {% if page.data.site_in_title %}
+            <title>{{ page.title }} — {{ site.title }}</title>
+        {% else %}
+            <title>{% assign title = page.title %}</title>
+        {% endif %}
+        {% comment %}
+        TODO: add CSP
+        TODO: add integrity attribute
+        {% endcomment %}
+        <link href="/default.css" rel="stylesheet" type="text/css;charset=utf-8">
+        {{ page.data.additional_head_content }}
+    </head>
+    <body>
+        {{ body }}
+    </body>
 </html>

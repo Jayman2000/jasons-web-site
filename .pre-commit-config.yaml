@@ -21,20 +21,10 @@ repos:
             - id: mixed-line-ending
             - id: trailing-whitespace
     -
-        repo: https://github.com/jumanjihouse/pre-commit-hooks
-        rev: 2.1.5
+        repo: https://github.com/Lucas-C/pre-commit-hooks
+        rev: v1.1.10
         hooks:
-            -
-                id: forbid-space-in-indent
-                # YAML requires spaces for indentation. See:
-                # <https://yaml.org/spec/1.2.2/#61-indentation-spaces>
-                # Liquid templates include YAML, and sometimes that means
-                # indentation with spaces is required.
-                # TODO: Figure out why default.css is failing.
-                exclude: '.*\.ya?ml$|^src/default\.css$|^src/cc0\.liquid$'
-                # This is a workaround the following issue:
-                # <https://github.com/jumanjihouse/pre-commit-hooks/issues/69>
-                types: ['text']
+            - id: forbid-tabs
     -
         repo: https://github.com/igorshubovych/markdownlint-cli
         rev: v0.30.0
