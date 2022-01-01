@@ -1,0 +1,10 @@
+{% comment %}
+SPDX-FileNotice: 🅭🄍1.0 This file was dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+
+include is deprecated and render should be used, but Cobalt doesn’t support
+render yet.
+<https://shopify.github.io/liquid/tags/template/#include>
+{% endcomment %}
+{% capture title %}{{ site.title }}{% endcapture %}
+{% include "base.liquid" %}

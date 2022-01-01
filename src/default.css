@@ -1,0 +1,49 @@
+/*
+SPDX-FileNotice: 🅭🄍1.0 This file was dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+*/
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif&display=swap');
+/*
+ * TODO: CC Symbols fallback font:
+ * <http://v65ngaoj2nyaiq2ltf4uzota254gnasarrkuj4aqndi2bb5lw6frt3ad.onion/entry/creative-commons-unicode-fallback-font.html>
+ */
+
+:root
+{
+	--footer-width: 30ch;
+	font-family: 'Noto Serif', serif;
+}
+
+footer
+{
+	border-radius: 1ch;
+	border-style: solid;
+	width: var(--footer-width);
+}
+
+figure
+{
+	margin-bottom: 1ch;
+	margin-left: 1ch;
+	margin-right: 1ch;
+	margin-top: 1ch;
+}
+
+#cc-symbols
+{
+	display: block;
+	font-size: calc(var(--footer-width) / 3);
+	line-height: 1;
+	text-align: center;
+}
+
+/*
+ * Thanks, Anna Fitzgerald.
+ * <https://blog.hubspot.com/website/remove-underline-from-links-css>
+ */
+/*#cc-symbols:link,#cc-symbols:visited,#cc-symbols:hover,#cc-symbols:active {*/
+#cc-symbols:where(:link, :visited, :hover, :active)
+{
+	color: black;
+	text-decoration: none;
+}

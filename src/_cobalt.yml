@@ -1,0 +1,13 @@
+# yamllint disable rule:line-length
+# SPDX-FileNotice: 🅭🄍1.0 This file was dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+# yamllint enable
+
+
+%YAML 1.2
+---
+destination: ../build
+site:
+    title: Jason’s Web Site
+    description: This site is for things that Jason Yundt has created.
+    # TODO: base_url
