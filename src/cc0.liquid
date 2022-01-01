@@ -1,0 +1,58 @@
+---
+# SPDX-FileNotice: 🅭🄍1.0 This file was dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021)
+
+layout: bare.liquid
+title: CC0 Notice
+data:
+    additional_head_content: |
+        <style>
+            :root, body
+            {
+                height: 100%;
+                width: 100%;
+            }
+
+            body
+            {
+                position: fixed;
+            }
+
+            body, figure
+            {
+                margin-bottom: 0;
+                margin-left: 0;
+                margin-right: 0;
+                margin-top: 0;
+            }
+
+            figure
+            {
+                text-align: center;
+                padding: 1ch;
+            }
+
+            #cc-symbols
+            {
+                display: block;
+                font-size: calc(var(--notice-width) / 3);
+                line-height: 1;
+            }
+
+            /*
+             * Thanks, Anna Fitzgerald.
+             * <https://blog.hubspot.com/website/remove-underline-from-links-css>
+             */
+            #cc-symbols:where(:link, :visited, :hover, :active)
+            {
+                color: black;
+                text-decoration: none;
+            }
+        </style>
+---
+<figure>
+	<a id="cc-symbols" href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external" hreflang="en">🅭🄍</a>
+	<figcaption>
+		This page was dedicated to the public domain using the <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external" hreflang="en">CC0 1.0 Universal Public Domain Dedication</a>.
+	</figcaption>
+</figure>

@@ -11,3 +11,8 @@ site:
     title: Jason’s Web Site
     description: This site is for things that Jason Yundt has created.
     # TODO: base_url
+pages:
+    default:
+        data:
+            site_in_title: true
+            additional_head_content: ""
