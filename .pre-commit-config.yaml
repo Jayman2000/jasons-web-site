@@ -41,6 +41,6 @@ repos:
     # TODO: Lint CSS
     -
         repo: https://pagure.io/jasons-copying-information-checker.git
-        rev: 0.1.0
+        rev: 0.2.0
         hooks:
             - id: jcic

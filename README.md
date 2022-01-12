@@ -9,9 +9,23 @@ This repo holds what will eventually become my Web site.
 
 ## Building
 
-At the moment, the site doesn’t need building because it’s entirely static
-content. Just open the `static` directory and start editing. This will change
-soon.
+### Prerequisites
+
+- [Python](https://www.python.org/) 3.7+
+- [Pipenv](https://pipenv.pypa.io/en/latest/) 2022.1.8
+
+It’s possible that other versions (especially newer versions) work, but they
+haven’t been tested.
+
+### Build and validate
+
+1. Change directory to the root of this repo.
+2. Run `pipenv install`
+3. Run `pipenv run python build.py`
+
+At the moment, the only thing this will do is copy the files from the `static`
+folder to the `build` folder, and validate them. If any of the files are
+invalid, then it will warn that they’re invalid.
 
 ## Hints for contributors
 
