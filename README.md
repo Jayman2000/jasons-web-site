@@ -9,15 +9,9 @@ This repo holds what will eventually become my Web site.
 
 ## Building
 
-This site is built using [Cobalt](https://cobalt-org.github.io/). To try out
-the site, run
-
-1. `cd` to the `src/` directory.
-2. Run `cobalt serve`
-3. Go to `http://localhost:3000`
-
-Once you do this, you’ll be able to find the contents of the site in the
-`build/` directory.
+At the moment, the site doesn’t need building because it’s entirely static
+content. Just open the `static` directory and start editing. This will change
+soon.
 
 ## Hints for contributors
 
@@ -26,7 +20,10 @@ contributions. Follow [these instructions](https://pre-commit.com/#quick-start)
 to get started (skip the part about creating a `.pre-commit-config.yaml` file).
 - Every file should declare its own copying information. See the comment at the
 top of `COPYING.md` for an example.
-- Use 4 spaces for indentation.
+- Use tabs for indentation. The only exception to this rule is in YAML files
+because [YAML requires spaces for
+indentation.](https://yaml.org/spec/1.2.2/#61-indentation-spaces) In YAML
+files, use 4 spaces for indentation.
 
 ## Copying
 
