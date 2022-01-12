@@ -29,9 +29,10 @@ invalid, then it will warn that they’re invalid.
 
 ## Hints for contributors
 
-- You can use [pre-commit](https://pre-commit.com/) to automatically check your
-contributions. Follow [these instructions](https://pre-commit.com/#quick-start)
-to get started (skip the part about creating a `.pre-commit-config.yaml` file).
+- You should build the site at least once before using [pre-commit].
+- You can use [pre-commit] to automatically check your contributions.
+Follow [these instructions](https://pre-commit.com/#quick-start) to get started
+(skip the part about creating a `.pre-commit-config.yaml` file).
 - Every file should declare its own copying information. See the comment at the
 top of `COPYING.md` for an example.
 - Use tabs for indentation. The only exception to this rule is in YAML files
@@ -42,3 +43,5 @@ files, use 4 spaces for indentation.
 ## Copying
 
 See [COPYING.md](./COPYING.md).
+
+[pre-commit]: https://pre-commit.com/

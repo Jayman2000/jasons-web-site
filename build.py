@@ -2,7 +2,7 @@
 # SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 from pathlib import Path
 from shutil import copytree, rmtree
-from sys import version_info
+from sys import exit, version_info
 # Final was added in Python 3.8[1], but 3.7 is still supported[2].
 #
 # 1. <https://docs.python.org/3/library/typing.html#typing.Final>
@@ -25,4 +25,4 @@ except FileNotFoundError:
 copytree(Path("static"), BUILD_DIR)
 
 VALIDATOR: Final[Validator] = Validator()
-VALIDATOR.validate([file for file in BUILD_DIR.glob("**")])
+exit(VALIDATOR.validate([file for file in BUILD_DIR.glob("**")]))

@@ -37,8 +37,17 @@ repos:
         rev: v0.30.0
         hooks:
             - id: markdownlint
-    # TODO: Validate HTML and CSS
-    # TODO: Lint CSS
+    -
+        repo: local
+        hooks:
+            -
+                id: build
+                name: Build Jason’s Web Site
+                entry: pipenv run python build.py
+                language: system
+                files: 'static/.*|^build\.py$'
+                pass_filenames: false
+                description: Fails if the site doesn’t validate.
     -
         repo: https://pagure.io/jasons-copying-information-checker.git
         rev: 0.2.0
