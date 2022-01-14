@@ -11,7 +11,7 @@ This repo holds what will eventually become my Web site.
 
 ### Prerequisites
 
-- [Python](https://www.python.org/) 3.7+
+- [Python](https://www.python.org/) 3.8+
 - [Pipenv](https://pipenv.pypa.io/en/latest/) 2022.1.8
 
 It’s possible that other versions (especially newer versions) work, but they
