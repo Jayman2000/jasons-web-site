@@ -13,6 +13,7 @@ This repo holds what will eventually become my Web site.
 
 - [Python](https://www.python.org/) 3.8+
 - [Pipenv](https://pipenv.pypa.io/en/latest/) 2022.1.8
+- A [Java](http://oracle.com/java/) 8 Runtime Environment
 
 It’s possible that other versions (especially newer versions) work, but they
 haven’t been tested.
