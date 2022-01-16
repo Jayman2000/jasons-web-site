@@ -34,7 +34,7 @@ except FileNotFoundError:
 copytree(Path("static"), BUILD_DIR)
 valid_or_exit("ERROR: The built HTML was invalid before it was even minified.")
 for path in all_built_files():
-	with path.open(mode='r') as file:
+	with path.open(mode='rt') as file:
 		code: str = file.read()
 	# See here for which options are needed for spec compliance:
 	# <https://docs.rs/minify-html/0.8.0/src/minify_html/cfg/mod.rs.html#40-47>
@@ -56,6 +56,6 @@ for path in all_built_files():
 	# (<https://www.rfc-editor.org/rfc/rfc2046.html#section-4.1.1>).
 	#
 	# In other words, to be as compliant as possible, use CRLFs.
-	with path.open(mode='w', newline='\r\n') as file:
+	with path.open(mode='wt', newline='\r\n') as file:
 		file.write(code)
 valid_or_exit("ERROR: html-minify generated invalid HTML.")
