@@ -44,6 +44,18 @@ for path in all_built_files():
 			ensure_spec_compliant_unquoted_attribute_values = True,
 			keep_spaces_between_attributes = True
 	)
-	with path.open(mode='w') as file:
+	# MIME hint note: The “text” MIME type uses CRLF.
+	#
+	# The HTML Standard allows for multiple different kinds of newlines
+	# (<https://html.spec.whatwg.org/multipage/syntax.html#newlines>), but
+	# it also requires HTML documents to have a “text” MIME type
+	# (<https://html.spec.whatwg.org/multipage/infrastructure.html#terminology>).
+	#
+	# MIME requires the “canonical form” of text to use CRLFs. It also
+	# forbids the use of CRs and LFs unless they’re part of a CRLF
+	# (<https://www.rfc-editor.org/rfc/rfc2046.html#section-4.1.1>).
+	#
+	# In other words, to be as compliant as possible, use CRLFs.
+	with path.open(mode='w', newline='\r\n') as file:
 		file.write(code)
 valid_or_exit("ERROR: html-minify generated invalid HTML.")
