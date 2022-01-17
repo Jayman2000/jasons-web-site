@@ -47,6 +47,10 @@ repos:
                 language: system
                 files: 'static/.*|^build\.py$'
                 pass_filenames: false
+                # While it’s true that this hook souldn’t be run in parallel,
+                # it seems unlikely that it ever would be. In other words, I’m
+                # not sure that setting require_serial does anything here.
+                require_serial: true
                 description: Fails if the site doesn’t validate.
     -
         repo: https://pagure.io/jasons-copying-information-checker.git
