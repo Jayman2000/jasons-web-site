@@ -18,9 +18,9 @@ def all_built_files(base_dir=BUILD_DIR):
 				yield file_path
 
 
-VALIDATOR = Validator()
+VALIDATOR = Validator(vnu_args=['--also-check-css', BUILD_DIR])
 def valid_or_exit(error_message):
-	exit_code = VALIDATOR.validate([BUILD_DIR])
+	exit_code = VALIDATOR.validate([])
 	if exit_code != 0:
 		print(error_message, file=stderr)
 		exit(exit_code)
@@ -31,18 +31,37 @@ try:
 except FileNotFoundError:
 	pass
 copytree(Path("static"), BUILD_DIR)
-valid_or_exit("ERROR: The built HTML was invalid before it was even minified.")
+valid_or_exit("ERROR: The built site was invalid before it was even minified.")
 for path in all_built_files():
 	with path.open(mode='rt') as file:
 		code = file.read()
-	# See here for which options are needed for spec compliance:
-	# <https://docs.rs/minify-html/0.8.0/src/minify_html/cfg/mod.rs.html#40-47>
-	code = minify(
-			code,
-			do_not_minify_doctype = True,
-			ensure_spec_compliant_unquoted_attribute_values = True,
-			keep_spaces_between_attributes = True
-	)
+	if path.suffix == ".html":
+		# See here for which options are needed for spec compliance:
+		# <https://docs.rs/minify-html/0.8.0/src/minify_html/cfg/mod.rs.html#40-47>
+		code = minify(
+				code,
+				do_not_minify_doctype = True,
+				ensure_spec_compliant_unquoted_attribute_values = True,
+				keep_spaces_between_attributes = True
+		)
+
+	# MIME hint note: Unicode signatures hint that charset="utf-8"
+	#
+	# As The Unicode Standard says,
+	# “Unicode Signature. An initial BOM may also serve as an implicit
+	# marker to identify a file as containing Unicode text. For UTF-16, the
+	# sequence FE 16 FF16 (or its byte-reversed counterpart, FF16 FE16) is
+	# exceedingly rare at the outset of text files that use other character
+	# encodings. The corresponding UTF-8 BOM sequence, EF16 BB16 BF16, is
+	# also exceedingly rare.”
+	# — <https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G9354>
+	#
+	# Unfortunately, the validator often fails to parse CSS files with a
+	# BOM (<https://github.com/validator/validator/issues/1302>).
+	if path.suffix == ".css":
+		output_encoding = 'utf_8'
+	else:
+		output_encoding = 'utf_8_sig'
 	# MIME hint note: The “text” MIME type uses CRLF.
 	#
 	# The HTML Standard allows for multiple different kinds of newlines
@@ -55,18 +74,6 @@ for path in all_built_files():
 	# (<https://www.rfc-editor.org/rfc/rfc2046.html#section-4.1.1>).
 	#
 	# In other words, to be as compliant as possible, use CRLFs.
-	#
-	#
-	# MIME hint note: Unicode signatures hint that charset="utf-8"
-	#
-	# As The Unicode Standard says,
-	# “Unicode Signature. An initial BOM may also serve as an implicit
-	# marker to identify a file as containing Unicode text. For UTF-16, the
-	# sequence FE 16 FF16 (or its byte-reversed counterpart, FF16 FE16) is
-	# exceedingly rare at the outset of text files that use other character
-	# encodings. The corresponding UTF-8 BOM sequence, EF16 BB16 BF16, is
-	# also exceedingly rare.”
-	# — <https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G9354>
-	with path.open(mode='wt', encoding='utf_8_sig', newline='\r\n') as file:
+	with path.open(mode='wt', encoding=output_encoding, newline='\r\n') as file:
 		file.write(code)
-valid_or_exit("ERROR: html-minify generated invalid HTML.")
+valid_or_exit("ERROR: html-minify generated invalid HTML or CSS.")
