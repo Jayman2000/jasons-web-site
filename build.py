@@ -5,7 +5,7 @@ from shutil import copytree, rmtree
 from sys import exit, stderr, version_info
 from typing import Final, Iterable
 
-from html5validator.validator import Validator
+from html5validator import Validator
 from minify_html import minify
 
 
@@ -21,7 +21,7 @@ def all_built_files(base_dir: Path = BUILD_DIR) -> Iterable[Path]:
 
 VALIDATOR: Final[Validator] = Validator()
 def valid_or_exit(error_message: str) -> None:
-	exit_code: int = VALIDATOR.validate(list(all_built_files()))
+	exit_code: int = VALIDATOR.validate([BUILD_DIR])
 	if exit_code != 0:
 		print(error_message, file=stderr)
 		exit(exit_code)
