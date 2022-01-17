@@ -55,6 +55,18 @@ for path in all_built_files():
 	# (<https://www.rfc-editor.org/rfc/rfc2046.html#section-4.1.1>).
 	#
 	# In other words, to be as compliant as possible, use CRLFs.
-	with path.open(mode='wt', newline='\r\n') as file:
+	#
+	#
+	# MIME hint note: Unicode signatures hint that charset="utf-8"
+	#
+	# As The Unicode Standard says,
+	# “Unicode Signature. An initial BOM may also serve as an implicit
+	# marker to identify a file as containing Unicode text. For UTF-16, the
+	# sequence FE 16 FF16 (or its byte-reversed counterpart, FF16 FE16) is
+	# exceedingly rare at the outset of text files that use other character
+	# encodings. The corresponding UTF-8 BOM sequence, EF16 BB16 BF16, is
+	# also exceedingly rare.”
+	# — <https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#G9354>
+	with path.open(mode='wt', encoding='utf_8_sig', newline='\r\n') as file:
 		file.write(code)
 valid_or_exit("ERROR: html-minify generated invalid HTML.")
