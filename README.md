@@ -34,9 +34,11 @@ invalid, then it will warn that they’re invalid.
 - You can use [pre-commit] to automatically check your contributions.
 Follow [these instructions](https://pre-commit.com/#quick-start) to get started
 (skip the part about creating a `.pre-commit-config.yaml` file).
-- `MIME hinting.md` fails one of pre-commit’s hooks, but only because one line
-is too long. I’m OK with that line being too long, so I [skip that hook](https://pre-commit.com/#temporarily-disabling-hooks)
-when I update that file.
+- Some [Markdown](https://daringfireball.net/projects/markdown/) files fail one
+of pre-commit’s hooks, but only because one line is too long. I’m OK with that
+line being too long, so I [skip that
+hook](https://pre-commit.com/#temporarily-disabling-hooks) when I update those
+files.
 - Every file should declare its own copying information. See the comment at the
 top of `COPYING.md` for an example.
 - Use tabs for indentation. The only exception to this rule is in YAML files
