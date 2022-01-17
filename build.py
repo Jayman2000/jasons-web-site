@@ -3,14 +3,13 @@
 from pathlib import Path
 from shutil import copytree, rmtree
 from sys import exit, stderr, version_info
-from typing import Final, Iterable
 
 from html5validator import Validator
 from minify_html import minify
 
 
-BUILD_DIR: Final[Path] = Path("build")
-def all_built_files(base_dir: Path = BUILD_DIR) -> Iterable[Path]:
+BUILD_DIR = Path("build")
+def all_built_files(base_dir=BUILD_DIR):
 	for subpath in base_dir.iterdir():
 		if subpath.is_file():
 			yield subpath
@@ -19,9 +18,9 @@ def all_built_files(base_dir: Path = BUILD_DIR) -> Iterable[Path]:
 				yield file_path
 
 
-VALIDATOR: Final[Validator] = Validator()
-def valid_or_exit(error_message: str) -> None:
-	exit_code: int = VALIDATOR.validate([BUILD_DIR])
+VALIDATOR = Validator()
+def valid_or_exit(error_message):
+	exit_code = VALIDATOR.validate([BUILD_DIR])
 	if exit_code != 0:
 		print(error_message, file=stderr)
 		exit(exit_code)
@@ -35,7 +34,7 @@ copytree(Path("static"), BUILD_DIR)
 valid_or_exit("ERROR: The built HTML was invalid before it was even minified.")
 for path in all_built_files():
 	with path.open(mode='rt') as file:
-		code: str = file.read()
+		code = file.read()
 	# See here for which options are needed for spec compliance:
 	# <https://docs.rs/minify-html/0.8.0/src/minify_html/cfg/mod.rs.html#40-47>
 	code = minify(
