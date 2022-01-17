@@ -2,7 +2,7 @@
 # SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 from pathlib import Path
 from shutil import copytree, rmtree
-from sys import exit, stderr, version_info
+from sys import exit, stderr
 
 from html5validator import Validator
 from minify_html import minify
