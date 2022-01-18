@@ -54,7 +54,17 @@ repos:
                 require_serial: true
                 description: Fails if the site doesn’t validate.
     -
-        repo: https://pagure.io/jasons-copying-information-checker.git
-        rev: 0.2.2
+        repo: https://pagure.io/assert_contains_regex.git
+        rev: 0.0.0
         hooks:
-            - id: jcic
+            -
+                id: assert_contains_regex
+                args:
+                    - --pattern
+                    - >
+                        SPDX-FileNotice: 🅭🄍1\.0 This file is dedicated to the
+                        public domain using the CC0 1\.0 Universal Public
+                        Domain Dedication
+                        <https://creativecommons.org/publicdomain/zero/1\.0/>\.
+                    - --pattern
+                    - "SPDX-FileContributor: .+ <.+> (.+)\n"
