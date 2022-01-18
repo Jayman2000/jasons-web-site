@@ -55,6 +55,6 @@ repos:
                 description: Fails if the site doesn’t validate.
     -
         repo: https://pagure.io/jasons-copying-information-checker.git
-        rev: 0.2.0
+        rev: 0.2.2
         hooks:
             - id: jcic
