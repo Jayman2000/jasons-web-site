@@ -9,30 +9,35 @@ from minify_html import minify
 
 
 BUILD_DIR = Path("build")
-def all_built_files(base_dir=BUILD_DIR):
+def built_html_and_css(base_dir=BUILD_DIR):
 	for subpath in base_dir.iterdir():
-		if subpath.is_file():
-			yield subpath
-		else:
-			for file_path in all_built_files(subpath):
+		if subpath.is_dir():
+			for file_path in built_html_and_css(subpath):
 				yield file_path
+		elif subpath.suffix in (".html", ".css"):
+			yield subpath
 
 
-VALIDATOR = Validator(vnu_args=['--also-check-css', BUILD_DIR])
+VALIDATED_SUFFIXES = (".html", ".css")
+VALIDATOR = Validator(vnu_args=['--also-check-css'])
 def valid_or_exit(error_message):
-	exit_code = VALIDATOR.validate([])
+	exit_code = VALIDATOR.validate(list(built_html_and_css()))
 	if exit_code != 0:
 		print(error_message, file=stderr)
 		exit(exit_code)
+
+
+def ignored_files(_src, names):
+	return [name for name in names if name.endswith(".spdx-meta")]
 
 
 try:
 	rmtree(BUILD_DIR)
 except FileNotFoundError:
 	pass
-copytree(Path("static"), BUILD_DIR)
+copytree(Path("static"), BUILD_DIR, ignore=ignored_files)
 valid_or_exit("ERROR: The built site was invalid before it was even minified.")
-for path in all_built_files():
+for path in built_html_and_css():
 	with path.open(mode='rt') as file:
 		code = file.read()
 	if path.suffix == ".html":
@@ -42,8 +47,12 @@ for path in all_built_files():
 				code,
 				do_not_minify_doctype = True,
 				ensure_spec_compliant_unquoted_attribute_values = True,
-				keep_spaces_between_attributes = True
+				keep_spaces_between_attributes = True,
+
+				minify_css=True
 		)
+	# TODO: Minify CSS (waiting on
+	# <https://github.com/wilsonzlin/minify-html/issues/66>).
 
 	# MIME hint note: Unicode signatures hint that charset="utf-8"
 	#
