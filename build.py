@@ -10,7 +10,9 @@ from minify_html import minify, minify_css
 from staticjinja import Site
 
 
-BUILD_DIR = Path("build")
+# An absolute path is needed for the base URL. Otherwise, BUILD_DIR could be
+# relative.
+BUILD_DIR = Path("build").absolute()
 def built_html_and_css(base_dir=BUILD_DIR):
 	for subpath in base_dir.iterdir():
 		if subpath.is_dir():
@@ -60,7 +62,14 @@ except FileNotFoundError:
 	pass
 
 copytree(Path("static"), BUILD_DIR, ignore=ignored_files)
-site = Site.make_site(searchpath=Path("templates"), outpath=BUILD_DIR)
+site = Site.make_site(
+		searchpath=Path("templates"),
+		outpath=BUILD_DIR,
+		# as_uri() seems to always leave out the final slash, but for
+		# base URLs the final slash is necessary to indicate that the
+		# last component is a directory.
+		env_globals={ 'base_url':BUILD_DIR.as_uri() + "/" }
+)
 site.render()
 if not ARGS.minify or ARGS.double_validate:
 	valid_or_exit("ERROR: The built site is invalid without being minified.")
