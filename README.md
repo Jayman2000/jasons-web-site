@@ -11,12 +11,12 @@ This repo holds what will eventually become my Web site.
 
 ### Prerequisites
 
+- A [Java](http://oracle.com/java/) 8 Runtime Environment
 - [Cargo](https://doc.rust-lang.org/cargo/index.html)* 1.57.0
 - [`env` (GNU coreutils)](https://www.gnu.org/software/coreutils/)* 9.0
 - [GNU Bash](https://www.gnu.org/software/bash/)*, version 5.1.16
 - [Python](https://www.python.org/) 3.8+
 - [Pipenv](https://pipenv.pypa.io/en/latest/) 2022.1.8
-- A [Java](http://oracle.com/java/) 8 Runtime Environment
 
 It’s possible that other versions (especially newer versions) and alternatives
 (like [PyPy](https://www.pypy.org/) or [FreeBSD](https://www.freebsd.org/)’s
@@ -49,6 +49,7 @@ top of `COPYING.md` for an example.
 because [YAML requires spaces for
 indentation.](https://yaml.org/spec/1.2.2/#61-indentation-spaces) In YAML
 files, use 4 spaces for indentation.
+- The `templates` folder contains [Jinja templates](https://jinja.palletsprojects.com/en/3.0.x/).
 
 ## pre-commit
 

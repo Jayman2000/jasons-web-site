@@ -6,6 +6,7 @@ from sys import exit, stderr
 
 from html5validator import Validator
 from minify_html import minify, minify_css
+from staticjinja import Site
 
 
 BUILD_DIR = Path("build")
@@ -35,8 +36,12 @@ try:
 	rmtree(BUILD_DIR)
 except FileNotFoundError:
 	pass
+
 copytree(Path("static"), BUILD_DIR, ignore=ignored_files)
+site = Site.make_site(searchpath=Path("templates"), outpath=BUILD_DIR)
+site.render()
 valid_or_exit("ERROR: The built site was invalid before it was even minified.")
+
 for path in built_html_and_css():
 	with path.open(mode='rt') as file:
 		code = file.read()

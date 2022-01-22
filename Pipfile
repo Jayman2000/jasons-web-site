@@ -9,6 +9,7 @@ name = "pypi"
 [packages]
 html5validator = "*"
 maturin = "*"
+staticjinja = "*"
 
 [dev-packages]
 # This program should work with all currently supported versions of Python.
