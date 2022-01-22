@@ -5,7 +5,7 @@ from shutil import copytree, rmtree
 from sys import exit, stderr
 
 from html5validator import Validator
-from minify_html import minify
+from minify_html import minify, minify_css
 
 
 BUILD_DIR = Path("build")
@@ -51,8 +51,10 @@ for path in built_html_and_css():
 
 				minify_css=True
 		)
-	# TODO: Minify CSS (waiting on
-	# <https://github.com/wilsonzlin/minify-html/issues/66>).
+	elif path.suffix == ".css":
+		# While minify_css() takes all of the same options as minify(),
+		# I don’t think that any of them do anything, at the moment.
+		code = minify_css(code)
 
 	# MIME hint note: Unicode signatures hint that charset="utf-8"
 	#
