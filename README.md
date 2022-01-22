@@ -38,9 +38,8 @@ with [a specific patch](https://github.com/wilsonzlin/minify-html/pull/67)._
 1. Run `./init-venv.sh`
 1. Run `pipenv run python build.py`
 
-At the moment, the only thing this will do is copy the files from the `static`
-folder to the `build` folder, and validate them. If any of the files are
-invalid, then it will warn that they’re invalid.
+After this has been done once, you just have to run
+`pipenv run python build.py` again to rebuild the site.
 
 ## Hints for contributors
 
