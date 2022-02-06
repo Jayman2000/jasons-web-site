@@ -30,3 +30,15 @@ html
 {
 	font-family: 'Noto Serif', CCSymbols, serif;
 }
+
+/*
+Normally, the font-size of <h1>s is decreased for every <article> or <section>
+that the <h1>s are in. This prevents that from happening. 2em is the default
+font-size for <h1>s.
+<https://html.spec.whatwg.org/multipage/rendering.html#sections-and-headings>
+*/
+h1
+{
+	font-size: 2em;
+	margin: 0;
+}
