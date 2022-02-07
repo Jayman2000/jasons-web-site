@@ -10,9 +10,18 @@ from minify_html import minify, minify_css
 from staticjinja import Site
 
 
-# An absolute path is needed for the base URL. Otherwise, BUILD_DIR could be
+ARGUMENT_PARSER = ArgumentParser(description="Builds Jason’s Web Site")
+# An absolute path is needed for the base URL. Otherwise, BASE_BUILD_DIR could be
 # relative.
 BASE_BUILD_DIR = Path("build").absolute()
+VALIDATED_SUFFIXES = (".html", ".css")
+VALIDATOR = Validator(vnu_args=['--also-check-css'])
+
+
+def dest_dir(scheme):
+	return Path(BASE_BUILD_DIR, scheme)
+
+
 def built_html_and_css(scheme):
 	for subpath in dest_dir(scheme).iterdir():
 		if subpath.is_dir():
@@ -22,48 +31,15 @@ def built_html_and_css(scheme):
 			yield subpath
 
 
-VALIDATED_SUFFIXES = (".html", ".css")
-VALIDATOR = Validator(vnu_args=['--also-check-css'])
+def ignored_files(_src, names):
+	return [name for name in names if name.endswith(".spdx-meta")]
+
+
 def valid_or_exit(scheme, error_message):
 	exit_code = VALIDATOR.validate(list(built_html_and_css(scheme)))
 	if exit_code != 0:
 		print(error_message, file=stderr)
 		exit(exit_code)
-
-
-def ignored_files(_src, names):
-	return [name for name in names if name.endswith(".spdx-meta")]
-
-
-ARGUMENT_PARSER = ArgumentParser(description="Builds Jason’s Web Site")
-ARGUMENT_PARSER.add_argument(
-		'-m',
-		'--minify',
-		action='store_true',
-		help=\
-				"This flag causes the site to be minified "
-				+ "after it’s built. After it gets minified, "
-				+ "it will be validated."
-)
-ARGUMENT_PARSER.add_argument(
-		'-d',
-		'--double-validate',
-		action='store_true',
-		help=\
-				"This flag causes the site to be validated "
-				+ "both before and after it’s minified. "
-				+ "Implies “--minify”."
-)
-ARGS = ARGUMENT_PARSER.parse_args()
-ARGS.minify = ARGS.minify or ARGS.double_validate
-try:
-	rmtree(BASE_BUILD_DIR)
-except FileNotFoundError:
-	pass
-
-
-def dest_dir(scheme):
-	return Path(BASE_BUILD_DIR, scheme)
 
 
 def copy_static(scheme):
@@ -161,6 +137,32 @@ def minify_build(scheme):
 			file.write(code)
 	valid_or_exit(scheme, "ERROR: html-minify generated invalid HTML or CSS.")
 
+
+ARGUMENT_PARSER.add_argument(
+		'-m',
+		'--minify',
+		action='store_true',
+		help=\
+				"This flag causes the site to be minified "
+				+ "after it’s built. After it gets minified, "
+				+ "it will be validated."
+)
+ARGUMENT_PARSER.add_argument(
+		'-d',
+		'--double-validate',
+		action='store_true',
+		help=\
+				"This flag causes the site to be validated "
+				+ "both before and after it’s minified. "
+				+ "Implies “--minify”."
+)
+ARGS = ARGUMENT_PARSER.parse_args()
+ARGS.minify = ARGS.minify or ARGS.double_validate
+
+try:
+	rmtree(BASE_BUILD_DIR)
+except FileNotFoundError:
+	pass
 
 for scheme in ('file', 'http', 'https'):
 	copy_static(scheme)
