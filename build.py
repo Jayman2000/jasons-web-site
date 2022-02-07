@@ -1,7 +1,9 @@
 # SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
 # SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 from argparse import ArgumentParser
+from itertools import chain
 from pathlib import Path
+from re import compile as compile_re
 from shutil import copytree, rmtree
 from sys import exit, stderr
 
@@ -11,9 +13,10 @@ from staticjinja import Site
 
 
 ARGUMENT_PARSER = ArgumentParser(description="Builds Jason’s Web Site")
-# An absolute path is needed for the base URL. Otherwise, BASE_BUILD_DIR could
-# be relative.
+# An absolute path is needed for files_in().
 BASE_BUILD_DIR = Path("build").absolute()
+STATIC_DIR = Path("static").absolute()
+TEMPLATES_DIR = Path("templates").absolute()
 VALIDATED_SUFFIXES = (".html", ".css")
 VALIDATOR = Validator(vnu_args=['--also-check-css'])
 
@@ -22,17 +25,20 @@ def dest_dir(scheme):
 	return Path(BASE_BUILD_DIR, scheme)
 
 
-def files_in(directory, allow_suffixes):
-	for subpath in directory.iterdir():
-		if subpath.is_dir():
-			for file_path in built_html_and_css(subpath):
-				yield file_path
-		elif subpath.suffix in allow_suffixes:
-			yield subpath
+def files_in(directory, pattern):
+	try:
+		for subpath in directory.iterdir():
+			if subpath.is_dir():
+				for file_path in files_in(subpath, pattern):
+					yield file_path
+			elif pattern.fullmatch(subpath.name):
+				yield subpath
+	except FileNotFoundError:
+		pass
 
 
 def built_html_and_css(scheme):
-	return files_in(dest_dir(scheme), (".html", ".css"))
+	return files_in(dest_dir(scheme), compile_re(r'^.*\.(html|css)$'))
 
 
 def ignored_files(_src, names):
@@ -47,7 +53,7 @@ def valid_or_exit(scheme, error_message):
 
 
 def copy_static(scheme):
-	copytree(Path("static"), dest_dir(scheme), ignore=ignored_files)
+	copytree(STATIC_DIR, dest_dir(scheme), ignore=ignored_files)
 
 
 def render_templates(scheme, host_and_maybe_port=None):
@@ -67,15 +73,25 @@ def render_templates(scheme, host_and_maybe_port=None):
 			print(f"WARNING: Base URI isn’t implemented for the “{scheme}” scheme.", file=stderr)
 			base_url = None
 		csp_self_source = scheme + ":"
+	posts = []
+	for path in chain(
+			files_in(Path(STATIC_DIR, "posts"), compile_re(r'^.*\.html$')),
+			files_in(Path(TEMPLATES_DIR, "posts"), compile_re(r'^[^_].*\.html$'))
+	):
+		try:
+			posts.append(path.relative_to(TEMPLATES_DIR))
+		except ValueError:
+			posts.append(path.relative_to(TEMPLATES_DIR))
 	site = Site.make_site(
-			searchpath=Path("templates"),
+			searchpath=TEMPLATES_DIR,
 			outpath=dest_dir(scheme),
 			# as_uri() seems to always leave out the final slash,
 			# but for base URLs the final slash is necessary to
 			# indicate that the last component is a directory.
 			env_globals={
 				'base_url':base_url,
-				'csp_self_source':csp_self_source
+				'csp_self_source':csp_self_source,
+				'posts':posts
 			}
 	)
 	site.render()
