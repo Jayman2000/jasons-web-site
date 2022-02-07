@@ -67,7 +67,7 @@ repos:
                     - --scheme
                     - https
                 language: system
-                files: 'static/.*|^build\.py$'
+                files: '(templates|static)/.*|^build\.py$'
                 pass_filenames: false
                 # While it’s true that this hook souldn’t be run in parallel,
                 # it seems unlikely that it ever would be. In other words, I’m
