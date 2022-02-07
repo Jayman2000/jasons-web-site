@@ -11,8 +11,8 @@ from staticjinja import Site
 
 
 ARGUMENT_PARSER = ArgumentParser(description="Builds Jason’s Web Site")
-# An absolute path is needed for the base URL. Otherwise, BASE_BUILD_DIR could be
-# relative.
+# An absolute path is needed for the base URL. Otherwise, BASE_BUILD_DIR could
+# be relative.
 BASE_BUILD_DIR = Path("build").absolute()
 VALIDATED_SUFFIXES = (".html", ".css")
 VALIDATOR = Validator(vnu_args=['--also-check-css'])
@@ -84,7 +84,8 @@ def minify_build(scheme):
 		with path.open(mode='rt') as file:
 			code = file.read()
 		if path.suffix == ".html":
-			# See here for which options are needed for spec compliance:
+			# See here for which options are needed for spec
+			# compliance:
 			# <https://docs.rs/minify-html/0.8.0/src/minify_html/cfg/mod.rs.html#40-47>
 			code = minify(
 					code,
