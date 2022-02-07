@@ -140,15 +140,6 @@ def minify_build(scheme):
 
 
 ARGUMENT_PARSER.add_argument(
-		'-m',
-		'--minify',
-		action='store_true',
-		help=\
-				"This flag causes the site to be minified "
-				+ "after it’s built. After it gets minified, "
-				+ "it will be validated."
-)
-ARGUMENT_PARSER.add_argument(
 		'-d',
 		'--double-validate',
 		action='store_true',
@@ -156,6 +147,15 @@ ARGUMENT_PARSER.add_argument(
 				"This flag causes the site to be validated "
 				+ "both before and after it’s minified. "
 				+ "Implies “--minify”."
+)
+ARGUMENT_PARSER.add_argument(
+		'-m',
+		'--minify',
+		action='store_true',
+		help=\
+				"This flag causes the site to be minified "
+				+ "after it’s built. After it gets minified, "
+				+ "it will be validated."
 )
 ARGS = ARGUMENT_PARSER.parse_args()
 ARGS.minify = ARGS.minify or ARGS.double_validate
