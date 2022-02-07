@@ -10,6 +10,50 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 		hint at the entire MIME type.
 		#}
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
+		{#
+		CSP directives [1], and why they’re set or not set the way they
+		are:
+			child-src: same as default-src
+			connect-src: same as default-src
+			default-src: I’m telling it to only allow approved URLs
+			font-src: required for Noto fonts
+			frame-src: same as default-src
+			img-src: same as default-src
+			manifest-src: same as default-src
+			media-src: same as default-src
+			object-src: same as default-src
+			prefetch-src: experimental
+			script-src: same as default-src
+			script-src-elem: experimental
+			script-src-attr: experimental
+			style-src: required for main.css
+			style-src-elem: experimental
+			style-src-attr: experimental
+			worker-src: experimental
+
+			base-uri: the best option for base-uri depends on the scheme
+			sandbox: not allowed [2]
+
+			form-action: there are not forms
+			frame-ancestors: not allowed [2]
+			navigate-to: experimental
+
+			report-uri: deprecated
+			report-to: experimental
+
+			require-sri-for: experimental
+			require-trusted-types-for: experimental
+			trusted-types: experimental
+			upgrade-insecure-requests: Any links that I include will probably already be HTTPS. If they’re HTTP, then that probably means that the site that I’m linking to doesn’t support HTTPS.
+
+			block-all-mixed-content: deprecated
+			plugin-types: deprecated
+			referrer: deprecated and non-standard
+
+		[1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>
+		[2]: <https://html.spec.whatwg.org/dev/semantics.html#attr-meta-http-equiv-content-security-policy>
+		#}
+		<meta http-equiv="content-security-policy" content="default-src 'none'; font-src https://fonts.gstatic.com; style-src {{ csp_self_source }} https://fonts.googleapis.com; base-uri {{ csp_self_source }}; form-action 'none';">
 		<base href="{{ base_url }}">
 		<title>{% block full_title %}{% block title %}{% endblock %} — Jason’s Web Site{% endblock %}</title>
 		<link href="main.css" rel="stylesheet" type="text/css;charset=utf-8">

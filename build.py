@@ -68,7 +68,10 @@ site = Site.make_site(
 		# as_uri() seems to always leave out the final slash, but for
 		# base URLs the final slash is necessary to indicate that the
 		# last component is a directory.
-		env_globals={ 'base_url':BUILD_DIR.as_uri() + "/" }
+		env_globals={
+			'csp_self_source':"file:",
+			'base_url':BUILD_DIR.as_uri() + "/"
+		}
 )
 site.render()
 if not ARGS.minify or ARGS.double_validate:
