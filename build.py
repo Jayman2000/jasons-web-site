@@ -22,8 +22,8 @@ def dest_dir(scheme):
 	return Path(BASE_BUILD_DIR, scheme)
 
 
-def built_html_and_css(scheme):
-	for subpath in dest_dir(scheme).iterdir():
+def built_html_and_css(directory):
+	for subpath in directory.iterdir():
 		if subpath.is_dir():
 			for file_path in built_html_and_css(subpath):
 				yield file_path
@@ -36,7 +36,7 @@ def ignored_files(_src, names):
 
 
 def valid_or_exit(scheme, error_message):
-	exit_code = VALIDATOR.validate(list(built_html_and_css(scheme)))
+	exit_code = VALIDATOR.validate(list(built_html_and_css(dest_dir(scheme))))
 	if exit_code != 0:
 		print(error_message, file=stderr)
 		exit(exit_code)
@@ -80,7 +80,7 @@ def render_templates(scheme, host_and_maybe_port=None):
 
 
 def minify_build(scheme):
-	for path in built_html_and_css(scheme):
+	for path in built_html_and_css(dest_dir(scheme)):
 		with path.open(mode='rt') as file:
 			code = file.read()
 		if path.suffix == ".html":
