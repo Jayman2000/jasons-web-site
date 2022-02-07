@@ -59,6 +59,13 @@ repos:
                 id: build
                 name: Build Jason’s Web Site
                 entry: pipenv run python build.py --minify --double-validate
+                args:
+                    - --scheme
+                    - file
+                    - --scheme
+                    - http
+                    - --scheme
+                    - https
                 language: system
                 files: 'static/.*|^build\.py$'
                 pass_filenames: false

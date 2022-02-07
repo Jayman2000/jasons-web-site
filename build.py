@@ -157,15 +157,27 @@ ARGUMENT_PARSER.add_argument(
 				+ "after it’s built. After it gets minified, "
 				+ "it will be validated."
 )
+ARGUMENT_PARSER.add_argument(
+		'-s',
+		'--scheme',
+		action='append',
+		help=\
+				"Scheme to use for base URLs. Can be  specified"
+				+ " multiple times. Default: “file”.",
+		metavar="SCHEME",
+		dest='schemes'
+)
 ARGS = ARGUMENT_PARSER.parse_args()
 ARGS.minify = ARGS.minify or ARGS.double_validate
+if len(ARGS.schemes) == 0:
+	ARGS.schemes = ("file",)
 
 try:
 	rmtree(BASE_BUILD_DIR)
 except FileNotFoundError:
 	pass
 
-for scheme in ('file', 'http', 'https'):
+for scheme in ARGS.schemes:
 	copy_static(scheme)
 	render_templates(scheme)
 	if ARGS.minify:
