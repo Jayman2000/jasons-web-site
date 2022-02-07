@@ -12,9 +12,9 @@ from staticjinja import Site
 
 # An absolute path is needed for the base URL. Otherwise, BUILD_DIR could be
 # relative.
-BUILD_DIR = Path("build").absolute()
-def built_html_and_css(base_dir=BUILD_DIR):
-	for subpath in base_dir.iterdir():
+BASE_BUILD_DIR = Path("build").absolute()
+def built_html_and_css(scheme):
+	for subpath in dest_dir(scheme).iterdir():
 		if subpath.is_dir():
 			for file_path in built_html_and_css(subpath):
 				yield file_path
@@ -24,8 +24,8 @@ def built_html_and_css(base_dir=BUILD_DIR):
 
 VALIDATED_SUFFIXES = (".html", ".css")
 VALIDATOR = Validator(vnu_args=['--also-check-css'])
-def valid_or_exit(error_message):
-	exit_code = VALIDATOR.validate(list(built_html_and_css()))
+def valid_or_exit(scheme, error_message):
+	exit_code = VALIDATOR.validate(list(built_html_and_css(scheme)))
 	if exit_code != 0:
 		print(error_message, file=stderr)
 		exit(exit_code)
@@ -57,28 +57,54 @@ ARGUMENT_PARSER.add_argument(
 ARGS = ARGUMENT_PARSER.parse_args()
 ARGS.minify = ARGS.minify or ARGS.double_validate
 try:
-	rmtree(BUILD_DIR)
+	rmtree(BASE_BUILD_DIR)
 except FileNotFoundError:
 	pass
 
-copytree(Path("static"), BUILD_DIR, ignore=ignored_files)
-site = Site.make_site(
-		searchpath=Path("templates"),
-		outpath=BUILD_DIR,
-		# as_uri() seems to always leave out the final slash, but for
-		# base URLs the final slash is necessary to indicate that the
-		# last component is a directory.
-		env_globals={
-			'csp_self_source':"file:",
-			'base_url':BUILD_DIR.as_uri() + "/"
-		}
-)
-site.render()
-if not ARGS.minify or ARGS.double_validate:
-	valid_or_exit("ERROR: The built site is invalid without being minified.")
 
-if ARGS.minify:
-	for path in built_html_and_css():
+def dest_dir(scheme):
+	return Path(BASE_BUILD_DIR, scheme)
+
+
+def copy_static(scheme):
+	copytree(Path("static"), dest_dir(scheme), ignore=ignored_files)
+
+
+def render_templates(scheme):
+	# In CSP, 'self' means “from the same origin” [1]. Unfortunately, origin
+	# is implementation defined for the file URI scheme [2]. The next best
+	# thing is to just use the scheme itself instead of 'self'.
+	#
+	# [1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#sources>
+	# [2]: <https://url.spec.whatwg.org/#origin>
+	if scheme == 'http' or scheme == 'https':
+		base_url = f"{scheme}://localhost/"
+		csp_self_source = "'self'"
+	else:
+		if scheme == 'file':
+			base_url = dest_dir(scheme).as_uri() + "/"
+		else:
+			print(f"WARNING: Base URI isn’t implemented for the “{scheme}” scheme.", file=stderr)
+			base_url = None
+		csp_self_source = scheme + ":"
+	site = Site.make_site(
+			searchpath=Path("templates"),
+			outpath=dest_dir(scheme),
+			# as_uri() seems to always leave out the final slash,
+			# but for base URLs the final slash is necessary to
+			# indicate that the last component is a directory.
+			env_globals={
+				'base_url':base_url,
+				'csp_self_source':csp_self_source
+			}
+	)
+	site.render()
+	if not ARGS.minify or ARGS.double_validate:
+		valid_or_exit(scheme, "ERROR: The built site is invalid, and it wasn’t minified.")
+
+
+def minify_build(scheme):
+	for path in built_html_and_css(scheme):
 		with path.open(mode='rt') as file:
 			code = file.read()
 		if path.suffix == ".html":
@@ -133,5 +159,11 @@ if ARGS.minify:
 		# In other words, to be as compliant as possible, use CRLFs.
 		with path.open(mode='wt', encoding=output_encoding, newline='\r\n') as file:
 			file.write(code)
+	valid_or_exit(scheme, "ERROR: html-minify generated invalid HTML or CSS.")
 
-	valid_or_exit("ERROR: html-minify generated invalid HTML or CSS.")
+
+for scheme in ('file', 'http', 'https'):
+	copy_static(scheme)
+	render_templates(scheme)
+	if ARGS.minify:
+		minify_build(scheme)
