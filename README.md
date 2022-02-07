@@ -50,6 +50,8 @@ because [YAML requires spaces for
 indentation.](https://yaml.org/spec/1.2.2/#61-indentation-spaces) In YAML
 files, use 4 spaces for indentation.
 - The `templates` folder contains [Jinja templates](https://jinja.palletsprojects.com/en/3.0.x/).
+- Pass `build.py` the `--help` flag. You may find some of its options useful
+(like `--scheme`).
 
 ## pre-commit
 

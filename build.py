@@ -46,7 +46,7 @@ def copy_static(scheme):
 	copytree(Path("static"), dest_dir(scheme), ignore=ignored_files)
 
 
-def render_templates(scheme):
+def render_templates(scheme, host_and_maybe_port=None):
 	# In CSP, 'self' means “from the same origin” [1]. Unfortunately, origin
 	# is implementation defined for the file URI scheme [2]. The next best
 	# thing is to just use the scheme itself instead of 'self'.
@@ -54,7 +54,7 @@ def render_templates(scheme):
 	# [1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#sources>
 	# [2]: <https://url.spec.whatwg.org/#origin>
 	if scheme == 'http' or scheme == 'https':
-		base_url = f"{scheme}://localhost/"
+		base_url = f"{scheme}://{host_and_maybe_port}/"
 		csp_self_source = "'self'"
 	else:
 		if scheme == 'file':
@@ -149,6 +149,19 @@ ARGUMENT_PARSER.add_argument(
 				+ "Implies “--minify”."
 )
 ARGUMENT_PARSER.add_argument(
+		'-H',
+		'--host',
+		default='localhost:8000',
+		type=str,
+		help=\
+				"The hostname (and optionally port) used for "
+				+ "the http(s) version of the site. Make sure "
+				+ "that an appropriate scheme is set using "
+				+ "--scheme, or else this option will do "
+				+ "nothing.",
+		metavar="HOST[:PORT]"
+)
+ARGUMENT_PARSER.add_argument(
 		'-m',
 		'--minify',
 		action='store_true',
@@ -169,7 +182,7 @@ ARGUMENT_PARSER.add_argument(
 )
 ARGS = ARGUMENT_PARSER.parse_args()
 ARGS.minify = ARGS.minify or ARGS.double_validate
-if len(ARGS.schemes) == 0:
+if ARGS.schemes is None:
 	ARGS.schemes = ("file",)
 
 try:
@@ -179,6 +192,6 @@ except FileNotFoundError:
 
 for scheme in ARGS.schemes:
 	copy_static(scheme)
-	render_templates(scheme)
+	render_templates(scheme, host_and_maybe_port=ARGS.host)
 	if ARGS.minify:
 		minify_build(scheme)
