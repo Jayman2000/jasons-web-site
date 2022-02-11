@@ -10,7 +10,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 	{# TODO: Technically, this list is ordered, but I’m still using a <ul>. Would it make sense to use an <ol> with CSS to change the numbers? #}
 	<ul>
 	{% for post in posts %}
-		<li><a href="{{ post }}">{{ post }}</a></li>
+		<li><a href="{{ post }}" hreflang="en-US">{{ post }}</a></li>
 	{% endfor %}
 	</ul>
 {% endblock %}
