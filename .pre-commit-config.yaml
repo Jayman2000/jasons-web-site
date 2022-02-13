@@ -63,6 +63,8 @@ repos:
                     - --scheme
                     - file
                     - --scheme
+                    - ftp
+                    - --scheme
                     - http
                     - --scheme
                     - https

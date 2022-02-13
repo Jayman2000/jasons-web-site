@@ -63,7 +63,7 @@ def render_templates(scheme, host_and_maybe_port=None):
 	#
 	# [1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#sources>
 	# [2]: <https://url.spec.whatwg.org/#origin>
-	if scheme == 'http' or scheme == 'https':
+	if scheme in ('ftp', 'http', 'https'):
 		base_url = f"{scheme}://{host_and_maybe_port}/"
 		csp_self_source = "'self'"
 	else:
@@ -175,9 +175,9 @@ ARGUMENT_PARSER.add_argument(
 		type=str,
 		help=\
 				"The hostname (and optionally port) used for "
-				+ "the http(s) version of the site. Make sure "
-				+ "that an appropriate scheme is set using "
-				+ "--scheme, or else this option will do "
+				+ "the ftp and http(s) versions of the site. "
+				+ "Make sure that an appropriate scheme is set "
+				+ "using --scheme, or else this option will do "
 				+ "nothing.",
 		metavar="HOST[:PORT]"
 )
