@@ -12,4 +12,3 @@ maturin = "*"
 staticjinja = "*"
 
 [dev-packages]
-# This program should work with all currently supported versions of Python.
