@@ -56,6 +56,11 @@ def copy_static(scheme):
 	copytree(STATIC_DIR, dest_dir(scheme), ignore=ignored_files)
 
 
+def html_files_in_posts(base_dir):
+	for file in files_in(Path(base_dir, "posts"), compile_re(r'^.*\.html$')):
+		yield file.relative_to(base_dir)
+
+
 def render_templates(scheme, host_and_maybe_port=None):
 	# In CSP, 'self' means “from the same origin” [1]. Unfortunately, origin
 	# is implementation defined for the file URI scheme [2]. The next best
@@ -73,15 +78,10 @@ def render_templates(scheme, host_and_maybe_port=None):
 			print(f"WARNING: Base URI isn’t implemented for the “{scheme}” scheme.", file=stderr)
 			base_url = None
 		csp_self_source = scheme + ":"
-	posts = []
-	for path in chain(
-			files_in(Path(STATIC_DIR, "posts"), compile_re(r'^.*\.html$')),
-			files_in(Path(TEMPLATES_DIR, "posts"), compile_re(r'^[^_].*\.html$'))
-	):
-		try:
-			posts.append(path.relative_to(TEMPLATES_DIR))
-		except ValueError:
-			posts.append(path.relative_to(TEMPLATES_DIR))
+	posts = tuple(post for post in chain(
+			html_files_in_posts(STATIC_DIR),
+			html_files_in_posts(TEMPLATES_DIR)
+	))
 	site = Site.make_site(
 			searchpath=TEMPLATES_DIR,
 			outpath=dest_dir(scheme),
