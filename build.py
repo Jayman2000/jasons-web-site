@@ -73,6 +73,9 @@ def render_templates(scheme, host_and_maybe_port=None):
 		csp_self_source = "'self'"
 	else:
 		if scheme == 'file':
+			# as_uri() seems to always leave out the final slash,
+			# but for base URLs the final slash is necessary to
+			# indicate that the last component is a directory.
 			base_url = dest_dir(scheme).as_uri() + "/"
 		else:
 			print(f"WARNING: Base URI isn’t implemented for the “{scheme}” scheme.", file=stderr)
@@ -85,9 +88,6 @@ def render_templates(scheme, host_and_maybe_port=None):
 	site = Site.make_site(
 			searchpath=TEMPLATES_DIR,
 			outpath=dest_dir(scheme),
-			# as_uri() seems to always leave out the final slash,
-			# but for base URLs the final slash is necessary to
-			# indicate that the last component is a directory.
 			env_globals={
 				'base_url':base_url,
 				'csp_self_source':csp_self_source,
