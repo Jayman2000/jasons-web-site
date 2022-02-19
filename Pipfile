@@ -9,6 +9,6 @@ name = "pypi"
 [packages]
 html5validator = "*"
 maturin = "*"
-staticjinja = "*"
-
-[dev-packages]
+jinja2 = "*"
+sortedcontainers = "*"
+python-dateutil = "*"

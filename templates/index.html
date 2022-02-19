@@ -10,8 +10,13 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 	<h2>Posts</h2>
 	{# TODO: Technically, this list is ordered, but I’m still using a <ul>. Would it make sense to use an <ol> with CSS to change the numbers? #}
 	<ul>
-		{% for post in posts %}
-			<li><a href="{{ post }}" hreflang="en-US" type="text/html;charset=utf-8">{{ post }}</a></li>
+		{#
+		posts is a SortedList [1]. SortedLists always put the smallest item first and the largest item last. In this situation, that means the the oldest post (the one with the “smallest” timestamp) is the first item in the list. reverse() is used to work around this problem.
+
+		[1]: <http://www.grantjenks.com/docs/sortedcontainers/sortedlist.html#sortedlist>
+		#}
+		{% for post in reversed(posts) %}
+			<li><a href="{{ post.relative_url }}" hreflang="en-US" type="text/html;charset=utf-8">{{ post.title }}</a></li>
 		{% endfor %}
 	</ul>
 {% endblock %}

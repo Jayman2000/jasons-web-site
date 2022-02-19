@@ -3,6 +3,9 @@ SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using t
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 #}
 {% extends "_base.html" %}
+
+{% set completion_time = self.completion_time() %}
+
 {% block body_content %}
 <article>
 	<header>
