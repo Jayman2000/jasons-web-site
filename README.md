@@ -1,6 +1,6 @@
 <!--
 SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
-SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021)
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
 -->
 
 # [Jason’s Web Site](https://jasonyundt.neocities.org/)
@@ -82,11 +82,17 @@ become simpler overtime.
 At this point, whenever you run `git commit`, [pre-commit] will run a series of
 tests for the files that you modified.
 
-Some [Markdown](https://daringfireball.net/projects/markdown/) files fail one
+There’s a few [pre-commit] hook failures that I’m OK with:
+
+- Some [Markdown](https://daringfireball.net/projects/markdown/) files fail one
 of pre-commit’s hooks, but only because one line is too long. I’m OK with that
-line being too long, so I [skip that
-hook](https://pre-commit.com/#temporarily-disabling-hooks) when I update those
-files.
+line being too long.
+- `SPDX-FileContributor` dates must end in the current year (see the comment at
+the top of the file as an example). Sometimes though, it’s correct for them not
+to (example: a file copied from another project).
+
+When I run into an error that I’m OK with, I [skip the failing hooks](https://pre-commit.com/#temporarily-disabling-hooks)
+for that commit.
 
 ## Copying
 

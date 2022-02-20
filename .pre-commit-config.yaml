@@ -99,4 +99,4 @@ repos:
                         The author of this font waived all copyright to the
                         font and released it into the 🅮 public domain)\.
                     - --pattern
-                    - "SPDX-FileContributor: .+ <.+> (.+)\n"
+                    - "SPDX-FileContributor: .+ <.+> \\((202[12][-–])?2022\\)\n"
