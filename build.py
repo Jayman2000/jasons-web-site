@@ -270,9 +270,9 @@ class Resource(ABC):
 		"""
 		Builds this Resource and puts the result in dest_dir.
 		"""
-		return self.destination(dest_dir)
+		return self.dest_file_path(dest_dir)
 
-	def destination(self, dest_dir: Path) -> Path:
+	def dest_file_path(self, dest_dir: Path) -> Path:
 		return Path(dest_dir, self.relative_to_base)
 
 	def source(self) -> Path:
@@ -316,7 +316,7 @@ class StaticResource(Resource):
 	destination.
 	"""
 	def build(self, dest_dir: Path) -> Path:
-		copy2(self.source(), self.destination(dest_dir))
+		copy2(self.source(), self.dest_file_path(dest_dir))
 		return super().build(dest_dir)
 
 
@@ -385,8 +385,8 @@ class JinjaResource(Resource):
 			yield resource
 
 	def build(self, dest_dir: Path) -> Path:
-		destination = self.destination(dest_dir)
-		print(f"Building “{destination}”…")
+		dest_file_path = self.dest_file_path(dest_dir)
+		print(f"Building “{dest_file_path}”…")
 		template = self.env.get_template(str(self.relative_to_base))
 		module = template.make_module(self.jinja_variables)
 
@@ -398,7 +398,7 @@ class JinjaResource(Resource):
 			)
 			self.jinja_variables['posts'].add(post_info)
 
-		write_out_text_file(str(module), destination)
+		write_out_text_file(str(module), dest_file_path)
 		return super().build(dest_dir)
 
 	def is_post(self) -> bool:
