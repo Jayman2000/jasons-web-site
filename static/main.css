@@ -26,6 +26,93 @@ Thanks, Daniel Aleksandersen.
 		u+1f16d-1f16f;
 }
 
+a
+{
+	text-decoration-line: underline;
+}
+
+a:hover
+{
+	text-decoration-line: none;
+}
+
+/*
+These color schemes are based on the Breeze Dark and Breeze Light themes:
+<https://community.kde.org/Get_Involved/Design/Breeze>
+*/
+::selection
+{
+	background: #3daee9;
+}
+
+@media (prefers-color-scheme: light)
+{
+	html
+	{
+		background: #ffffff;
+		color: #232629;
+	}
+
+	::selection
+	{
+		color: #ffffff;
+	}
+
+	a
+	{
+		color: #2980b9;
+	}
+
+	a:hover
+	{
+		color: #194d6e;
+	}
+
+	a:visited
+	{
+		color: #9d5bb9;
+	}
+
+	a:hover:visited
+	{
+		color: #5d366e;
+	}
+}
+
+@media (prefers-color-scheme: dark)
+{
+	html
+	{
+		background: #1b1e20;
+		color: #fcfcfc;
+	}
+
+	::selection
+	{
+		color: #fcfcfc;
+	}
+
+	a
+	{
+		color: #2980b9;
+	}
+
+	a:hover
+	{
+		color: #39b3ff;
+	}
+
+	a:visited
+	{
+		color: #9b59b6;
+	}
+
+	a:hover:visited
+	{
+		color: #d87dff;
+	}
+}
+
 html
 {
 	font-family: 'Noto Serif', CCSymbols, serif;
