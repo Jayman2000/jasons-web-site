@@ -53,6 +53,11 @@ repos:
                 id: beautysh
                 args: ['--tab', '--force-function-style', 'fnonly']
     -
+        repo: https://github.com/PyCQA/autoflake
+        rev: v1.4
+        hooks:
+            - id: autoflake
+    -
         repo: local
         hooks:
             -
