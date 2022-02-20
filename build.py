@@ -2,7 +2,7 @@
 # SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 from __future__ import annotations
 
-from abc import ABC, abstractclassmethod, abstractmethod
+from abc import ABC, abstractmethod
 from argparse import ArgumentParser
 from datetime import datetime
 from itertools import chain
@@ -10,12 +10,11 @@ from os import mkdir, makedirs
 from pathlib import Path
 from shutil import copy2, rmtree
 from sys import exit, stderr
-from typing import Final, Iterable, List, NamedTuple, Optional, Tuple, TypeVar, Type
+from typing import Final, Iterable, List, NamedTuple, Optional, TypeVar, Type
 
 from dateutil.parser import isoparse
 from html5validator import Validator
 from jinja2 import FileSystemLoader, Environment
-from jinja2.environment import TemplateModule
 from minify_html import minify as minify_html, minify_css
 from sortedcontainers import SortedList
 
