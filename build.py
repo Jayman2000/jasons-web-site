@@ -119,14 +119,23 @@ def files_in(directory: Path) -> Iterable[Path]:
 		pass
 
 
-class BaseURL(ABC):
-	"""
-	Represents a URL to be used by a <base> element [1].
+class Destination(ABC):
+	"""Represents a possible location of the site."""
+	def __init__(self, scheme: str):
+		"""
+		scheme — a URL scheme [1].
 
-	[1]: <https://html.spec.whatwg.org/dev/semantics.html#the-base-element>
-	"""
+		[1]: <https://www.w3.org/TR/webarch/#URI-scheme>
+		"""
+		self.scheme = scheme
+
 	@abstractmethod
-	def __str__(self) -> str:
+	def base_url(self) -> Optional[str]:
+		"""
+		URL to include in a <base> element [1].
+
+		[1]: <https://html.spec.whatwg.org/dev/semantics.html#the-base-element>
+		"""
 		...
 
 	def csp_self_source(self) -> str:
@@ -143,38 +152,27 @@ class BaseURL(ABC):
 		[2]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#self>
 		[3]: <https://www.w3.org/TR/webarch/#URI-scheme>
 		"""
-		return self.scheme() + ":"
-
-	@abstractmethod
-	def scheme(self) -> str:
-		"""
-		Returns this BaseURL’s scheme [1].
-
-		[1]: <https://www.w3.org/TR/webarch/#URI-scheme>
-		"""
+		return self.scheme + ":"
 
 
-class GenericBaseURL(BaseURL):
-	"""Use this if your BaseURL isn’t a HTTPStyleBaseURL."""
+class GenericDestination(Destination):
+	"""Use this if your Destination isn’t an HTTPStyleDestination or an UnknownDestination."""
 	def __init__(self, scheme: str, part_after_colon:str):
 		"""
 		scheme — a URL scheme [1].
 
-		part_after_colon — make sure that this ends with a slash
+		part_after_colon — make sure that this ends with a slash.
 
 		Example: In the URL “file:///foo/” the scheme is “file” and the
 		part_after_colon is “///foo/”.
 
 		[1]: <https://www.w3.org/TR/webarch/#URI-scheme>
 		"""
-		self._scheme = scheme
+		super().__init__(scheme)
 		self.part_after_colon = part_after_colon
 
-	def __str__(self) -> str:
-		return f"{self._scheme}:{self.part_after_colon}"
-
-	def scheme(self) -> str:
-		return self._scheme
+	def base_url(self) -> str:
+		return f"{self.scheme}:{self.part_after_colon}"
 
 
 # In CSP, 'self' means “from the same origin” [1]. Unfortunately, with most
@@ -183,10 +181,8 @@ class GenericBaseURL(BaseURL):
 # [1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#sources>
 # [2]: <https://url.spec.whatwg.org/#origin>
 SCHEMES_WHERE_SELF_WORKS: Final = ("ftp", "http", "https", "ws", "wss")
-class HTTPStyleBaseURL(BaseURL):
-	"""
-	A base URL that looks something like this http://<domain>/
-	"""
+class HTTPStyleDestination(Destination):
+	"""A base URL that looks something like this “http://<domain>/”."""
 	def __init__(self, scheme: str, host_and_maybe_port: str):
 		"""
 		scheme — The URL scheme [1]. Should be all lower case.
@@ -197,23 +193,31 @@ class HTTPStyleBaseURL(BaseURL):
 
 		[1]: <https://www.w3.org/TR/webarch/#URI-scheme>
 		"""
-		self._scheme = scheme
+		super().__init__(scheme)
 		self.host_and_maybe_port = host_and_maybe_port
 
-	def __str__(self) -> str:
-		return f"{self._scheme}://{self.host_and_maybe_port}/"
+	def base_url(self) -> str:
+		return f"{self.scheme}://{self.host_and_maybe_port}/"
 
 	def csp_self_source(self) -> str:
-		if self._scheme in SCHEMES_WHERE_SELF_WORKS:
+		if self.scheme in SCHEMES_WHERE_SELF_WORKS:
 			# The single quotes are required:
 			# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#sources>
 			return "'self'"
 		else:
 			return super().csp_self_source()
 
-	def scheme(self) -> str:
-		return self._scheme
 
+class UnknownDestination(Destination):
+	"""
+	A Destination which isn’t full known.
+
+	Use this for unsupported schemes [1].
+
+	[1]: <https://www.w3.org/TR/webarch/#URI-scheme>
+	"""
+	def base_url(self) -> None:
+		return None
 
 
 class PostInfo(NamedTuple):
@@ -468,11 +472,11 @@ if __name__ == "__main__":
 		dest_dir = Path(BASE_BUILD_DIR, scheme)
 		mkdir(dest_dir)
 
-		base_url: Optional[BaseURL]
+		destination: Destination
 		if scheme in ("ftp", "http", "https"):
-			base_url = HTTPStyleBaseURL(scheme, ARGS.host)
+			destination = HTTPStyleDestination(scheme, ARGS.host)
 		elif scheme == "file":
-			base_url = GenericBaseURL(
+			destination = GenericDestination(
 					"file",
 					# as_uri() seems to always leave out the
 					# final slash, but for base URLs the
@@ -483,14 +487,9 @@ if __name__ == "__main__":
 			)
 		else:
 			eprint(f"WARNING: The scheme “{scheme}” is not supported. Omitting base URL…")
-			base_url = None
-		if base_url is not None:
-			csp_self_source = base_url.csp_self_source()
-		else:
-			csp_self_source = scheme + ":"
+			destination = UnknownDestination(scheme)
 		jinja_variables = {
-				'base_url':base_url,
-				'csp_self_source':csp_self_source,
+				'destination':destination,
 				'posts':SortedList()
 		}
 
