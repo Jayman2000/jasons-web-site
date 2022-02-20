@@ -64,7 +64,7 @@ def write_out_text_file(text: str, file_path: Path) -> None:
 		file.write(text)
 
 
-MINIFIED_SUFFIXES = (".html", ".css")
+MINIFIED_SUFFIXES: Final = (".html", ".css")
 def minify(paths: Iterable[Path]) -> None:
 	print("Minifying…")
 	for path in paths:
