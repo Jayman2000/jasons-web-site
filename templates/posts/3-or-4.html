@@ -3,76 +3,35 @@ SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using t
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 #}
 {% extends "_post.html" %}
-{% block title %}Newer post{% endblock %}
-{% block completion_time %}2022-02-10T11:12:37-05:00{% endblock %}
+
+{% block title %}<cite>Godot</cite> 3 or <cite>Godot</cite> 4?{% endblock %}
+{% block completion_time %}2022-02-20T08:51:18-05:00{% endblock %}
+
 {% block post_content %}
-<p>I really enjoy playing <a href="https://ringfitadventure.nintendo.com/" target="_blank" rel="external"><cite>Ring Fit Adventure</cite></a>, but it has a significant problem: it’s <a href="http://www.catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/" target="_blank" rel="external">cathedral-style</a> <a href="https://www.gnu.org/philosophy/free-sw.html" target="_blank" rel="external">proprietary software</a>. To make matters worse, Nintendo goes out of their way to make it difficult to install mods on their systems, and <cite>Ring Fit Adventure</cite> remains the only Nintendo-approved game that uses the Ring-Con or Leg Strap (I don’t even know if there’s a non-Nintendo-approved one). This is unfortunate. There’s plenty of people who have ideas about how <cite>Ring Fit Adventure</cite> could be improved or ideas about how else the Ring-Con could be used. I’m one of these people, and I want to make a game that uses the Ring-Con.</p>
-<p>The first problem I’ve run into is input. Somehow, I have to give <a href="https://godotengine.org/" target="_blank" rel="external"><cite>Godot</cite></a> (my game engine of choice) access to</p>
-<ul>
-	<li>the Joy-Con’s buttons,</li>
-	<li>the Joy-Con’s analog sticks,</li>
-	<li>the Joy-Con’s motion sensors and</li>
-	<li>the Ring-Con’s flex sensor.</li>
-</ul>
-{#
-Potentially useful link: <https://www.phoronix.com/scan.php?page=news_item&px=Nintendo-HID-For-Linux-5.16>
-#}
-<p>Luckily, there is software out there that’s capable of collecting some or all of that information from Joy-Cons. Unluckily, the different software options aren’t necessarily compatible. For example, does <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2af16c1f846bd60240745bbd3afa13d5f040c61a" target="_blank" rel="external"><cite>Linux</cite>’s Joy-Con driver</a> use the same axis numbers as <a href="https://github.com/fossephate/JoyCon-Driver" target="_blank" rel="external">this one</a>? What about if you’re using <a href="https://github.com/DanielOgorchock/joycond" target="_blank" rel="external"><cite>joycond</cite></a>? Even if I do find a combination of drivers that is consistent across platforms, will those drivers support the Ring-Con?</p>
-<p>What I need is an API that will provide the data in a way that is consistent across multiple platforms.</p>
-
-<section>
-	<h2>Ideal UX</h2>
-	<p>Ideally, here’s what the user should experience when they first start the game. It’s largely the same as what happens when users start <cite>Ring Fit Adventure</cite>.</p>
-	<ol>
-		<li>If the left Joy-Con isn’t connected, have the user connect it through their OS.</li>
-		<li><i>(Optional)</i> Once the left Joy-Con is connected, have it give some sort of feedback to the user (something like setting the LEDs or vibrating).</li>
-		<li>Once the left Joy-Con is connected, have the user put it in the leg strap and stand up</li>
-		<li>If the right Joy-Con isn’t connected, have the user connect it through their OS.</li>
-		<li><i>(Optional)</i> Once the right Joy-Con is connected, have it give some sort of feedback to the user (something like setting the LEDs or vibrating).</li>
-		<li>If the Ring-Con isn’t connected, have the user connect it.</li>
-		<li><i>(Optional)</i> Once the Ring-Con is connected, have the right Joy-Con give some sort of feedback to the user (something like setting the LEDs or vibrating).</li>
-	</ol>
-	<p>In order to find the ideal API, I’m going to try to create a command-line program that walks the user through those steps. This will help me figure out what certain APIs are capable of and what they’re missing.</p>
-</section>
-
-<section>
-	<h2>The candidates</h2>
-	<section>
-		<h3><a href="https://pypi.org/project/joycon-python/" target="_blank" rel="external"><cite>joycon-python</cite></a></h3>
-		<p>This library isn’t a good option in this scenario, but I’m still glad that I took a look at it. <a href="https://www.python.org/" target="_blank" rel="external">Python</a> is the programming language that I have the most experience with. Using a library written in Python gave me the opportunity to think through how I would implement the Ideal UX without worrying about learning a new language. Plus, it reminded me of something that I didn’t include in the Ideal UX: calibration. The experience in <cite>Ring Fit Adventure</cite> is so seamless that I didn’t even realize that calibration was necessary.</p>
-
-		<p>That being said, <cite>joycon-python</cite> isn’t a good fit for my situation. For one thing, Python is never (rarely?) fully compiled. Maybe I’m just superstitious, but I would rather choose something that’s less likely to add latency. More importantly, the library lacks Ring-Con support and crashes unpredictably (at least, it does on my system).</p>
-	</section>
-	<section>
-		<h3><a href="https://crates.io/crates/joycon-rs" target="_blank" rel="external"> KaiseiYokoyama’s <cite>joycon-rs</cite></a></h3>
-		<p>At first glace, <cite>joycon-rs</cite> looked very promising. <a href="https://crates.io/crates/joycon-rs" target="_blank" rel="external">It’s well documented</a>, <a href="https://github.com/KaiseiYokoyama/joycon-rs/tree/master/examples" target="_blank" rel="external">provides some helpful examples</a>, and <a href="https://github.com/KaiseiYokoyama/joycon-rs#setup" target="_blank" rel="external">targets Linux, macOS and Windows</a>. Unlike the previous example, it’s written in <a href="https://www.rust-lang.org/" target="_blank" rel="external">Rust</a>. I’m not very familiar with Rust, but it seems like a good language for this task.</p>
-
-		<p><cite>joycon-rs</cite> lacks Ring-Con support, but I would be more than willing to at least try adding Ring-Con support. The real problem is that <cite>joycon-rs</cite> doesn’t work properly on my system. I’m experiencing <a href="https://github.com/KaiseiYokoyama/joycon-rs/issues/65" target="_blank" rel="external">this issue</a>. <a href="https://github.com/KaiseiYokoyama/joycon-rs/issues/65#issuecomment-1000996015" target="_blank" rel="external">There is a workaround</a>, but I haven’t gotten it to work yet. Plus, it would nice if I didn’t have to tell users to install custom <a href="https://www.freedesktop.org/software/systemd/man/udev.html" target="_blank" rel="external"><code>udev</code></a> rules. That might be unavoidable, though.</p>
-	</section>
-	<section>
-		<h3><a href="https://github.com/Yamakaky/joy" target="_blank" rel="external">Yamakaky’s <cite>joy</cite></a></h3>
-		<p>The first thing I noticed about <cite>joy</cite> was that its documentation is sparce. It is, however, the only software that I’m aware of that runs on <a href="https://kernel.org/linux.html" target="_blank" rel="external">Linux</a> and can read the Ring-Con’s flex sensor.</p>
-
-		<p><cite>joy</cite> includes <cite>joytk</cite> a command-line application that can retrieve data from the Ring-Con. To implement the Ideal UX, I ended up copying a lot of code from that tool. Having it as an example was very helpful.</p>
-
-		{# TODO: File relevant issues and link to them #}
-		<p><cite>joy</cite>, like the other candidates, has it’s fair share of problems. The difference with <cite>joy</cite> is that the problems that I feel confident that I can fix the problems it has. Adding documentation is going to be easier than fixing random crashes, compensating for gyro drift is going to be easier that adding Ring-Con support, and turning the code that I copied into public functions is going to be easier that debugging Linux-specific <a href="https://www.bluetooth.com/" target="_blank" rel="external">Bluetooth</a> problems.</p>
-	</section>
-	<section>
-		<h3>Others?</h3>
-		<p>There’s plenty of other software out there that provide some sort of Joy-Con support. It’s very possible that I missed the best one. One in particular that I skipped over was the <a href="https://microsoft.com/windows" target="_blank" rel="external">Windows</a>-only <a href="https://github.com/ringrunnermg/Ringcon-Driver" target="_blank" rel="external"><cite>Ringcon-Driver</cite></a>. Being multi-platform is a must for me, and I know very little about doing things the <a href="https://microsoft.com/" target="_blank" rel="external">Microsoft</a> way (i.e., using <a href="https://docs.microsoft.com/en-us/visualstudio/extensibility/internals/solution-dot-sln-file" target="_blank" rel="external"><code>.sln</code> files</a>, Windows APIs, etc.). Making Linux-only software work on Windows is going to be much easier for me than making Windows-only software work on Linux.</p>
-	</section>
-</section>
-
-<section>
-	<h2>Conclusion</h2>
-	<p>The right API for my project is… something that doesn’t exist yet. <cite>joy</cite>, however, appears to be a good starting point. Here’s the current plan:</p>
-	<ol>
-		<li>Submit <a href="https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues" target="_blank" rel="external">issues</a> and <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests" target="_blank" rel="external">pull requests</a> to <cite>joy</cite>.
-		<li>Investigate options for including Rust code in <cite>Godot</cite> games.</li>
-		<li>Create some sort of <a href="https://godotengine.org/asset-library/asset" target="_blank" rel="external"><cite>Godot</cite> asset</a> that provides an API for interacting with Joy-Cons and Ring-Cons.</li>
-		<li>Create an example project that implements the Ideal UX in <cite>Godot</cite>.</li>
-		<li>Start creating a game!</li>
-	</ol>
-</section>
+<p>In <a href="posts/finding-the-right-ringcon-api.html" hreflang="en-US" type="text/html;charset=utf-8">my last post</a>, I talked about wanting to create a game that uses the <a href="https://ringfitadventure.nintendo.com/#ring-con" target="_blank" rel="external"><cite>Ring Fit Adventure</cite> accessories</a>. In addition to creating a game, <a href="posts/finding-the-right-ringcon-api.html#godot-asset" hreflang="en-US" type="text/html;charset=utf-8">I also want to make it easier for others to make games that use those accessories</a>. I guess that makes this a software project. For now I’ll call it Jason’s Ring-Con project. Maybe I’ll come up with a better name for it later (probably not). More importantly, I need to figure out which version of the <a href="https://godotengine.org/" target="_blank" rel="external"><cite>Godot Engine</cite></a> I’m going to use for it.</p>
+<p>The best platforms are ones that are improved over time. There is one unfortunate cost of improvement, though: maintenance. Any changes to a platform risk breaking software written for that platform. Even if the platform has <a href="https://unix.stackexchange.com/questions/235335/why-is-there-a-linux-kernel-policy-to-never-break-user-space" target="_blank" rel="external">a backwards compatibility guarantee</a>, there’s still a chance that <a href="https://linuxreviews.org/WE_DO_NOT_BREAK_USERSPACE" target="_blank" rel="external">unintentional breakages will happen</a>.</p>
+<p><a href="https://docs.godotengine.org/en/3.4/about/release_policy.html#godot-versioning" target="_blank" rel="external">According to Godot’s documentation,</a></p>
+<figure>
+	<blockquote>
+		<p>Godot loosely follows <a href="https://semver.org/" target="_blank" rel="external">Semantic Versioning</a> with a <code>major.minor.patch</code> versioning system, albeit with an interpretation of each term adapted to the complexity of a game engine:</p>
+		<ul>
+			<li>
+				<p>The <code>major</code> version is incremented when major compatibility breakages happen which imply significant porting work to move projects from one major version to another.</p>
+				<p>For example, porting Godot projects from Godot 2.1 to Godot 3.0 required running the project through a conversion tool, and then performing a number of further adjustments manually for what the tool could not do automatically.</p>
+			</li>
+		</ul>
+	</blockquote>
+	<figcaption>The <a href="https://docs.godotengine.org/en/3.4/index.html" target="_blank" rel="external"><cite>Godot Docs</cite></a> by <a href="https://github.com/reduz" target="_blank" rel="external">Juan Linietsky</a>, <a href="https://github.com/punto-" target="_blank" rel="external">Ariel Manzur</a> and <a href="https://github.com/godotengine/godot-docs/blob/master/AUTHORS.md" target="_blank" rel="external">the <cite>Godot</cite> community</a> is licensed under <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="external">CC BY 3.0</a>.</figcaption>
+</figure>
+<p>So, if I create something in <cite>Godot</cite> 3 now, then I’m going to have to do <q>significant porting work</q> in the future. If I create something in <cite>Godot</cite> 4 now, then it still looks like I’m going to have to do significant extra work. <a href="https://godotengine.org/article/dev-snapshot-godot-4-0-alpha-2" target="_blank" rel="external">According to the release notes for the latest snapshot of Godot 4,</a></p>
+<figure>
+	<blockquote>
+		<p>So here's Godot 4.0 alpha 2 with a great deal of fixes and new features!</p>
+		<p>Be aware that during the alpha stage the engine is still not feature-complete or stable. <strong>There will likely be breaking changes between this release and the first <a href="https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta" target="_blank" rel="external"><em>beta</em> release</a>.</strong> Only the beta will mark the so-called "feature freeze".</p>
+		<p>As such, we do not recommend porting existing projects to this and other upcoming alpha releases unless you are prepared to do it again to fix future incompatibilities. However, if you can port some existing projects and demos to the new version, that may provide a lot of useful information about critical issues still left to fix.</p>
+	</blockquote>
+	<figcaption>— <a href="https://godotengine.org/article/dev-snapshot-godot-4-0-alpha-2" target="_blank" rel="external"><cite>Dev snapshot: Godot 4.0 alpha 2</cite></a> by <a href="https://github.com/akien-mga" target="_blank" rel="external">Rémi Verschelde</a> (<time>2022-02-09</time>)</figcaption>
+</figure>
+<p>So, would I rather put in extra work now or later? The answer is: now. At the moment, I’m willing to put significant time and effort into Jason’s Ring-Con project. That won’t necessarily be true later. Plus, while I can’t know for sure, it also seems like starting with <cite>Godot</cite> 4 will result in less work overall. Finally, using <cite>Godot</cite> 4 will allow me to contribute to the future of <cite>Godot</cite>. Even if this project never comes to fruition, those contributions will still be valuable.</p>
+<p>So, while it might be ill-advised, I’m going to use <cite>Godot</cite> 4.</p>
 {% endblock %}

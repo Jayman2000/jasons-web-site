@@ -48,3 +48,18 @@ footer p
 	line-height: 1.1;
 	margin: 0;
 }
+
+blockquote > *:first-child::before
+{
+	content: open-quote;
+}
+
+blockquote > *:last-child:not(ul)::after
+{
+	content: close-quote;
+}
+
+blockquote > *:last-child > li:last-child > p:last-child::after
+{
+	content: close-quote;
+}
