@@ -36,10 +36,10 @@ with [a specific patch](https://github.com/wilsonzlin/minify-html/pull/67)._
 	git submodule update --init --recursive
 	```
 1. Run `./init-venv.sh`
-1. Run `pipenv run python build.py`
+1. Run `pipenv run python -m build_tool`
 
 After this has been done once, you just have to run
-`pipenv run python build.py` again to rebuild the site.
+`pipenv run python -m build_tool` again to rebuild the site.
 
 ## Hints for contributors
 

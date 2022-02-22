@@ -10,7 +10,7 @@ from typing import Final, Iterable, List, Optional, Type, TypeVar
 from dateutil.parser import isoparse
 from jinja2 import Environment
 
-from misc import files_in, PostInfo, write_out_text_file
+from .misc import files_in, PostInfo, write_out_text_file
 
 
 class Resource(ABC):

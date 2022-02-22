@@ -12,9 +12,9 @@ from typing import Final
 from jinja2 import FileSystemLoader, Environment
 from sortedcontainers import SortedList
 
-from destination import *
-from misc import *
-from resource import *
+from .destination import *
+from .misc import *
+from .resource import *
 
 
 if __name__ == "__main__":

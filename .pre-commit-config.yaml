@@ -63,8 +63,10 @@ repos:
             -
                 id: build
                 name: Build Jason’s Web Site
-                entry: pipenv run python build.py --minify --double-validate
+                entry: pipenv run python -m build_tool
                 args:
+                    - --minify
+                    - --double-validate
                     - --scheme
                     - file
                     - --scheme
