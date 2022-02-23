@@ -1,0 +1,83 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block css_url %}rust-in-godot.css{% endblock %}
+{% block title %}Including Rust code in a <cite>Godot</cite> Game{% endblock %}
+{% block completion_time %}2022-02-22T19:22:11-05:00{% endblock %}
+
+
+{% block post_content %}
+<p>As I’ve written about previously, <a href="posts/finding-the-right-ringcon-api.html" hreflang="en-US" type="text/html;charset=utf-8">I want to create a game that uses the <cite>Ring Fit Adventure</cite> accessories</a>, and <a href="posts/3-or-4.html" hreflang="en-US" type="text/html;charset=utf-8">I want to make it using <cite>Godot</cite> 4.</a> The item currently on <a href="posts/finding-the-right-ringcon-api.html#to-do-list" hreflang="en-US" type="text/html;charset=utf-8">my to do list</a> is <q>Investigate options for including <a href="https://www.rust-lang.org/" target="_blank" rel="external">Rust</a> code in <cite>Godot</cite> games.</q></p>
+
+<section>
+	<h2>The candidates</h2>
+	<p><cite>Godot</cite> provides many different options for integrating code into <a href="https://docs.godotengine.org/en/latest/getting_started/introduction/first_look_at_the_editor.html#the-project-manager" target="_blank" rel="external">projects</a>. If I tried hard enough, I could probably find a way to make all of them interface with Rust code. The question is: which one makes the most sense in this particular situation?</p>
+	<section>
+		<h3><a href="https://docs.microsoft.com/en-us/dotnet/csharp/" target="_blank" rel="external">C#</a></h3>
+
+		<p>Including C# code in <cite>Godot</cite> projects has some inherent disadvantages. For one thing, the standard version of <cite>Godot</cite> doesn’t support C#. Instead <a href="https://godotengine.org/download" target="_blank" rel="external">you have to download the Mono version to get C# support.</a> <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html#prerequisites" target="_blank" rel="external">That Mono version of the editor has an additional dependency: the <cite>.NET Core SDK</cite>.</a> I don’t find those two requirements to be much of an obstacle personally, but I can see it being unappealing to developers who might otherwise use or contribute to my code. In that same vein, developers working with <cite>Godot</cite> probably know <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html" target="_blank" rel="external">GDScript</a>. <a href="https://docs.google.com/forms/d/e/1FAIpQLSfOj9m71X98_z7-UC4iiM6Uxd2HhITRzmF-M2Yx-d7Yq5KNUg/viewanalytics" target="_blank" rel="external">There’s a much smaller chance that they know C#.</a> Using C# would limit the potential number of users and contributors.</p>
+
+		<p>Similarly, <cite>Godot</cite> has two different types of <a href="https://docs.godotengine.org/en/stable/tutorials/export/exporting_basics.html#export-templates" target="_blank" rel="external">export templates</a>: <a href="https://godotengine.org/download" target="_blank" rel="external">standard ones and Mono / C# ones</a>. Each of the C# templates is larger that its standard counterpart. For a single download, the difference probably isn’t noticeable, but for many downloads overtime, the bandwidth costs will add up (or not, I don’t really know that much about <a href="https://www.w3.org/TR/webarch/#def-web" target="_blank" rel="external">Web</a> hosting).</p>
+
+		<p>Another thing that I dislike about C# is that it’s not platform neutral. When you write code in <a href="https://en.wikipedia.org/wiki/C_(programming_language)" target="_blank" rel="external" hreflang="en">C</a>, you end up with <a href="http://fileformats.archiveteam.org/wiki/Executable_and_Linkable_Format" target="_blank" rel="external">extension-less executable files and <code>.so</code> files</a> on <a href="https://kernel.org/linux.html" target="_blank" rel="external">Linux</a> and <a href="http://fileformats.archiveteam.org/wiki/EXE" target="_blank" rel="external"><code>.EXE</code> files</a> and <a href="http://fileformats.archiveteam.org/wiki/Dynamic-link_library_(Windows)" target="_blank" rel="external"><code>.DLL</code> files</a> on <a href="https://microsoft.com/windows" target="_blank" rel="external">Windows</a>. When you write code in <a href="https://java.com/" target="_blank" rel="external">Java</a>, you end up with <a href="http://fileformats.archiveteam.org/wiki/Jar" target="_blank" rel="external"><code>.JAR</code> files</a> and <a href="http://fileformats.archiveteam.org/wiki/Java_bytecode" target="_blank" rel="external"><code>.class</code> files</a> on both Linux and Windows. When you write C# code, you end up with <code>.EXE</code> files and <code>.DLL</code> files on both Linux and Windows. I definitely don’t want to make people’s Linux installations more Windows-y.</p>
+
+		<p>Another problem is that C# support in <cite>Godot</cite> 4 isn’t very stable. <a href="https://godotengine.org/article/dev-snapshot-godot-4-0-alpha-3" target="_blank" rel="external">According to the release notes for the latest snapshot of <cite>Godot</cite> 4</a>, <q>Mono builds are currently not available as our focus is on porting to .NET 6. You'll get a chance to test it with later alpha releases!</q></p>
+
+		<p>Additionally, while doing research for this post, I found the following quote:</p>
+		<figure>
+			<blockquote>
+				<p><b>.NET 20th anniversary</b></p>
+				<p>Tune in on February 14 to watch the broadcast, share your stories on Twitter using the hashtag #dotNETLovesMe, and have fun celebrating 20 years of innovation.</p>
+				<p><a href="https://dotnet.microsoft.com/en-us/" target="_blank" rel="external"><b id="join-the-celebration">Join the celebration</b></a></p>
+			</blockquote>
+			<figcaption>— <a href="https://dotnet.microsoft.com/en-us/download/dotnet" target="_blank" rel="external" hreflang="en-US"><cite>.NET Downloads (Linux, macOS, and Windows)</cite></a> (<a href="https://web.archive.org/web/20220222140021/https://dotnet.microsoft.com/en-us/download/dotnet" target="_blank" rel="external" hreflang="en-US"><time>2022-02-22</time></a>)</figcaption>
+		</figure>
+		<p>If something is truly innovative, then its creators probably wouldn’t be saying that it’s innovative. More importantly, if you truly believe that .NET loves you, then you have mental problems. I don’t like the idea of using people’s mental problems for marketing purposes.</p>
+
+		<p>After all of that, is there any advantages to using C#? I can think of one: C# is more established than <cite>Godot</cite>. If I can’t find a good way to include Rust code in a <cite>Godot</cite> game directly, then I can certainly find a way to include Rust code in C#.</p>
+	</section>
+	<section>
+		<h3><a href="https://docs.godotengine.org/en/latest/tutorials/scripting/visual_script/index.html" target="_blank" rel="external">VisualScript</a></h3>
+
+		<p>From what I can tell, any APIs available to <a href="https://docs.godotengine.org/en/latest/tutorials/scripting/gdscript/index.html" target="_blank" rel="external">GDScript</a> are also available to VisualScript. An important difference between the two is that <a href="https://docs.godotengine.org/en/latest/tutorials/scripting/visual_script/what_is_visual_scripting.html" target="_blank" rel="external">VisualScript’s target audience is people who don’t have much programming experience</a>. I’m not one of those people, so I don’t think that it makes sense for me to use VisualScript.</p>
+	</section>
+	<section>
+		<h3><a href="https://docs.godotengine.org/en/latest/tutorials/scripting/gdscript/index.html" target="_blank" rel="external">GDScript</a></h3>
+
+		<p>GDScript makes some sense seeing as <a href="https://docs.godotengine.org/en/latest/about/faq.html#what-is-gdscript-and-why-should-i-use-it" target="_blank" rel="external">it’s <cite>Godot</cite>’s main programming language</a>. The problem is that GDScript doesn’t have much support for foreign code. GDScript can access functions exposed using any of the other candidates, but GDScript itself doesn’t really have a <a href="https://en.wikipedia.org/wiki/Foreign_function_interface" target="_blank" rel="external" hreflang="en">foreign function interface</a>. The only way to get information from foreign code using purely GDScript would be to call something like <a href="https://docs.godotengine.org/en/latest/classes/class_os.html#class-os-method-execute" target="_blank" rel="external"><code>OS.execute()</code></a> and then monitor <a href="https://www.computerhope.com/jargon/s/stdout.htm" target="_blank" rel="external"><code>stdout</code></a>.</p>
+	</section>
+	<section>
+		<h3><a href="https://godotengine.org/article/introducing-gd-extensions" target="_blank" rel="external">GDExtension</a></h3>
+
+		<p>At the moment, documentation for GDExtension is sparse. The main documentation that exists for it is <a href="https://godotengine.org/article/introducing-gd-extensions" target="_blank" rel="external">this blog post</a>. When I tried <a href="https://github.com/godotengine/godot-cpp/tree/master/test/demo" target="_blank" rel="external">the test project that that post mentions</a>, it built successfully but crashed <cite>Godot</cite> when I tried to open it. <a href="https://github.com/godotengine/godot-cpp/issues/678#issuecomment-1004435260" target="_blank" rel="external">It also looks like that project won’t be updated.</a> I read the rest of the blog post, but most of it went over my head. It looks like I don’t know enough about <a href="https://isocpp.org/wiki/faq/big-picture#what-is-cpp" target="_blank" rel="external">C++</a> and <cite>Godot</cite>’s internals to use GDExtension yet.</p>
+
+		<section>
+			<h4><a href="https://godot-rust.github.io/" target="_blank" rel="external"><cite>godot-rust</cite></a></h4>
+
+			<p><cite>godot-rust</cite> is very close to being a good option. <a href="https://godot-rust.github.io/#example" target="_blank" rel="external"><cite>godot-rust</cite> would allow me to create a <cite>Godot</cite> “script” using Rust, and then attach that script to a Node</a>. This is exactly what I’m looking for. The problem is: <cite>godot-rust</cite> depends on <a href="https://docs.godotengine.org/en/3.4/tutorials/scripting/gdnative/what_is_gdnative.html" target="_blank" rel="external">GDNative</a>. <a href="https://godotengine.org/article/introducing-gd-extensions" target="_blank" rel="external">GDNative is being replaced by GDExtension in <cite>Godot</cite> 4.</a> <a href="https://github.com/godot-rust/godot-rust#engine-compatibility" target="_blank" rel="external"><cite>godot-rust</cite> doesn’t support GDExtension yet because GDExtension isn’t stable enough.</a></p>
+		</section>
+	</section>
+	<section>
+		<h3><a href="https://docs.godotengine.org/en/latest/development/cpp/custom_modules_in_cpp.html" target="_blank" rel="external">Writing a custom module</a></h3>
+
+		<p>From what I understand, custom modules are very similar to GDExtension extensions. <a href="https://docs.godotengine.org/en/latest/development/cpp/custom_modules_in_cpp.html#improving-the-build-system-for-development" target="_blank" rel="external">The biggest difference is that custom modules require you to compile your own versions of <cite>Godot</cite>.</a> I’m not sure what the advantage of creating a custom module would be, but I’m guessing that, compared to extensions, modules are able to do more (i.e., they have access to a larger API).</p>
+
+		<p>Unfortunately, I don’t know very much about C++, I don’t know enough about Rust, and I know nothing about interoperability between C++ and Rust, so this doesn’t seem like a good solution either.</p>
+	</section>
+</section>
+
+<section>
+	<h2>Conclusion</h2>
+
+	<p><a href="posts/finding-the-right-ringcon-api.html#conclusion" hreflang="en-US" type="text/html;charset=utf-8">Yet again</a>, the best option is one that doesn’t exist yet. I’m stuck waiting for <cite>godot-rust</cite> to wait for <cite>Godot</cite>. In the meantime, here’s what I’ll do:</p>
+	<ol>
+		<li>Create a Rust program that prints the information that I need to <code>stdout</code>.</li>
+		<li>Create a <a href="https://godotengine.org/asset-library/asset" target="_blank" rel="external"><cite>Godot</cite> asset</a> that provides an API for receiving data from Joy-Cons and Ring-Cons. For the moment, this asset will be written in GDScript. It will run the aforementioned Rust program and parse its <code>stdout</code>.</li>
+		<li>If <cite>godot-rust</cite> gains <cite>Godot</cite> 4 support, then transition the asset to use <cite>godot-rust</cite>.</li>
+		<li>Eventually, if <cite>godot-rust</cite> never gains <cite>Godot</cite> 4 support, turn the asset into a GDExtension extension or a custom module.</li>
+	</ol>
+</section>
+{% endblock %}
