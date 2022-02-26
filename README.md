@@ -5,8 +5,6 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
 
 # [Jason’s Web Site](https://jasonyundt.neocities.org/)
 
-This repo holds what will eventually become my Web site.
-
 ## Building
 
 ### Prerequisites
