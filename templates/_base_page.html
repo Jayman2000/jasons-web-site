@@ -64,8 +64,18 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 		<link href="{% block css_url %}main.css{% endblock %}" rel="stylesheet" type="text/css;charset=utf-8">
 	</head>
 	<body>
-		{% block pre_body_content %}{% endblock %}
+		{% if nav %}
+			<a href="index.html" hreflang="en-US" type="text/html;charset=utf-8">⬅ Home</a>
+		{% endif %}
 		{% block body_content %}{% endblock %}
-		{% block post_body_content %}{% endblock %}
+		{% if footer %}
+			<footer>
+				<p><strong><a href="v4v.html" hreflang="en-US" type="text/html;charset=utf-8">If you received value from this site, then please contribute.</a></strong></p>
+
+				<p>🅭🄍1.0 This page is dedicated to the public domain using <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external">the CC0 1.0 Universal Public Domain Dedication</a>.</p>
+
+				<p><a href="https://www.ctrl.blog/entry/creative-commons-unicode-fallback-font.html" target="_blank" rel="external" hreflang="en">The CCSymbols font</a> was created by <a href="https://www.daniel.priv.no/" target="_blank" rel="external" hreflang="en">Daniel Aleksandersen</a>.</p>
+			</footer>
+		{% endif %}
 	</body>
 </html>
