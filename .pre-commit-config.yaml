@@ -75,6 +75,8 @@ repos:
                     - http
                     - --scheme
                     - https
+                    - jasons-web-site
+                    - jasons-forge
                 language: system
                 files: '(templates|static)/.*|^build_tool/.*|^Pipfile$'
                 pass_filenames: false

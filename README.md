@@ -37,8 +37,13 @@ with [a specific patch](https://github.com/wilsonzlin/minify-html/pull/67)._
 1. Run `./init-venv.sh`
 1. Run `pipenv run python -m build_tool`
 
+The built site will be placed in the `build` folder.
+
 After this has been done once, you just have to run
 `pipenv run python -m build_tool` again to rebuild the site.
+
+You can run `pipenv run python -m build_tool jasons-forge` to build the static
+portion of Jason’s Software Forge’s site.
 
 ## Hints for contributors
 
