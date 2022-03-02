@@ -98,7 +98,11 @@ class StaticResource(Resource):
 	destination.
 	"""
 	def build(self, dest_dir: Path) -> Path:
-		copy2(self.source(), self.dest_file_path(dest_dir))
+		dest_file_path = self.dest_file_path(dest_dir)
+		# Create the directory for this file to go in,
+		Path(*dest_file_path.parts[:-1]).mkdir(parents=True, exist_ok=True)
+		# then copy it to that directory.
+		copy2(self.source(), dest_file_path)
 		return super().build(dest_dir)
 
 
