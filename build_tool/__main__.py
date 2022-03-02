@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from argparse import ArgumentParser
 from itertools import chain
-from os import mkdir
+from os import makedirs
 from pathlib import Path
 from shutil import rmtree
 from typing import Final
@@ -18,12 +18,19 @@ from .resource import *
 
 
 BASE_BUILD_DIR: Final = Path("build")
-STATIC_DIR: Final = Path("static")
-TEMPLATES_DIR = Path("templates")
-ENV: Final = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
-ENV.globals = { 'reversed':reversed }
+BASE_SOURCE_DIR: Final = Path("src")
 
 ARGUMENT_PARSER: Final = ArgumentParser(description="Builds Jason’s Web Site")
+ARGUMENT_PARSER.add_argument(
+		'site_slugs',
+		nargs='*',
+		default=('jasons-web-site',),
+		help=\
+				"The name of the site to build. Look in the "
+				+ "“sites” folder for valid names. Default: "
+				+ "“jasons-web-site”.",
+		metavar="SITE_SLUG"
+)
 ARGUMENT_PARSER.add_argument(
 		'-d',
 		'--double-validate',
@@ -74,48 +81,69 @@ try:
 	rmtree(BASE_BUILD_DIR)
 except FileNotFoundError:
 	pass
-mkdir(BASE_BUILD_DIR)
-for scheme in ARGS.schemes:
-	print(f"---------------------- {scheme} ----------------------")
-	dest_dir = Path(BASE_BUILD_DIR, scheme)
-	mkdir(dest_dir)
 
-	destination: Destination
-	if scheme in ("ftp", "http", "https"):
-		destination = HTTPStyleDestination(scheme, ARGS.host)
-	elif scheme == "file":
-		destination = GenericDestination(
-				"file",
-				# as_uri() seems to always leave out the
-				# final slash, but for base URLs the
-				# final slash is necessary to indicate
-				# that the last component is a
-				# directory.
-				dest_dir.absolute().as_uri()[5:] + "/"
-		)
-	else:
-		eprint(f"WARNING: The scheme “{scheme}” is not supported. Omitting base URL…")
-		destination = UnknownDestination(scheme)
-	jinja_variables = {
-			'destination':destination,
-			'posts':SortedList()
-	}
 
-	built_resources = []
-	for resource in chain(
-			StaticResource.all(STATIC_DIR, ignored_suffix=".spdx-meta"),
-			JinjaResource.all(TEMPLATES_DIR, ENV, jinja_variables, ignored_suffix=".spdx-meta")
-	):
-		built_resources.append(resource.build(dest_dir))
+def build_site(site_slug: str,) -> None:
+	print(f"======================== {site_slug} ========================")
 
-	if not ARGS.minify or ARGS.double_validate:
-		valid_or_exit(
-				built_resources,
-				"ERROR: Files weren’t minified (yet), but at least one of them is still invalid."
+	static_dir = Path(BASE_SOURCE_DIR, site_slug, "static")
+	templates_dir = Path(BASE_SOURCE_DIR, site_slug, "templates")
+
+	if not static_dir.is_dir() and not templates_dir.is_dir():
+		raise ValueError(
+				f"ERROR: neither “{static_dir}” nor "
+				+ f"“{templates_dir}” exist. Is “{site_slug}” a"
+				+ " valid site slug? Is the current working "
+				+ "directory the root of the repo?"
 		)
-	if ARGS.minify:
-		minify(built_resources)
-		valid_or_exit(
-				built_resources,
-				"ERROR: Something was invalid after it was minified."
-		)
+
+	env = Environment(loader=FileSystemLoader(templates_dir))
+	env.globals = { 'reversed':reversed }
+
+	for scheme in ARGS.schemes:
+		print(f"---------------------- {scheme} ----------------------")
+		dest_dir = Path(BASE_BUILD_DIR, site_slug, scheme)
+		makedirs(dest_dir)
+
+		destination: Destination
+		if scheme in ("ftp", "http", "https"):
+			destination = HTTPStyleDestination(scheme, ARGS.host)
+		elif scheme == "file":
+			destination = GenericDestination(
+					"file",
+					# as_uri() seems to always leave out the
+					# final slash, but for base URLs the
+					# final slash is necessary to indicate
+					# that the last component is a
+					# directory.
+					dest_dir.absolute().as_uri()[5:] + "/"
+			)
+		else:
+			eprint(f"WARNING: The scheme “{scheme}” is not supported. Omitting base URL…")
+			destination = UnknownDestination(scheme)
+		jinja_variables = {
+				'destination':destination,
+				'posts':SortedList()
+		}
+
+		built_resources = []
+		for resource in chain(
+				StaticResource.all(static_dir, ignored_suffix=".spdx-meta"),
+				JinjaResource.all(templates_dir, env, jinja_variables, ignored_suffix=".spdx-meta")
+		):
+			built_resources.append(resource.build(dest_dir))
+
+		if not ARGS.minify or ARGS.double_validate:
+			valid_or_exit(
+					built_resources,
+					"ERROR: Files weren’t minified (yet), but at least one of them is still invalid."
+			)
+		if ARGS.minify:
+			minify(built_resources)
+			valid_or_exit(
+					built_resources,
+					"ERROR: Something was invalid after it was minified."
+			)
+
+for site_slug in ARGS.site_slugs:
+	build_site(site_slug)
