@@ -1,0 +1,24 @@
+# SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+{
+	#http_port 2015
+
+	email jason@jasonyundt.email
+}
+
+jasonyundt.website
+#localhost:2015
+
+encode zstd gzip
+root * ./root/
+
+handle_errors {
+	@404 expression `{http.error.status_code} == 404`
+	rewrite @404 /not_found.html
+
+	@not_404 expression `{http.error.status_code} != 404`
+	respond @not_404 "{http.error.status_code} {http.error.status_text}"
+	file_server
+}
+
+file_server

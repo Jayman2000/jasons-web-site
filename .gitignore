@@ -1,6 +1,9 @@
 # SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
 # SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 # SPDX-FileContributor: Many people <https://github.com/github/gitignore/blob/752b7678db497edb377fa982ded0c70035393794/Python.gitignore> (2010–2021)
+
+
+## Python
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -153,3 +156,7 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+
+# Specific to this project
+WWW
