@@ -1,0 +1,20 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "common/_base_page.html" %}
+
+{% set nav = true %}
+{% set footer = true %}
+
+{% set completion_time = self.completion_time() %}
+
+{% block body_content %}
+<article>
+	<header>
+		<h1>{% block title %}{% endblock %}</h1>
+		<p><time>{% block completion_time %}0001-01-01T00:00Z{% endblock %}</time> <a href="https://www.ionos.com/digitalguide/websites/web-development/iso-8601/" target="_blank" rel="external">(learn about this date format)</a></p>
+	</header>
+	{% block post_content %}{% endblock %}
+</article>
+{% endblock %}

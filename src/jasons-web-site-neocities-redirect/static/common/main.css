@@ -1,0 +1,158 @@
+@charset "utf-8";
+/*
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+SPDX-FileContributor: Daniel Aleksandersen <https://www.daniel.priv.no/> (2020)
+*/
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Noto+Serif&family=Source+Code+Pro&display=swap');
+
+/*
+Thanks, Daniel Aleksandersen.
+<https://www.ctrl.blog/entry/creative-commons-unicode-fallback-font.html>
+*/
+@font-face
+{
+	font-display: swap;
+	font-family: CCSymbols;
+	/*Not until CSS3*/
+	/*font-synthesis: none;*/
+	src:
+		url(CCSymbols.woff2) format("woff2"),
+		url(CCSymbols.woff)  format("woff");
+	unicode-range:
+		u+a9,
+		u+229c,
+		u+1f10d-1f10f,
+		u+1f16d-1f16f;
+}
+
+a
+{
+	text-decoration-line: underline;
+}
+
+a:hover
+{
+	text-decoration-line: none;
+}
+
+/*
+These color schemes are based on the Breeze Dark and Breeze Light themes:
+<https://community.kde.org/Get_Involved/Design/Breeze>
+*/
+::selection
+{
+	background: #3daee9;
+}
+
+@media (prefers-color-scheme: light)
+{
+	html
+	{
+		background: #ffffff;
+		color: #232629;
+	}
+
+	::selection
+	{
+		color: #ffffff;
+	}
+
+	a
+	{
+		color: #2980b9;
+	}
+
+	a:hover
+	{
+		color: #194d6e;
+	}
+
+	a:visited
+	{
+		color: #9d5bb9;
+	}
+
+	a:hover:visited
+	{
+		color: #5d366e;
+	}
+}
+
+@media (prefers-color-scheme: dark)
+{
+	html
+	{
+		background: #1b1e20;
+		color: #fcfcfc;
+	}
+
+	::selection
+	{
+		color: #fcfcfc;
+	}
+
+	a
+	{
+		color: #2980b9;
+	}
+
+	a:hover
+	{
+		color: #39b3ff;
+	}
+
+	a:visited
+	{
+		color: #9b59b6;
+	}
+
+	a:hover:visited
+	{
+		color: #d87dff;
+	}
+}
+
+html
+{
+	font-family: 'Noto Serif', 'Noto Sans Symbols 2', CCSymbols, serif;
+}
+
+code, pre
+{
+	font-family: 'Source Code Pro', monospace;
+	font-size: 90%;
+}
+
+/*
+Normally, the font-size of <h1>s is decreased for every <article> or <section>
+that the <h1>s are in. This prevents that from happening. 2em is the default
+font-size for <h1>s.
+<https://html.spec.whatwg.org/multipage/rendering.html#sections-and-headings>
+*/
+h1
+{
+	font-size: 2em;
+	margin: 0;
+}
+
+footer p
+{
+	line-height: 1.1;
+	margin: 0;
+}
+
+blockquote > *:first-child::before
+{
+	content: open-quote;
+}
+
+blockquote > *:last-child:not(ul)::after
+{
+	content: close-quote;
+}
+
+blockquote > *:last-child > li:last-child > p:last-child::after
+{
+	content: close-quote;
+}

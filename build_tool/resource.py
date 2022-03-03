@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from pathlib import Path
+from pathlib import Path, PosixPath
 from shutil import copy2
 from typing import Final, Iterable, List, Optional, Type, TypeVar
 
@@ -136,7 +136,8 @@ class JinjaResource(Resource):
 		"""
 		super().__init__(src_dir, relative_to_base)
 		self.env = env
-		self.jinja_variables = jinja_variables
+		self.jinja_variables = jinja_variables.copy()
+		self.jinja_variables['relative_to_base'] = str(PosixPath(relative_to_base))
 
 	def __repr__(self) -> str:
 		return f"""{type(self).__name__}(
