@@ -48,8 +48,7 @@ It’s an SPDX Metadata File because its name ends with “`.spdx-meta`”. It�
 invalid because it has no companion file.
 
 SPDX Metadata Files describe their companion files; [SPDX file tags] in SPDX
-Metadata Files don’t describe the SPDX Metadata Files that they’re in. SPDX
-Metadata Files describe their companion files.
+Metadata Files don’t describe the SPDX Metadata Files that they’re in.
 
 Consider that previous example again. If `./a/foo.txt.spdx-meta` contained
 “SPDX-FileType” followed by a colon, a space and “DOCUMENTATION”, that would
