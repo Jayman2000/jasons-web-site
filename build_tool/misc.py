@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from minify_html import minify as minify_html, minify_css
 from os import makedirs
-from pathlib import Path
+from pathlib import Path, PosixPath
 from sys import stderr
 from typing import Final, Iterable, List, NamedTuple
 
@@ -122,6 +122,81 @@ class PostInfo(NamedTuple):
 		return self.completion_time < other.completion_time
 
 
+# In CSP, 'self' means “from the same origin” [1]. Unfortunately, with most
+# schemes, it’s impossible to create a same origin URL [2].
+#
+# [1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#sources>
+# [2]: <https://url.spec.whatwg.org/#origin>
+SCHEMES_WHERE_SELF_WORKS: Final = ("ftp", "http", "https", "ws", "wss")
+def csp_self_source(scheme: str) -> str:
+	"""
+	Returns CSP source to be used instead of 'self'.
+
+	Sometimes, when I’m writing a Content Security Policy [1], I
+	want to use the 'self' source [2]. Unfortunately, 'self' doesn’t
+	work for all URL schemes [3]. This method should return the
+	closest thing to 'self' that will actually work for this
+	BaseURL’s scheme.
+
+	[1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP>
+	[2]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#self>
+	[3]: <https://www.w3.org/TR/webarch/#URI-scheme>
+	"""
+	if scheme in SCHEMES_WHERE_SELF_WORKS:
+		# The single quotes are required:
+		# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/Sources#sources>
+		return "'self'"
+	else:
+		return scheme + ":"
+
+
+def generate_relative_url(current_resource_path: str, desired_path: str) -> str:
+	"""
+	Returns a URL to a particular resource that’s relative to the current one.
+
+	current_resource_path — The path of the current resource.
+	desired_path — The path that the current resource is trying to access.
+
+	Both of those paths must be relative to the root of the site. In other
+	words, they must be relative to the directory that the site’s homepage
+	is in. Neither of those paths should use “.” (current directory) or “..”
+	(parent directory).
+
+	As an example, consider the following directory:
+
+	.
+	├── index.html
+	├── main.css
+	└── posts
+		├── example.css
+		└── example.html
+
+	1 directory, 4 files
+
+	generate_relative_url("index.html", "main.css") -> "main.css"
+	generate_relative_url("index.html", "posts/example.html") -> "posts/example.html"
+
+	generate_relative_url("posts/example.html", "index.html") -> "../index.html"
+	generate_relative_url("posts/example.html", "posts/example.css") -> "example.css"
+	"""
+	CRP: Final[PosixPath] = PosixPath("/", current_resource_path)
+	DP: Final[PosixPath] = PosixPath("/", desired_path)
+
+	last_common_part: int = 0
+	try:
+		while CRP.parts[last_common_part] == DP.parts[last_common_part]:
+			last_common_part += 1
+	except IndexError:
+		pass
+
+	parts_after_lcp: int = len(CRP.parts) - 1 - last_common_part
+	retrun_value_parts: List[str] = [".."] * parts_after_lcp
+	retrun_value_parts += DP.parts[last_common_part:]
+
+	return str(PosixPath(*retrun_value_parts))
+
+
+
 __all__ = (
 		"eprint",
 		"encoding_for",
@@ -129,5 +204,7 @@ __all__ = (
 		"minify",
 		"valid_or_exit",
 		"files_in",
-		"PostInfo"
+		"PostInfo",
+		"csp_self_source",
+		"generate_relative_url"
 )

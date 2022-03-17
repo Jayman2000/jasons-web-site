@@ -12,7 +12,6 @@ from typing import Final
 from jinja2 import FileSystemLoader, Environment
 from sortedcontainers import SortedList
 
-from .destination import *
 from .misc import *
 from .resource import *
 
@@ -41,19 +40,6 @@ ARGUMENT_PARSER.add_argument(
 				+ "“--minify”."
 )
 ARGUMENT_PARSER.add_argument(
-		'-H',
-		'--host',
-		default='localhost:8000',
-		type=str,
-		help=\
-				"The hostname (and optionally port) used for "
-				+ "the ftp and http(s) versions of the site. "
-				+ "Make sure that an appropriate scheme is set "
-				+ "using --scheme, or else this option will do "
-				+ "nothing.",
-		metavar="HOST[:PORT]"
-)
-ARGUMENT_PARSER.add_argument(
 		'-m',
 		'--minify',
 		action='store_true',
@@ -67,8 +53,11 @@ ARGUMENT_PARSER.add_argument(
 		'--scheme',
 		action='append',
 		help=\
-				"Scheme to use for base URLs. Can be specified "
-				+ "multiple times. Default: “file”.",
+				"Eventually, the built site will be given a URL"
+				+ " and opened in a Web browser. This is that "
+				+ "URL’s scheme. This argument gets used to "
+				+ "help generate the site’s Content Security "
+				+ "Policy. Default: “file”.",
 		metavar="SCHEME",
 		dest='schemes'
 )
@@ -104,25 +93,9 @@ def build_site(site_slug: str,) -> None:
 		print(f"---------------------- {scheme} ----------------------")
 		dest_dir = Path(BASE_BUILD_DIR, site_slug, scheme)
 		makedirs(dest_dir)
-
-		destination: Destination
-		if scheme in ("ftp", "http", "https"):
-			destination = HTTPStyleDestination(scheme, ARGS.host)
-		elif scheme == "file":
-			destination = GenericDestination(
-					"file",
-					# as_uri() seems to always leave out the
-					# final slash, but for base URLs the
-					# final slash is necessary to indicate
-					# that the last component is a
-					# directory.
-					dest_dir.absolute().as_uri()[5:] + "/"
-			)
-		else:
-			eprint(f"WARNING: The scheme “{scheme}” is not supported. Omitting base URL…")
-			destination = UnknownDestination(scheme)
 		jinja_variables = {
-				'destination':destination,
+				'csp_self_source':csp_self_source(scheme),
+				'generate_relative_url':generate_relative_url,
 				'posts':SortedList()
 		}
 

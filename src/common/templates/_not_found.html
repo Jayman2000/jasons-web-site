@@ -7,7 +7,7 @@ Most of the time, I’ll use hyphens instead of spaces in URLs. For this URL in 
 {% extends "common/_base_page.html" %}
 
 {% block title %}404{% endblock %}
-{% block css_url %}common/not_found.css{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "common/not_found.css") }}{% endblock %}
 
 {% block body_content %}
 	<div>

@@ -6,4 +6,4 @@ Most of the time, I’ll use hyphens instead of spaces in URLs. For this URL in 
 #}
 {% extends "common/_not_found.html" %}
 
-{% block homeurl %}index.html{% endblock %}
+{% block homeurl %}{{ generate_relative_url(relative_to_base, "index.html") }}{% endblock %}

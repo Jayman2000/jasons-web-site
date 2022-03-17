@@ -56,21 +56,18 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 		[1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>
 		[2]: <https://html.spec.whatwg.org/dev/semantics.html#attr-meta-http-equiv-content-security-policy>
 		#}
-		<meta http-equiv="content-security-policy" content="default-src 'none'; font-src {{ destination.csp_self_source() }} https://fonts.gstatic.com; style-src {{ destination.csp_self_source() }} https://fonts.googleapis.com; base-uri {{ destination.csp_self_source() }}; form-action 'none';">
-		{% if destination.base_url() is not none %}
-			<base href="{{ destination.base_url() }}">
-		{% endif %}
+		<meta http-equiv="content-security-policy" content="default-src 'none'; font-src {{ csp_self_source }} https://fonts.gstatic.com; style-src {{ csp_self_source }} https://fonts.googleapis.com; base-uri {{ csp_self_source }}; form-action 'none';">
 		<title>{% block full_title %}{% filter striptags %}{% block title %}{% endblock %}{% endfilter %} — {% block site_title %}Jason’s Web Site{% endblock %}{% endblock %}</title>
-		<link href="{% block css_url %}common/main.css{% endblock %}" rel="stylesheet" type="text/css;charset=utf-8">
+		<link href="{% block css_url %}{{ generate_relative_url(relative_to_base, "common/main.css") }}{% endblock %}" rel="stylesheet" type="text/css;charset=utf-8">
 	</head>
 	<body>
 		{% if nav %}
-			<a href="index.html" hreflang="en-US" type="text/html;charset=utf-8">⬅ Home</a>
+			<a href="{{ generate_relative_url(relative_to_base, "index.html") }}" hreflang="en-US" type="text/html;charset=utf-8">⬅ Home</a>
 		{% endif %}
 		{% block body_content %}{% endblock %}
 		{% if footer %}
 			<footer>
-				<p><strong><a href="v4v.html" hreflang="en-US" type="text/html;charset=utf-8">If you received value from this site, then please contribute.</a></strong></p>
+				<p><strong><a href="{{ generate_relative_url(relative_to_base, "v4v.html") }}" hreflang="en-US" type="text/html;charset=utf-8">If you received value from this site, then please contribute.</a></strong></p>
 
 				<p>🅭🄍1.0 This page is dedicated to the public domain using <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external">the CC0 1.0 Universal Public Domain Dedication</a>.</p>
 

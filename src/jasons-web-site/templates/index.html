@@ -19,7 +19,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 		[1]: <http://www.grantjenks.com/docs/sortedcontainers/sortedlist.html#sortedlist>
 		#}
 		{% for post in reversed(posts) %}
-			<li><a href="{{ post.relative_url }}" hreflang="en-US" type="text/html;charset=utf-8">{{ post.title }}</a></li>
+			<li><a href="{{ generate_relative_url(relative_to_base, post.relative_url) }}" hreflang="en-US" type="text/html;charset=utf-8">{{ post.title }}</a></li>
 		{% endfor %}
 	</ul>
 {% endblock %}

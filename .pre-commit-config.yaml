@@ -76,7 +76,6 @@ repos:
                     - --scheme
                     - https
                     - jasons-web-site
-                    - jasons-web-site-neocities-redirect
                     - jasons-forge
                 language: system
                 files: '(templates|static)/.*|^build_tool/.*|^Pipfile$'

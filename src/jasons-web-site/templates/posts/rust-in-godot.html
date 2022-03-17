@@ -4,13 +4,13 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 #}
 {% extends "_post.html" %}
 
-{% block css_url %}rust-in-godot.css{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "rust-in-godot.css") }}{% endblock %}
 {% block title %}Including Rust code in a <cite>Godot</cite> Game{% endblock %}
 {% block completion_time %}2022-02-22T19:22:11-05:00{% endblock %}
 
 
 {% block post_content %}
-<p>As I’ve written about previously, <a href="posts/finding-the-right-ringcon-api.html" hreflang="en-US" type="text/html;charset=utf-8">I want to create a game that uses the <cite>Ring Fit Adventure</cite> accessories</a>, and <a href="posts/3-or-4.html" hreflang="en-US" type="text/html;charset=utf-8">I want to make it using <cite>Godot</cite> 4.</a> The item currently on <a href="posts/finding-the-right-ringcon-api.html#to-do-list" hreflang="en-US" type="text/html;charset=utf-8">my to do list</a> is <q>Investigate options for including <a href="https://www.rust-lang.org/" target="_blank" rel="external">Rust</a> code in <cite>Godot</cite> games.</q></p>
+<p>As I’ve written about previously, <a href="{{ generate_relative_url(relative_to_base, "posts/finding-the-right-ringcon-api.html") }}" hreflang="en-US" type="text/html;charset=utf-8">I want to create a game that uses the <cite>Ring Fit Adventure</cite> accessories</a>, and <a href="{{ generate_relative_url(relative_to_base, "posts/3-or-4.html") }}" hreflang="en-US" type="text/html;charset=utf-8">I want to make it using <cite>Godot</cite> 4.</a> The item currently on <a href="{{ generate_relative_url(relative_to_base, "posts/finding-the-right-ringcon-api.html#to-do-list") }}" hreflang="en-US" type="text/html;charset=utf-8">my to do list</a> is <q>Investigate options for including <a href="https://www.rust-lang.org/" target="_blank" rel="external">Rust</a> code in <cite>Godot</cite> games.</q></p>
 
 <section>
 	<h2>The candidates</h2>
@@ -72,7 +72,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 <section>
 	<h2>Conclusion</h2>
 
-	<p><a href="posts/finding-the-right-ringcon-api.html#conclusion" hreflang="en-US" type="text/html;charset=utf-8">Yet again</a>, the best option is one that doesn’t exist yet. I’m stuck waiting for <cite>godot-rust</cite> to wait for <cite>Godot</cite>. In the meantime, here’s what I’ll do:</p>
+	<p><a href="{{ generate_relative_url(relative_to_base, "posts/finding-the-right-ringcon-api.html#conclusion") }}" hreflang="en-US" type="text/html;charset=utf-8">Yet again</a>, the best option is one that doesn’t exist yet. I’m stuck waiting for <cite>godot-rust</cite> to wait for <cite>Godot</cite>. In the meantime, here’s what I’ll do:</p>
 	<ol>
 		<li>Create a Rust program that prints the information that I need to <code>stdout</code>.</li>
 		<li>Create a <a href="https://godotengine.org/asset-library/asset" target="_blank" rel="external"><cite>Godot</cite> asset</a> that provides an API for receiving data from Joy-Cons and Ring-Cons. For the moment, this asset will be written in GDScript. It will run the aforementioned Rust program and parse its <code>stdout</code>.</li>
