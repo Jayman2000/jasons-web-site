@@ -1,0 +1,35 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block title %}One Small Step Towards <em>Scheme</em> Diversity{% endblock %}
+{% block completion_time %}2022-03-18T13:43:51-04:00{% endblock %}
+
+{% block post_content %}
+	<p><a href="https://www.w3.org/TR/webarch/#def-world-wide-web" target="_blank" rel="external" hreflang="en">According to its most official definition</a>, <q>The <dfn>World Wide Web</dfn> (<dfn><abbr>WWW</abbr></dfn>, or simply <dfn><abbr>Web</abbr></dfn>) is an information space in which the items of interest, referred to as resources, are identified by global identifiers called Uniform Resource Identifiers (<dfn><abbr>URI</abbr></dfn>).</q> Web addresses (or URIs as that document prefers to call them) are what truly make the Web stand out. Putting something as flexible as Web addresses at the center of the World Wide Web has made it uncensorable. Every time content at one Web address gets taken down, that same content can be reposted at two new ones. What I’m trying to say is: Web addresses are important. That’s why I’ve been thinking about them.</p>
+
+	<p>That same document goes on to say:</p>
+	<figure>
+		<blockquote>
+<p>In the URI
+"http://weather.example.com/", the "http" that appears before the
+colon (":") names a URI scheme. Each URI scheme has a specification
+that explains the scheme-specific details of how scheme identifiers
+are allocated and become associated with a resource. The URI syntax
+is thus a federated and extensible naming system wherein each
+scheme's specification may further restrict the syntax and
+semantics of identifiers within that scheme.</p>
+		</blockquote>
+		<figcaption>— The <a href="https://www.w3.org/Consortium/" target="_blank" rel="external">W3C</a>’s <a href="https://www.w3.org/TR/webarch" target="_blank" rel="external"><cite>Architecture of the World Wide Web, Volume One</cite></a>, <a href="https://www.w3.org/TR/webarch/#URI-scheme" target="_blank" rel="external">section 2.4. URI Schemes</a></figcaption>
+	</figure>
+
+	<p>Today, the most common URI scheme is <code>https</code>. That scheme is very similar to the <code>http</code> URI scheme which <a href="https://www.w3.org/History/19921103-hypertext/hypertext/WWW/Addressing/Addressing.html" target="_blank" rel="external" hreflang="en">was one of the first URI schemes.</a> Those two facts lead me to one conclusion: <code>https</code> probably isn’t the best scheme. Surely someone has come up with something better in the past 30 years.</p>
+
+	<p>The question remains though: if <code>https</code> isn’t the best scheme, then which one is? That is a difficult question to answer, and it’s almost certainly a subjective one. Even if <code>https</code> was the best scheme, it’s still a good idea to give it something to compete against. With that in mind, I’ve decided that I want this site to promote scheme diversity. In other words, I want this site to be available under a variety of schemes.</p>
+
+	<p>Early on, I made sure that this site supported the <code>file</code> URI scheme. After this site launched, I made it available at <a href="https://jasonyundt.website/" hreflang="en-US" type="text/html;charset=utf-8"><code>https://jasonyundt.website/</code></a>. Today, I’m proud to announce that the site is now available at <a href="ftp://jasonyundt.website/index.html" hreflang="en-US" type="text/html;charset=utf-8"><code>ftp://jasonyundt.website/index.html</code></a>.</p>
+
+	<p>To be clear, FTP is almost certainly inferior to modern HTTPS. In fact, the only browser that I found that still supports it is <a href="https://www.palemoon.org/" target="_blank" rel="external" hreflang="en"><cite>Pale Moon</cite></a>, a browser that I do not recommend. I’m only really using FTP because I wanted to start with something that is more established and less experimental. In the future I plan to support some more interesting protocols</p>
+{% endblock %}

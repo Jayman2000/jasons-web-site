@@ -4,7 +4,7 @@ SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using t
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 SPDX-FileContributor: Daniel Aleksandersen <https://www.daniel.priv.no/> (2020)
 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Noto+Serif&family=Source+Code+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Source+Code+Pro&display=swap');
 
 /*
 Thanks, Daniel Aleksandersen.
@@ -155,4 +155,9 @@ blockquote > *:last-child:not(ul)::after
 blockquote > *:last-child > li:last-child > p:last-child::after
 {
 	content: close-quote;
+}
+
+dfn {
+	font-style: italic;
+	font-weight: bold;
 }
