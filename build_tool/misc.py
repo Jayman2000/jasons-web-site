@@ -182,19 +182,21 @@ def generate_relative_url(current_resource_path: str, desired_path: str) -> str:
 	CRP: Final[PosixPath] = PosixPath("/", current_resource_path)
 	DP: Final[PosixPath] = PosixPath("/", desired_path)
 
-	last_common_part: int = 0
-	try:
-		while CRP.parts[last_common_part] == DP.parts[last_common_part]:
-			last_common_part += 1
-	except IndexError:
-		pass
+	if CRP == DP:  # If a page is linking to itself…
+		return DP.parts[-1]  # then return the page’s filename.
+	else:
+		last_common_part: int = 0
+		try:
+			while CRP.parts[last_common_part] == DP.parts[last_common_part]:
+				last_common_part += 1
+		except IndexError:
+			pass
 
-	parts_after_lcp: int = len(CRP.parts) - 1 - last_common_part
-	retrun_value_parts: List[str] = [".."] * parts_after_lcp
-	retrun_value_parts += DP.parts[last_common_part:]
+		parts_after_lcp: int = len(CRP.parts) - 1 - last_common_part
+		retrun_value_parts: List[str] = [".."] * parts_after_lcp
+		retrun_value_parts += DP.parts[last_common_part:]
 
-	return str(PosixPath(*retrun_value_parts))
-
+		return str(PosixPath(*retrun_value_parts))
 
 
 __all__ = (
