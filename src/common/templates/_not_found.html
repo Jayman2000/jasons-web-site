@@ -7,7 +7,8 @@ Most of the time, I’ll use hyphens instead of spaces in URLs. For this URL in 
 {% extends "common/_base_page.html" %}
 
 {% block title %}404{% endblock %}
-{% block css_url %}{{ generate_relative_url(relative_to_base, "common/not_found.css") }}{% endblock %}
+{# Normally, I would use a regular relative URL here. The problem is that the URL for this 404 page could be pretty much anything (example: https://jasonyundt.website/a/b/c/d/e/f/), so we don’t know how many “..”s should be included. Root relative URLs aren’t the best option (they don’t work in schemes like “file”), but they’ll have to do for now. #}
+{% block css_url %}/common/not_found.css{% endblock %}
 
 {% block body_content %}
 	<div>
