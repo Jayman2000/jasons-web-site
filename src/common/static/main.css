@@ -2,29 +2,9 @@
 /*
 SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
-SPDX-FileContributor: Daniel Aleksandersen <https://www.daniel.priv.no/> (2020)
 */
+@import url('cc-symbols-font.css');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Source+Code+Pro&display=swap');
-
-/*
-Thanks, Daniel Aleksandersen.
-<https://www.ctrl.blog/entry/creative-commons-unicode-fallback-font.html>
-*/
-@font-face
-{
-	font-display: swap;
-	font-family: CCSymbols;
-	/*Not until CSS3*/
-	/*font-synthesis: none;*/
-	src:
-		url(CCSymbols.woff2) format("woff2"),
-		url(CCSymbols.woff)  format("woff");
-	unicode-range:
-		u+a9,
-		u+229c,
-		u+1f10d-1f10f,
-		u+1f16d-1f16f;
-}
 
 a
 {

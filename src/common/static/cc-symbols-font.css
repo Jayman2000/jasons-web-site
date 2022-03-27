@@ -1,0 +1,27 @@
+@charset "utf-8";
+/*
+SPDX-License-Identifier: CC0-1.0
+SPDX-FileContributor: Daniel Aleksandersen <https://www.daniel.priv.no/> (2020)
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+
+Normally, I wouldn’t use a license identifier for CC0, but the page that this
+CSS comes from [1] incorrectly calls CC0 a license.
+
+[1]: <https://web.archive.org/web/20220207221417/https://www.ctrl.blog/entry/creative-commons-unicode-fallback-font.html>
+*/
+
+@font-face
+{
+	font-display: swap;
+	font-family: CCSymbols;
+	/*Not until CSS3*/
+	/*font-synthesis: none;*/
+	src:
+		url(CCSymbols.woff2) format("woff2"),
+		url(CCSymbols.woff)  format("woff");
+	unicode-range:
+		u+a9,
+		u+229c,
+		u+1f10d-1f10f,
+		u+1f16d-1f16f;
+}

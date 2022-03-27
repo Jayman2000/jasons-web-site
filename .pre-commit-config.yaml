@@ -91,6 +91,8 @@ repos:
         hooks:
             -
                 id: assert_contains_regex
+                name: "assert_contains_regex (everything but CC symbols CSS)"
+                exclude: &cc_css '^src/common/static/cc-symbols-font\.css$'
                 args:
                     - --companion-suffix
                     - .spdx-meta
@@ -102,5 +104,22 @@ repos:
                         <https://creativecommons.org/publicdomain/zero/1\.0/>|
                         The author of this font waived all copyright to the
                         font and released it into the 🅮 public domain)\.
+                    - --pattern
+                    - "SPDX-FileContributor: .+ <.+> \\((202[12][-–])?2022\\)\n"
+            -
+                # This file gets special treatment because the page that its
+                # contents comes from [1] incorrectly calls CC0 a license.
+                #
+                # yamllint disable rule:line-length
+                # [1]: <https://web.archive.org/web/20220207221417/https://www.ctrl.blog/entry/creative-commons-unicode-fallback-font.html>
+                # yamllint enable
+                id: assert_contains_regex
+                name: "assert_contains_regex (CC symbols CSS)"
+                files: *cc_css
+                args:
+                    - --companion-suffix
+                    - .spdx-meta
+                    - --pattern
+                    - "SPDX-License-Identifier: CC0-1.0\n"
                     - --pattern
                     - "SPDX-FileContributor: .+ <.+> \\((202[12][-–])?2022\\)\n"
