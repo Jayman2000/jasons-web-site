@@ -3,7 +3,7 @@ SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using t
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
 -->
 
-# [Jason’s Web Site](https://jasonyundt.neocities.org/)
+# [Jason’s Web Site](https://jasonyundt.website/)
 
 ## Building
 
