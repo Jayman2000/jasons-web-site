@@ -75,8 +75,6 @@ repos:
                     - http
                     - --scheme
                     - https
-                    - jasons-web-site
-                    - jasons-forge
                 language: system
                 files: '(templates|static)/.*|^build_tool/.*|^Pipfile$'
                 pass_filenames: false
@@ -92,7 +90,8 @@ repos:
             -
                 id: assert_contains_regex
                 name: "assert_contains_regex (everything but CC symbols CSS)"
-                exclude: &cc_css '^src/common/static/cc-symbols-font\.css$'
+                exclude: &cc_css
+                    '^src/jasons-web-site/static/cc-symbols-font\.css$'
                 args:
                     - --companion-suffix
                     - .spdx-meta
