@@ -106,11 +106,11 @@ repos:
                     - --pattern
                     - "SPDX-FileContributor: .+ <.+> \\((202[12][-–])?2022\\)\n"
             -
-                # This file gets special treatment because the page that its
-                # contents comes from [1] incorrectly calls CC0 a license.
-                #
                 # yamllint disable rule:line-length
-                # [1]: <https://web.archive.org/web/20220207221417/https://www.ctrl.blog/entry/creative-commons-unicode-fallback-font.html>
+                #
+                # This file gets special treatment. Here’s why:
+                # <https://comment.ctrl.blog/discussion/creative-commons-unicode-fallback-font>
+                #
                 # yamllint enable
                 id: assert_contains_regex
                 name: "assert_contains_regex (CC symbols CSS)"
