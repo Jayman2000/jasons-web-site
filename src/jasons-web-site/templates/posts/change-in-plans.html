@@ -1,0 +1,30 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block title %}Jason’s Ring-Con Project: A Slight Change in Plans{% endblock %}
+{% block completion_time %}2022-03-31T18:52:13-04:00{% endblock %}
+
+{% block post_content %}
+<p>In <a href="{{ generate_relative_url(relative_to_base, "posts/rust-in-godot.html") }}" hreflang="en-US" type="text/html;charset=utf-8">a previous post</a>, I took a look at every different way to include <a href="https://www.rust-lang.org/" target="_blank" rel="external">Rust</a> code in a <a href="https://godotengine.org/" target="_blank" rel="external"><cite>Godot</cite></a> game. I concluded that, for the moment, it makes the most sense to create a command-line application and have <cite>Godot</cite> read from that application’s output. It turns out that I overlooked something.</p>
+
+<p>Now that I’ve taken a break from <a href="{{ generate_relative_url(relative_to_base, "posts/small-step-towards-scheme-diversity.html") }}" hreflang="en-US" type="text/html;charset=utf-8">updating</a> <a href="{{ generate_relative_url(relative_to_base, "posts/small-step-towards-decentralization.html") }}" hreflang="en-US" type="text/html;charset=utf-8">this</a> <a href="{{ generate_relative_url(relative_to_base, "posts/another-piece-of-the-decentralization-puzzle.html") }}" hreflang="en-US" type="text/html;charset=utf-8">site</a>, I’ve started to focus on <a href="{{ generate_relative_url(relative_to_base, "posts/3-or-4.html") }}" hreflang="en-US" type="text/html;charset=utf-8">my Ring-Con Project</a> again, and I’ve noticed a problem. In <a href="https://docs.godotengine.org/en/latest/tutorials/scripting/gdscript/index.html" target="_blank" rel="external" hreflang="en">GDScript</a> (assuming that you aren’t using any <a href="https://godotengine.org/article/introducing-gd-extensions" target="_blank" rel="external">GDExtensions</a> or <a href="https://docs.godotengine.org/en/latest/development/cpp/custom_modules_in_cpp.html" target="_blank" rel="external" hreflang="en">custom modules</a>), there’s only two ways to run an external program:</p>
+<ol>
+	<li><a href="https://docs.godotengine.org/en/latest/classes/class_os.html#class-os-method-create-process" target="_blank" rel="external" hreflang="en"><code>OS.create_process()</code></a></li>
+	<li><a href="https://docs.godotengine.org/en/latest/classes/class_os.html#class-os-method-execute" target="_blank" rel="external" hreflang="en"><code>OS.execute()</code></a></li>
+</ol>
+<p><code>OS.create_process()</code> doesn’t give you access to the program’s output. <code>OS.execute()</code> does, but <a href="https://docs.godotengine.org/en/latest/classes/class_os.html#class-os-method-execute" target="_blank" rel="external" hreflang="en">according to the <cite>Godot</cite> Docs</a>, <q>[…]the complete shell output of the process will be appended as a single <a href="https://docs.godotengine.org/en/latest/classes/class_string.html#class-string" target="_blank" rel="external" hreflang="en">String</a> element in <code>output</code>.</q> If the complete shell output is the only thing that we have access to, then the complete shell output has to exist before we can access any shell output at all. In other words the program has to finish before we can access any shell output at all. It would be possible to create a program that prints the next batch of output every time it’s run, but that’s a lot more complicated than what I had in mind.</p>
+
+<p>Luckily, I found <a href="https://godotengine.org/qa/77691/communicate-between-godot-game-and-other-software" target="_blank" rel="external">this question on <cite>Godot Engine</cite> - Q&amp;A</a>. Its answers mention something that I had forgotten about: local networking. I could use any of the networking protocols that <cite>Godot</cite> supports to communicate with a program running on the local system.</p>
+
+<p>With all of that in mind, here’s my updated plan:</p>
+<ol>
+	<li>Create a Rust program that serves the information that I need over <a href="https://www.rfc-editor.org/rfc/rfc768.html" target="_blank" rel="external" hreflang="en">UDP</a>.</li>
+	<li>Create a <a href="https://godotengine.org/asset-library/asset" target="_blank" rel="external"><cite>Godot</cite> asset</a> that provides an API for receiving data from Joy-Cons and Ring-Cons. For the moment, this asset will be written in GDScript. It will run the aforementioned Rust program and parse the packets that it generates.</li>
+	<li>If <a href="https://godot-rust.github.io/" target="_blank" rel="external"><cite>godot-rust</cite></a> gains <cite>Godot</cite> 4 support, then transition the asset to use <cite>godot-rust</cite>.</li>
+	<li>Eventually, if <cite>godot-rust</cite> never gains <cite>Godot</cite> 4 support, turn the asset into a GDExtension extension or a custom module.</li>
+</ol>
+<p>I don’t know all that much about networking protocols, so I’m not really sure if UDP is the best option here. The best way to find out is by trying it.</p>
+{% endblock %}
