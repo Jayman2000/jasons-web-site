@@ -14,6 +14,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
 - [`env` (GNU coreutils)](https://www.gnu.org/software/coreutils/)* 9.0
 - [GNU Bash](https://www.gnu.org/software/bash/)*, version 5.1.16
 - [Go](https://golang.org/)* 1.17.7
+- [npm](https://www.npmjs.com/)* 8.5.5
 - [Python](https://www.python.org/) 3.8+
 - [Pipenv](https://pipenv.pypa.io/en/latest/) 2022.1.8
 
