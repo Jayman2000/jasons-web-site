@@ -1,0 +1,50 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block title %}How to Run a Terminal Application in ASCII on <cite>Linux</cite>{% endblock %}
+{% block completion_time %}2022-04-07T16:28:55-04:00{% endblock %}
+
+{% block css_url %}{{ generate_relative_url(relative_to_base, "terminal-in-ascii-on-linux.css") }}{% endblock %}
+
+{% block post_content %}
+<p>Recently, I’ve discovered that some of the programs that I’ve written and some of their dependencies make a bad assumption. They assume that the system uses <a href="https://www.unicode.org/versions/Unicode14.0.0/ch02.pdf#page=26" target="_blank" rel="external" hreflang="en">UTF-8</a> by default. That assumption is especially bad because <a href="https://www.unicode.org/faq/utf_bom.html#gen5" target="_blank" rel="external" hreflang="en">Windows uses UTF-16</a>.</p>
+
+<p>As part of the debugging process, I tried to run my software with the encoding set to <a href="https://standards.incits.org/apps/group_public/project/details.php?project_id=1829" target="_blank" rel="external">plain-old ASCII</a>. Doing that was harder than I expected. Here’s what I had to do to. These’s instructions are specific to <a href="https://archlinux.org/" target="_blank" rel="external"><cite>Arch Linux</cite></a>. I don’t know how well they’ll work on other distros.</p>
+
+<ol>
+	<li>Find out what name <a href="https://man.archlinux.org/man/setlocale.3" target="_blank" rel="external"><code>locale</code></a> uses for ASCII. <code>/usr/share/i18n/charmaps</code> should contain a file for each character encoding that your system supports. On my system, the encoding wasn’t called “ASCII”. Instead it was called “ANSI_X3.4-1968”. <a href="https://www.iana.org/assignments/character-sets/character-sets.xhtml" target="_blank" rel="external">IANA’s character set list</a> might be helpful here. It has a list of aliases for “US-ASCII”.</li>
+
+	<li>
+		<p><a href="https://wiki.archlinux.org/title/LOCALE#Generating_locales" target="_blank" rel="external">Generate a locale</a> for that character set:</p>
+		<ol type="A">
+			<li>Open <code>/etc/locale.gen</code></li>
+			<li>
+				<p>Add the following on a new line:</p>
+
+				<pre><code><b>language</b>[_<i>country</i>].<b>charset</b> <b>charset</b></code></pre>
+
+				<p>“<code><b>language</b>[_<i>country</i>].<b>charset</b></code>” will be the name of the new locale. <code><b>language</b></code> and <code><i>country</i></code> should be a valid <a href="https://www.loc.gov/standards/iso639-2/php/English_list.php" target="_blank" rel="external" hreflang="en-US">two letter language code</a> and a valid <a href="https://www.iso.org/obp/ui/#search" target="_blank" rel="external">two letter country code</a> respectively. <code><b>charset</b></code> should be the name of the character set you found before. For mine, I did:</p>
+
+				<pre><code><b>en</b>_<i>US</i>.<b>ANSI_X3.4-1968</b> <b>ANSI_X3.4-1968</b></code></pre>
+
+				<p>In that example, the locale is named “<code><b>en</b>_<i>US</i>.<b>ANSI_X3.4-1968</b></code>”.</p>
+			</li>
+			<li>Run <code>sudo locale-gen</code></li>
+		</ol>
+	</li>
+
+	<li>Make sure that <a href="https://konsole.kde.org/" target="_blank" rel="external"><cite>Konsole</cite></a> is installed</li>
+
+	<li>
+		<p>Run:</p>
+
+		<pre><code>LANG='<b>locale</b>' konsole -p DefaultEncoding='<b>charset</b>'</code>.</pre>
+
+		<p>On my system, the final command was:</p>
+
+		<pre><code>LANG='<b>en_US.ANSI_X3.4-1968</b>' konsole -p DefaultEncoding='<b>ANSI_X3.4-1968</b>'</code></pre>
+</ol>
+{% endblock %}
