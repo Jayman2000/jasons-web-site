@@ -1,0 +1,131 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block title %}How Should I Accept Patches?{% endblock %}
+{% block completion_time %}2022-05-26T09:33:10-04:00{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "how-should-i-accept-patches.css") }}{% endblock %}
+{% block additional_csp %}img-src {{ csp_self_source }};{% endblock %}
+
+{% block post_content %}
+<p>I believe strongly in <a href="http://www.catb.org/esr/writings/cathedral-bazaar/" target="_blank" rel="external" hreflang="en">the Bazaar model of software development</a>. I want to use the Bazaar model on the projects that I’m developing, but I’m running into a problem. To adopt the Bazaar model, I have to decide on how I’m going to allow people to submit patches. There’s a ton of different ways to do this. In order to narrow things down, I’ve come up with three different qualities that I want my patch submission process to have. As it turns out, it’s hard to find one that has those three qualities.</p>
+
+<p>One thing that I should mention up front is that I only use <a href="https://git-scm.com/" target="_blank" rel="external">Git</a>. I don’t have very much experience with other version control systems, and I’m not willing switch at the moment. If I ever decide to switch, then I’ll have to revisit this question again.</p>
+
+<section>
+	<h2>The Three Qualities</h2>
+	<section>
+		<h3>You should be able to submit a patch using only <a href="https://www.gnu.org/philosophy/free-sw.html" target="_blank" rel="external">free software</a></h3>
+		<p>I do use proprietary software myself, but I’ve been slowly weening off it overtime. There’s plenty of free software software-development tools out there. If there weren’t so many, then I would be more open to using proprietary ones. Issues with dev tools can be frustrating, but they’re much more frustrating when the tools are proprietary because there’s nothing that I can do to fix them. Plus, there’s plenty of people who would be less likely to contribute if proprietary software was required.</p>
+	</section>
+	<section>
+		<h3>The barrier to entry should be low</h3>
+		<p>Over the years, I’ve created a lot of public repos across three different project hosts (<a href="https://github.com/jayman2000" target="_blank" rel="external">GitHub</a>, <a href="https://gitlab.com/Jayman2000" target="_blank" rel="external">GitLab</a> and <a href="https://pagure.io/user/jayman" target="_blank" rel="external">Pagure</a>), but I’ve never received a single contribution. This is to be expected. <a href="https://redmonk.com/dberkholz/2013/04/22/the-size-of-open-source-communities-and-its-impact-upon-activity-licensing-and-hosting/" target="_blank" rel="external" hreflang="en">According to a 2013 analysis by Donnie Berkholz, <q>[o]n an annual level, <strong>just over half of active projects<strong>&nbsp;(51%)</strong> have only 1 contributor</strong>, while 19% have 2, 9% have 3, 5% have 4, and 3% have 5 (see the PDF column below).</q></a> Having a low barrier to entry will (hopefully) increase the likelihood of someone actually contributing.</p>
+	</section>
+	<section>
+		<h3>The process should be distributed</h3>
+		<p>In <a href="https://www.rand.org/pubs/research_memoranda/RM3420.html" target="_blank" rel="external" hreflang="en-US">his 1964 memorandum, <cite>On Distributed Communications: I. Introduction to Distributed Communications Networks</cite>,</a> <a href="https://www.internethalloffame.org/official-biography-paul-baran" target="_blank" rel="external">Paul Baran</a> wrote:</p>
+		<blockquote>
+			<p>Although one can draw a wide variety of networks, they all factor into two components: centralized (or star) and distributed (or grid or mesh) (see Fig. 1).</p>
+			<figure>
+				<img src="{{ generate_relative_url(relative_to_base, "posts/centralized-decentralized-and-distributed.webp") }}">
+				<figcaption>FIG. 1 — Centralized, Decentralized and Distributed Networks.</figcaption>
+			</figure>
+		</blockquote>
+		<p>Baran assigned letters to each of those network types, but I actually think that it makes more sense to assign them numbers: 0 for centralized, 1 for decentralized and 2 for distributed. Few networks are a perfect 0, 1 or 2. Take <a href="https://www.cloudflare.com/learning/dns/what-is-dns/" target="_blank" rel="external">DNS</a> for example. Anyone can run their own <a href="https://www.cloudflare.com/learning/dns/dns-server-types#recursive-resolver" target="_blank" rel="external">DNS recursor</a>, but <a href="https://www.isc.org/froot-process/" target="_blank" rel="external">you have to get permission from one of the twelve DNS root operators to run a DNS root node</a>. This puts DNS somewhere between a centralized and decentralized network. I give it a score of 0.8 (mostly decentralized). Email, as another example, is maybe a 1.2. While you need the decentralized infrastructure of mail servers to send and receive email, you can still read and compose mail offline using the distributed infrastructure of your own personal computers.</p>
+		<p>Ideally, my patch system would be a perfect 2. Being completely distributed would have a few advantages:</p>
+		<ol>
+			<li>If my servers go down, then the patch process will continue to function. At the moment, I don’t have a lot of experience hosting servers, and I wouldn’t be surprised if I end up making some big mistakes in the future.</li>
+			<li>I won’t have to provide all of the bandwidth.</li>
+			<li>People who live far away from my infrastructure won’t necessarily have to make a slow connection to my infrastructure to participate.</li>
+		</ol>
+	</section>
+</section>
+<section>
+	<h2>The Candidates</h2>
+	<section>
+		<h3><a href="https://github.com/" target="_blank" rel="external">GitHub</a></h3>
+		<p>GitHub is <a href="https://www.gnu.org/philosophy/categories.en.html#ProprietarySoftware" target="_blank" rel="external" hreflang="en">proprietary</a>, and, I can’t think of a single advantage that GitHub has over its free software alternatives. There’s plenty of things that GitHub does well. I like GitHub <a href="https://github.com/features/issues/" target="_blank" rel="external">issues</a> and <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests" target="_blank" rel="external">pull requests</a>, but I don’t see how they’re any better than their <a href="https://about.gitlab.com/" target="_blank" rel="external">GitLab</a> or <a href="https://pagure.io/" target="_blank" rel="external">Pagure</a> equivalents.</p>
+
+		<p>The only potential advantage would be the fact that so many people already use GitHub. That being said, I’m skeptical that this would actually be an advantage for patches specifically. I could see someone not reporting a bug because they don’t already have an account for something or because they don’t want to learn how to use a new system. If someone’s already willing to write a patch, they’re probably willing to spend a few minutes registering a new account and learning a new system. I want to emphasize that they’re probably willing to spend a few minutes getting set up. If the setup process becomes a whole ordeal, then there’s a good chance that they’ll give up on submitting the patch.</p>
+	</section>
+	<section>
+		<h3><a href="https://about.gitlab.com/" target="_blank" rel="external">GitLab</a></h3>
+		<p><a href="https://about.gitlab.com/install/ce-or-ee/" target="_blank" rel="external">There’s two different editions of GitLab, the Enterprise Edition and the Community Edition.</a> <a href="https://gitlab.com/gitlab-org/gitlab#editions" target="_blank" rel="external" hreflang="en-US">The Community Edition is available under the MIT license</a> <a href="https://www.gnu.org/licenses/license-list.html#Expat" target="_blank" rel="external" hreflang="en-US">(which is a free software license)</a>. The Enterprise Edition has <a href="https://gitlab.com/gitlab-org/gitlab" target="_blank" rel="external">a free software core</a> with <a href="https://gitlab.com/gitlab-org/gitlab/-/tree/master/ee" target="_blank" rel="external">source-available additions</a>. <a href="https://gitlab.com/explore" target="_blank" rel="external">gitlab.com</a> is a publicly hosted instance of GitLab Enterprise Edition (<a href="https://about.gitlab.com/pricing/" target="_blank" rel="external">it offers features</a> that are <a href="https://about.gitlab.com/install/ce-or-ee/" target="_blank" rel="external">only available in GitLab EE</a>). Luckily, <a href="https://gitlab.com/gitlab-org/gitlab/-/blob/master/LICENSE" target="_blank" rel="external" hreflang="en-US"><q>[a]ll client-side JavaScript (when served directly or after being compiled, arranged, augmented, or combined), is licensed under the "MIT Expat" license.</q></a> This means that it’s definitely possible to submit a <a href="https://docs.gitlab.com/ee/user/project/merge_requests/" target="_blank" rel="external">merge request</a> to gitlab.com using only free software. Even if it wasn’t, I could always just host my own GitLab Community Edition instance.</p>
+
+		<p>GitLab’s barrier to entry is pretty low. The hardest part is registering an account. Forking and creating a merge request will (hopefully) be easy for anyone who’s already willing to create a patch.</p>
+
+		<p>My biggest concern with GitLab is how centralized it is. Git is supposed to be a distributed version control system, but the design of GitHub, GitLab and other similar systems subverts Git’s distributed nature. As far as Git is concerned, <a href="https://github.com/git-guides/git-commit" target="_blank" rel="external">commits</a> can be <a href="https://git-scm.com/docs/git-fetch#_git_urls" target="_blank" rel="external">fetched from pretty much anywhere</a>. GitLab, on the other hand, requires that the instance that hosts the original repo also hosts the branch for the merge request. <a href="https://gitlab.com/groups/gitlab-org/-/epics/260" target="_blank" rel="external">There’s certainly a lot of noise about changing that fact</a>, but it doesn’t look like anything is implemented yet. This leaves me with two options:</p>
+		<ol>
+			<li>Be more centralized, and require that everyone creates merge requests on gitlab.com.</li>
+			<li>Be more decentralized, and require that everyone creates merge requests on a GitLab instance that I set up.</li>
+		</ol>
+		<p>The first option is OK, but it’s certainly not ideal. The second option is definitely something that I don’t want to do. If I allow people to have accounts on a system that I control, then I would be responsible for:</p>
+		<ul>
+			<li>making sure that confirmation and password reset emails aren’t blocked by people’s mail servers,</li>
+			<li>helping people recover their accounts if they lose both their password and access to their recovery email,</li>
+			<li>punishing users who are abusing the system,</li>
+			<li>blocking bots that are trying to brute force people’s passwords,</li>
+			<li>dealing with a data breach (if one happens) and</li>
+			<li>storing other people’s data forever for free.</li>
+		</ul>
+		<p>I don’t know how hard it would be to deal with any of those things or even if any of those things would be problems. The fact that I don’t know is the problem. I have zero experience hosting or running online communities, but I do know that it can be a very time consuming and thankless job.</p>
+	</section>
+	<section>
+		<h3><a href="https://radicle.xyz/" target="_blank" rel="external">Radicle</a></h3>
+		<p>When I first started looking into Radicle, it looked promising. It’s <a href="https://docs.radicle.xyz/understanding-radicle/faq#how-is-radicle-licensed" target="_blank" rel="external">free software</a>. It’s very distributed (it’s pretty much a perfect 2!). Unfortunately, it has a two fatal flaws.</p>
+
+		<p>The first is its barrier to entry. When I first tried Radicle, you pretty much had to have someone help you get started. I ended up figuring it out on my own, but it about 2 days of troubleshooting. The experience was frustrating. I’m sure that Radicle has improved since then, but I’m not sure by how much.</p>
+
+		<p>The second flaw is more significant. At the moment, there’s no way for anyone to comment on patches. You could take a look at the email address in the patches’s commits, but there’s no guarantee that it will be a real address (in fact, when I started using <a href="https://github.com/radicle-dev/radicle-upstream" target="_blank" rel="external">Upstream</a>, my email was set to <code>&lt;username&gt;@&lt;hash&gt;</code>). Even if the email address is correct, you would still only be able to comment on the patch privately. Public discourse is an important part of the bazaar development model, and Radicle doesn’t enable it yet.</p>
+
+		<p>I definitely like Radicle and want to use it for my projects, but it just isn’t quite ready yet.</p>
+	</section>
+	<section>
+		<h3>Email</h3>
+		<p>After looking into many of these solutions, I felt like I was missing something. If Git is supposed to be a distributed <abbr title="Version Control System">VCS</abbr>, then shouldn’t there be a distributed way of submitting changes upstream? Did the Git developers just drop the ball here? As it turns out, the Git developers didn’t have to create a distributed system for submitting patches because one already existed.</p>
+
+		<p>Historical context is important here. <a href="https://www.linuxjournal.com/content/git-origin-story" target="_blank" rel="external" hreflang="en-US">Git was created to help people develop the Linux kernel.</a> Originally, Torvalds didn’t use version control at all. Contributors just sent their patches to a mailing list. When Linux started using version control, that fact didn’t change.</p>
+
+		<p>Email can definitely be sent using only free software. Email is also fairly decentralized. The barrier to entry is about as low as it can get. Having an email address is (pretty much) a requirement for having a GitLab account. People are much more likely to already have email set up than they are to already have Radicle set up. <a href="https://git-send-email.io/" target="_blank" rel="external">Getting <code>git-send-email</code> working can be challenging</a>, but I can always have people run <a href="https://git-scm.com/docs/git-format-patch" target="_blank" rel="external"><code>git-format-patch</code></a> and send the results as an attachment.</p>
+
+		<p>One potential problem with email is that it’s private by default. One very traditional solution to this problem is to use a mailing list. My concern with running a mailing list is very similar to my concern with running a GitLab instance. There’s a lot that can go wrong with email, and I have very little experience with running mail servers.</p>
+
+		<p>The solution to that problem is <a href="https://public-inbox.org/" target="_blank" rel="external" hreflang="en">public-inbox</a>. <a href="https://public-inbox.org/README.html" target="_blank" rel="external" hreflang="en">It’s README</a> says:</p>
+		<blockquote>
+<pre>public-inbox stores mail in git repositories as documented
+in <a target="_blank" rel="external" href="https://public-inbox.org/public-inbox-v2-format.txt">https://public-inbox.org/public-inbox-v2-format.txt</a> and
+<a target="_blank" rel="external" href="https://public-inbox.org/public-inbox-v1-format.txt">https://public-inbox.org/public-inbox-v1-format.txt</a>
+
+By storing (and optionally) exposing an inbox via git, it is
+fast and efficient to host and mirror public-inboxes.
+
+Traditional mailing lists use the "push" model.  For readers,
+that requires commitment to subscribe and effort to unsubscribe.
+New readers may also have difficulty following existing
+discussions if archives do not expose Message-ID and References
+headers.  List server admins are also burdened with delivery
+failures.
+
+public-inbox uses the "pull" model.  Casual readers may
+follow the list via NNTP, IMAP, Atom feed or HTML archives.
+
+If a reader loses interest, they simply stop following.
+
+Since we use git, mirrors are easy-to-setup, and lists are
+easy-to-relocate to different mail addresses without losing
+or splitting archives.
+
+_Anybody_ may also setup a delivery-only mailing list server to
+replay a public-inbox git archive to subscribers via SMTP.</pre>
+		</blockquote>
+		<p>I’ll still have to set up a new email address and worry about incoming mail. Public-inbox makes it so that I don’t have to worry about outgoing mail. As a bonus, public-inbox makes the system more distributed by using Git for the archive. Anyone can create a perfect mirror of a public-inbox by cloning its Git repo.</p>
+	</section>
+</section>
+<section>
+	<h2>Conclusion</h2>
+	<p>Public-inbox is the way to go! I had come to that conclusion a while ago. The original plan was to set up public-inbox and then to write a blog post about it. Unfortunately, creating a well-oiled public-inbox isn’t exactly easy. The current plan is to write another post about some of the problems that I’m running into and then to start fixing them.</p>
+</section>
+{% endblock %}

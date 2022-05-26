@@ -56,7 +56,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 		[1]: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#directives>
 		[2]: <https://html.spec.whatwg.org/dev/semantics.html#attr-meta-http-equiv-content-security-policy>
 		#}
-		<meta http-equiv="content-security-policy" content="default-src 'none'; font-src {{ csp_self_source }} https://fonts.gstatic.com; style-src {{ csp_self_source }} https://fonts.googleapis.com; base-uri {{ csp_self_source }}; form-action 'none';">
+		<meta http-equiv="content-security-policy" content="default-src 'none'; font-src {{ csp_self_source }} https://fonts.gstatic.com; style-src {{ csp_self_source }} https://fonts.googleapis.com; base-uri 'none'; form-action 'none'; {% block additional_csp %}{% endblock %}">
 		<title>{% block full_title %}{% filter striptags %}{% block title %}{% endblock %}{% endfilter %} — {% block site_title %}Jason’s Web Site{% endblock %}{% endblock %}</title>
 		<link href="{% block css_url %}{{ generate_relative_url(relative_to_base, "main.css") }}{% endblock %}" rel="stylesheet" type="text/css;charset=utf-8">
 	</head>

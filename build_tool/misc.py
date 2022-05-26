@@ -6,6 +6,7 @@ from datetime import datetime
 from minify_html import minify as minify_html, minify_css
 from os import makedirs
 from pathlib import Path, PosixPath
+from re import compile as compile_re, Pattern
 from sys import stderr
 from typing import Final, Iterable, List, NamedTuple
 
@@ -57,6 +58,7 @@ def write_out_text_file(text: str, file_path: Path) -> None:
 		file.write(text)
 
 
+INVALID_LESS_THAN: Final[Pattern] = compile_re("&LT(?!;)")
 MINIFIED_SUFFIXES: Final = (".html", ".css")
 def minify(paths: Iterable[Path]) -> None:
 	print("Minifying…")
@@ -76,6 +78,17 @@ def minify(paths: Iterable[Path]) -> None:
 
 						minify_css=True
 				)
+				# WORKAROUND (should be removed later):
+				# According to the HTML Standard, character
+				# references have to end with semicolons (at
+				# least, they have to in text/html documents)
+				# [1]. Minify-html encodes less than signs as
+				# “&LT” [2]. Doing that is invalid (there’s no
+				# semicolon).
+				#
+				# [1]: <https://html.spec.whatwg.org/multipage/syntax.html#character-references>
+				# [2]: <https://github.com/wilsonzlin/minify-html/issues/1#issuecomment-618362516>
+				code = INVALID_LESS_THAN.sub("&lt;", code)
 			elif path.suffix == ".css":
 				# While minify_css() takes all of the same
 				# options as minify(), I don’t think that any of

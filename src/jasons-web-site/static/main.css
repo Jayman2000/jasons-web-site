@@ -127,12 +127,9 @@ blockquote > *:first-child::before
 	content: open-quote;
 }
 
-blockquote > *:last-child:not(ul)::after
-{
-	content: close-quote;
-}
-
-blockquote > *:last-child > li:last-child > p:last-child::after
+blockquote > *:last-child:not(ul, figure)::after,
+blockquote > *:last-child > li:last-child > p:last-child::after,
+blockquote > figure:last-child > figcaption::after
 {
 	content: close-quote;
 }

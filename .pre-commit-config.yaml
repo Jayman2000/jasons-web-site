@@ -102,9 +102,15 @@ repos:
                         Domain Dedication
                         <https://creativecommons.org/publicdomain/zero/1\.0/>|
                         The author of this font waived all copyright to the
-                        font and released it into the 🅮 public domain)\.
+                        font and released it into the 🅮 public domain|
+                        I believe that my use of this file is fair use, but you
+                        might disagree. If you do disagree, send me an email and
+                        I’ll be more than happy to take it down)\.
                     - --pattern
-                    - "SPDX-FileContributor: .+ <.+> \\((202[12][-–])?2022\\)\n"
+                    - >
+                        SPDX-FileContributor:
+                        .+( <.+>)?
+                        \(([0-9]{4}[-–])?[0-9]{4}\)
             -
                 # yamllint disable rule:line-length
                 #
