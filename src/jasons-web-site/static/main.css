@@ -127,7 +127,14 @@ blockquote > *:first-child::before
 	content: open-quote;
 }
 
-blockquote > *:last-child:not(ul, figure)::after,
+/*
+TODO: Combine the first two.
+
+In CSS, you can do :not(foo, bar, baz), but when you do, html5validator fails
+with a parse error. Once html5validator is fixed, those two should be combined.
+*/
+blockquote > *:last-child:not(ul)::after,
+blockquote > *:last-child:not(figure)::after,
 blockquote > *:last-child > li:last-child > p:last-child::after,
 blockquote > figure:last-child > figcaption::after
 {
