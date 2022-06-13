@@ -17,6 +17,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
 - [npm](https://www.npmjs.com/)*
 - [Python](https://www.python.org/) 3.8+
 - [Pipenv](https://pipenv.pypa.io/en/latest/)
+- [`rustc`](https://doc.rust-lang.org/rustc/index.html)
 
 It’s possible that alternatives (like [PyPy](https://www.pypy.org/) or
 [FreeBSD](https://www.freebsd.org/)’s `env`) will work, but they haven’t been
