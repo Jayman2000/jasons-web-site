@@ -10,17 +10,17 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
 ### Prerequisites
 
 - A [Java](http://oracle.com/java/) 8 Runtime Environment
-- [Cargo](https://doc.rust-lang.org/cargo/index.html)* 1.57.0
-- [`env` (GNU coreutils)](https://www.gnu.org/software/coreutils/)* 9.0
-- [GNU Bash](https://www.gnu.org/software/bash/)*, version 5.1.16
-- [Go](https://golang.org/)* 1.17.7
-- [npm](https://www.npmjs.com/)* 8.5.5
+- [Cargo](https://doc.rust-lang.org/cargo/index.html)*
+- [`env` (GNU coreutils)](https://www.gnu.org/software/coreutils/)*
+- [GNU Bash](https://www.gnu.org/software/bash/)*
+- [Go](https://golang.org/)*
+- [npm](https://www.npmjs.com/)*
 - [Python](https://www.python.org/) 3.8+
-- [Pipenv](https://pipenv.pypa.io/en/latest/) 2022.1.8
+- [Pipenv](https://pipenv.pypa.io/en/latest/)
 
-It’s possible that other versions (especially newer versions) and alternatives
-(like [PyPy](https://www.pypy.org/) or [FreeBSD](https://www.freebsd.org/)’s
-`env`) work, but they haven’t been tested.
+It’s possible that alternatives (like [PyPy](https://www.pypy.org/) or
+[FreeBSD](https://www.freebsd.org/)’s `env`) will work, but they haven’t been
+tested.
 
 _*In general, I want this project and its build system to be platform neutral,
 but some of these aren’t platform neutral. The only reason these are
