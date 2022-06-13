@@ -28,6 +28,12 @@ but some of these aren’t platform neutral. The only reason these are
 dependencies is to build [`minify-html`](https://crates.io/crates/minify-html)
 with [a specific patch](https://github.com/wilsonzlin/minify-html/pull/67)._
 
+If you have [Nix](https://nixos.org/) installed, then you can change directory
+to the root of this repo and run this command to start a shell that has all of
+the prerequisites installed:
+
+	nix-shell
+
 ### Build and validate
 
 1. Open a Bash terminal.
