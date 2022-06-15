@@ -62,7 +62,16 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 	</head>
 	<body>
 		{% if nav %}
-			<a href="{{ generate_relative_url(relative_to_base, "index.html") }}" hreflang="en-US" type="text/html;charset=utf-8">⬅ Home</a>
+			{#
+			Normally, I wouldn’t write elements like this. Here’s the problem: the CSS that I apply to the <ul> makes the whitespace actually matter. A single space gets placed between the elements in the DOM.
+			Thanks to J. Holmes (<https://stackoverflow.com/users/373378/j-holmes>) for this idea: <https://stackoverflow.com/a/3143465>.
+			#}
+			<nav>
+				<ul
+					><li><a href="{{ generate_relative_url(relative_to_base, "index.html") }}" hreflang="en-US" type="text/html;charset=utf-8"><span>⬅ Home</span></a></li
+					><li><a href="{{ generate_relative_url(relative_to_base, "v4v.html") }}" hreflang="en-US" type="text/html;charset=utf-8"><span>V4V</span></a></li
+				></ul>
+			</nav>
 		{% endif %}
 		{% block body_content %}{% endblock %}
 		{% if footer %}
