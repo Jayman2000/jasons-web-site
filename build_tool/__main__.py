@@ -10,6 +10,7 @@ from shutil import rmtree
 from typing import Final
 
 from jinja2 import FileSystemLoader, Environment
+from jinja2.filters import escape
 from sortedcontainers import SortedList
 
 from .misc import *
@@ -87,7 +88,14 @@ def build_site(site_slug: str,) -> None:
 		)
 
 	env = Environment(loader=FileSystemLoader(templates_dir))
-	env.globals = { 'reversed':reversed }
+	def include_static(relative_to_static_dir: Path) -> str:
+		with Path(static_dir, relative_to_static_dir).open() as file:
+			return escape(file.read())
+	env.globals = {
+			'include_static':include_static,
+			'Path':Path,
+			'reversed':reversed
+	}
 
 	for scheme in ARGS.schemes:
 		print(f"---------------------- {scheme} ----------------------")
