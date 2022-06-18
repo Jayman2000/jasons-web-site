@@ -4,6 +4,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 #}
 
 {% set nav = nav | default(true) %}
+{% set home_in_nav = home_in_nav | default(true) %}
 {% set footer = footer | default(true) %}
 
 {% set title = self.title() %}
@@ -71,7 +72,9 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 			#}
 			<nav>
 				<ul
-					><li><a href="{{ generate_relative_url(relative_to_base, "index.html") }}" hreflang="en-US" type="text/html;charset=utf-8"><span>⬅ Home</span></a></li
+					{% if home_in_nav %}
+						><li><a href="{{ generate_relative_url(relative_to_base, "index.html") }}" hreflang="en-US" type="text/html;charset=utf-8"><span>⬅ Home</span></a></li
+					{% endif %}
 					><li><a href="{{ generate_relative_url(relative_to_base, "v4v.html") }}" hreflang="en-US" type="text/html;charset=utf-8"><span>V4V</span></a></li
 				></ul>
 			</nav>
