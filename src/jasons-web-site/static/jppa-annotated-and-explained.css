@@ -1,0 +1,68 @@
+@charset "utf-8";
+/*
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+*/
+@import url('main.css');
+
+mark
+{
+	color: inherit;
+}
+/*
+TODO: This doesn’t validate properly even though it’s valid. It would really be nice if the Nu Html Checker had a new release. Then the html5validator package could be updated and this would validate.
+mark :is(a, a:is(:visited, :hover, :visited:hover))
+*/
+mark a,
+mark a:visited,
+mark a:hover,
+mark a:visited:hover
+{
+	color: inherit;
+}
+
+@media (prefers-color-scheme: light)
+{
+	.non_patch
+	{
+		background-color: #FF8080;
+	}
+
+	.patch_metadata
+	{
+		background-color: #80FFFF;
+	}
+
+	.proposed_addition
+	{
+		background-color: #BFFF80;
+	}
+
+	.potentially_someone_else
+	{
+		background-color: #BF80FF;
+	}
+}
+
+@media (prefers-color-scheme: dark)
+{
+	.non_patch
+	{
+		background-color: #800000;
+	}
+
+	.patch_metadata
+	{
+		background-color: #007F80;
+	}
+
+	.proposed_addition
+	{
+		background-color: #408000;
+	}
+
+	.potentially_someone_else
+	{
+		background-color: #400080;
+	}
+}
