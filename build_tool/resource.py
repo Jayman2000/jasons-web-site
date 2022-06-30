@@ -82,8 +82,9 @@ class Resource(ABC):
 		"""
 		for file_path in files_in(src_dir):
 			if (
-					ignored_suffix is None
-					or file_path.suffix != ignored_suffix
+					not file_path.name.startswith("_")
+					and (ignored_suffix is None
+					or file_path.suffix != ignored_suffix)
 			):
 				file_path = file_path.relative_to(src_dir)
 				yield cls(src_dir, file_path, *additional_args)
@@ -163,11 +164,10 @@ class JinjaResource(Resource):
 				*additional_args,
 				ignored_suffix=ignored_suffix
 		):
-			if not resource.relative_to_base.name.startswith("_"):
-				if resource.is_post():
-					yield resource
-				else:
-					NONPOSTS.append(resource)
+			if resource.is_post():
+				yield resource
+			else:
+				NONPOSTS.append(resource)
 		for resource in NONPOSTS:
 			yield resource
 

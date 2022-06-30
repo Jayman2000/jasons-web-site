@@ -1,0 +1,186 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block css_url %}{{ generate_relative_url(relative_to_base, "public-inbox-copyright-concerns.css") }}{% endblock %}
+{% block title %}How Should I Get Permission to Use Contributions?{% endblock %}
+{% block completion_time %}2022-06-29T18:53:04-04:00{% endblock %}
+
+{% block post_content %}
+<p>In <a href="{{ generate_relative_url(relative_to_base, "posts/how-should-i-accept-patches.html") }}" hreflang="en-US" type="text/html;charset=utf-8">a previous post</a>, I decided that I would accept patches using a <a href="https://public-inbox.org/README.html" target="_blank" rel="external" hreflang="en">public-inbox</a>. <a href="https://public-inbox.org/reproducibility.html" target="_blank" rel="external" hreflang="en">One advantage of public-inboxes is that anyone can mirror them.</a> There’s a few legal issues associated with accepting patches via public-inboxes and allowing people to mirror public-inboxes:</p>
+
+<ol>
+	<li><a href="https://copyright.gov/what-is-copyright/" target="_blank" rel="external" hreflang="en-US">By default, emails are copyrighted.</a> In other words, I’ll need permission to redistribute any emails that get sent to my public-inbox.</li>
+	<li>Even if I had permission to redistribute the emails, others wouldn’t necessarily have permission to redistribute them further.</li>
+	<li>Even if I had permission to do 1 and 2, I still wouldn’t necessarily have permission to incorporate emails that contain patches into upstream projects.</li>
+</ol>
+
+<section>
+	<h2>How others have solved similar issues</h2>
+	<p>I’m certainly not the first person to run into these sorts of challenges. Let’s take a look at how others have solved similar issues:</p>
+	<section>
+		<h3><a href="https://stackoverflow.com/" target="_blank" rel="external">Stack Overflow</a></h3>
+		<p>Stack Overflow isn’t meant to be mirrored or contain patches per se, but readers are often encouraged to copy from posters’ answers. To make sure that readers have legal permission to copy from answers, Stack Overflow first makes sure that posters agree to <a href="https://stackoverflow.com/legal/terms-of-service" target="_blank" rel="external">its Terms of Service</a>. Stack Overflow does this using three different mechanisms. The first is by linking to the Terms at the bottom of every page. If you click on that link, you’ll see that the first sentence is <q>By using our products, you agree to our Terms of Service.</q> The Terms go on to say:</p>
+		<figure>
+			<blockquote>
+				<p>By accessing or using the Services or the public Network in any manner, including without limitation by visiting or browsing the public Network or registering for an account on the Network, you affirm that you have read, understand, and agree to be bound by these Public Network Terms, as well as the <a href="https://stackoverflow.com/legal/content-policy" target="_blank" rel="external">Acceptable Use Policy</a> and <a href="https://stackoverflow.com/legal/privacy-policy" target="_blank" rel="external">Privacy Policy</a>.</p>
+			</blockquote>
+			<figcaption>— <a href="https://stackoverflow.com/legal/terms-of-service#terms" target="_blank" rel="external">Stack Overflow’s <cite>Public Network Terms of Service</cite> / 1. Public Network Terms</a> (<a href="https://web.archive.org/web/20220618025816/https://stackoverflow.com/legal/terms-of-service#terms" target="_blank" rel="external"><time>2022-01-12</time> revision</a>)</figcaption>
+		</figure>
+		<p>This first mechanism is something that I would like to avoid. How could anyone expect someone to truly (not just legally) agree to those terms <em>before</em> they use Stack Overflow? Even if the first time you visited Stack Overflow was by going directly to the Terms of Service page, you still would still be using the site before you had fully read those terms. Sending an <abbr title="Hypertext Transfer Protocol">HTTP</abbr> request for the Terms and interpreting the response counts as using the site (that might not be legally true, but it’s definitely literally true). In other words, you have to use the site to figure out what legal terms you’ve agreed to by using the site. It’s a trap!</p>
+		<p>The second mechanism for ensuring agreement to the Terms is gating off certain functionality. <a href="https://stackoverflow.com/help/why-register" target="_blank" rel="external">While you can use Stack Overflow without an account, you need an account to do certain things.</a> <a href="https://stackoverflow.com/users/signup" target="_blank" rel="external">The registration page</a> says <q>By clicking ‘Sign up’, you agree to our <a href="https://stackoverflow.com/legal/terms-of-service/public" target="_blank" rel="external">terms of service</a>, <a href="https://stackoverflow.com/legal/privacy-policy" target="_blank" rel="external">privacy policy</a> and <a href="https://stackoverflow.com/legal/cookie-policy" target="_blank" rel="external">cookie policy</a></q>. This mechanism is something that I’m much more OK with. This mechanism tells users exactly what they’re agreeing to before they have an opportunity to agree to it.</p>
+
+		<p>The final mechanism for ensuring agreement is the simplest. To the right of every “Post Your Answer” button is the text <q>By clicking ‘Post Your Answer’, you agree to our <a href="https://stackoverflow.com/legal/terms-of-service/public" target="_blank" rel="external">terms of service</a>, <a href="https://stackoverflow.com/legal/privacy-policy" target="_blank" rel="external">privacy policy</a> and <a href="https://stackoverflow.com/legal/cookie-policy" target="_blank" rel="external">cookie policy</a></q>.</p>
+
+		<p>The second thing that Stack Overflow does (to make sure readers have permission to copy from answers) is to include a license agreement in its Terms of Service:</p>
+		<figure>
+			<blockquote>
+				<p>You agree that any and all content, including without limitation any and all text, graphics, logos, tools, photographs, images, illustrations, software or source code, audio and video, animations, and product feedback (collectively, ‘Content’) that you provide to the public Network (collectively, ‘Subscriber Content’), is perpetually and irrevocably licensed to Stack Overflow on a worldwide, royalty-free, non-exclusive basis pursuant to Creative Commons licensing terms (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="external">CC BY-SA 4.0</a>), and[…]</p>
+			</blockquote>
+			<figcaption>— <a href="https://stackoverflow.com/legal/terms-of-service#licensing" target="_blank" rel="external">Stack Overflow’s <cite>Public Network Terms of Service</cite> / 6. Content Permissions, Restrictions, and Creative Commons Licensing</a> / Subscriber Content (<a href="https://web.archive.org/web/20220618025816/https://stackoverflow.com/legal/terms-of-service#licensing" target="_blank" rel="external"><time>2022-01-12</time> revision</a>)</figcaption>
+		</figure>
+		<p>I only have two complaints with this license agreement:</p>
+		<ol>
+			<li>It’s buried in a much longer Terms of service. The likelihood that anyone would actually read it is very low.</li>
+			<li>It’s all crammed in to a single sentence. I cut the quote off, but the full sentence is about the length of a paragraph, if you don’t include the bulleted list at the end of it.</li>
+		</ol>
+	</section>
+
+	<section>
+		<h3><a href="https://github.com/" target="_blank" rel="external">GitHub</a></h3>
+		<p>GitHub is a little bit closer to my use case than Stack Overflow. Stack Overflow only accepts comments that might contain snippets of code. GitHub accepts both comments and pull requests.</p>
+		<p>Like Stack Overflow, GitHub starts by making sure that everyone agrees to <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service" target="_blank" rel="external">its Terms of Service</a>. Unlike Stack Overflow, GitHub doesn’t try to make its Terms automatically apply to everyone who visits the site. Instead, there’s some text at the bottom of the <a href="https://github.com/join" target="_blank" rel="external">sign-up page</a> that says <q>By creating an account, you agree to the <a href="https://github.com/site/terms" target="_blank" rel="external">Terms of Service</a>.</q></p>
+		<section>
+			<h4>Comments</h4>
+			<p>GitHub’s handling of comments is a little bit tricky. GitHub appears to be leveraging copyright law for vendor lock-in:</p>
+			<figure>
+				<blockquote><p>If you set your pages and repositories to be viewed publicly, you grant each User of GitHub a nonexclusive, worldwide license to use, display, and perform Your Content through the GitHub Service and to reproduce Your Content solely on GitHub as permitted through GitHub's functionality (for example, through forking).</p></blockquote>
+				<figcaption>
+					<p>— <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users" target="_blank" rel="external"><cite>GitHub Terms of Service</cite> / D.5. License Grant to Other Users</a> (<a href="https://web.archive.org/web/20220620031107/https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users" target="_blank" rel="external"><time>2020-11-16</time> revision</a>)</p>
+					<p>(“Your Content” is defined to include comments. See <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#a-definitions" target="_blank" rel="external">A.4</a>.)</p>
+				</figcaption>
+			</figure>
+			<p>This means that GitHub comments aren’t necessarily <a href="https://public-inbox.org/reproducibility.html" target="_blank" rel="external">reproducible</a> outside of GitHub. In practice though, I doubt that prevision has made anyone think twice about moving away from GitHub.</p>
+		</section>
+		<section>
+			<h4>Pull requests</h4>
+			<p>Pull requests (both <a href="https://git-scm.com/docs/git-request-pull" target="_blank" rel="external">regular ones</a> and <a href="https://docs.github.com/en/pull-requests" target="_blank" rel="external">GitHub ones</a>) have an advantage over <a href="https://git-scm.com/docs/git-format-patch" target="_blank" rel="external">patches</a>: to make a pull request, you have to push an entire commit. Consider the following situation:</p>
+<pre><samp>$ <kbd>git clone <a href="https://github.com/octocat/git-consortium" target="_blank" rel="external">https://github.com/octocat/git-consortium</a>.git
+</kbd>Cloning into 'git-consortium'...
+remote: Enumerating objects: 19, done.
+remote: Total 19 (delta 0), reused 0 (delta 0), pack-reused 19
+Receiving objects: 100% (19/19), 7.13 KiB | 7.13 MiB/s, done.
+Resolving deltas: 100% (7/7), done.
+$ <kbd>cd git-consortium/
+</kbd>$ <kbd>git checkout -b example
+</kbd>Switched to a new branch 'example'
+$ <kbd>echo -e '\nBTW, this license doesn’t apply to foo.txt.' >> LICENSE
+</kbd>$ <kbd>git add LICENSE
+</kbd>$ <kbd>git commit -m 'Preemptively relicense foo'
+</kbd>[example 57804db] Preemptively relicense foo
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+$ <kbd>echo 'Pretend that there’s something copyrightable here.' > foo.txt
+</kbd>$ <kbd>git add foo.txt
+</kbd>$ <kbd>git commit -m 'Create foo.txt'
+</kbd>[example bbfbbc1] Create foo.txt
+ 1 file changed, 1 insertion(+)
+ create mode 100644 foo.txt
+$ <kbd>git format-patch HEAD^
+</kbd>0001-Create-foo.txt.patch
+$ <kbd>cat 0001-Create-foo.txt.patch
+</kbd>From bbfbbc128d3dce29699b0e56821f1bd9bb01d01c Mon Sep 17 00:00:00 2001
+From: Jason Yundt &lt;jason@jasonyundt.email&gt;
+Date: Mon, 20 Jun 2022 15:34:39 -0400
+Subject: [PATCH] Create foo.txt
+
+---
+ foo.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 foo.txt
+
+diff --git a/foo.txt b/foo.txt
+new file mode 100644
+index 0000000..18b454a
+--- /dev/null
++++ b/foo.txt
+@@ -0,0 +1 @@
++Pretend that there’s something copyrightable here.
+--
+2.36.0
+
+</samp></pre>
+			<p>If that patch was sent to me, I would assume that <code>foo.txt</code> was available under the same license as the rest of the repo. In reality, most patches don’t contain enough information for us to determine what legal terms apply to them. Now, let’s imagine that this change was submitted as a pull request rather than a patch. <a href="https://git-scm.com/docs/git-request-pull#_examples" target="_blank" rel="external">Before you can submit a pull request, you have to push all of the pull request’s commits to a remote.</a> <a href="https://github.blog/2020-12-17-commits-are-snapshots-not-diffs/" target="_blank" rel="external">Commits are snapshots</a> which means that every commit contains (a reference to) every file that was being tracked at the time. In other words, before you make a pull request, you have to give the recipient a complete copy of your version of the project. That complete copy would (probably) contain a license for the changes.</p>
+			<p>Even if the license file wasn’t modified, it still isn’t clear to me what the patch’s license would be. When I receive a copyright license, I expect there to be a statement telling me what the license is. As it turns out, that isn’t always the case. I recently found out that there’s something known as an <a href="https://www.authorsalliance.org/2020/05/27/implied-licenses-in-copyright-law/" target="_blank" rel="external" hreflang="en-US">implied license</a>. In other words, when someone sends me a patch, it’s possible that I’ll get a license for that patch even if the email doesn’t mention licensing or permissions at all. The question is: what license would I get in this situation? I would want it to be the same as what the upstream project is using, but I don’t know how likely that would be.</p>
+			<p>All in all, pull requests tend to be licensed correctly, even in the absence extra legal agreements. The keyword here is <em>tend</em>. There are a few scenarios where pull requests get a little bit of help from the GitHub Terms of Service. The first is when a repo has no license. As I mentioned before, you must push commits to a remote in order to make a pull request. In other words, you have to distribute copies of the upstream project in order to make a pull request. <a href="https://choosealicense.com/no-permission/" target="_blank" rel="external" hreflang="en-US">If you don’t have a license, then you can’t distribute copies.</a> Here’s GitHub’s solution to that problem:</p>
+			<figure>
+				<blockquote>
+					<p>By setting your repositories to be viewed publicly, you agree to allow others to view and "fork" your repositories (this means that others may make their own copies of Content from your repositories in repositories they control).</p>
+					<p>If you set your pages and repositories to be viewed publicly, you grant each User of GitHub a nonexclusive, worldwide license to use, display, and perform Your Content through the GitHub Service and to reproduce Your Content solely on GitHub as permitted through GitHub's functionality (for example, through forking). You may grant further rights if you <a href="https://docs.github.com/en/articles/adding-a-license-to-a-repository/#including-an-open-source-license-in-your-repository" target="_blank" rel="external" hreflang="en">adopt a license</a>.
+				</blockquote>
+				<figcaption>— <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users" target="_blank" rel="external"><cite>GitHub Terms of Service</cite> / D.5. License Grant to Other Users</a> (<a href="https://web.archive.org/web/20220620031107/https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users" target="_blank" rel="external"><time>2020-11-16</time> revision</a>)</figcaption>
+			</figure>
+			<p>The second scenario where pull requests get help from the GitHub ToS is for projects with <abbr title="Contributor License Agreements">CLAs</abbr>. Some (perhaps all) <abbr title="Contributor License Agreements">CLAs</abbr> give more permission to project owners than project licenses give to others. The ToS specifically has a prevision for <abbr title="Contributor License Agreements">CLAs</abbr>:</p>
+			<figure>
+				<blockquote>
+					<p>Whenever you add Content to a repository containing notice of a license, you license that Content under the same terms, and you agree that you have the right to license that Content under those terms. If you have a separate agreement to license that Content under different terms, such as a contributor license agreement, that agreement will supersede.</p>
+				</blockquote>
+				<figcaption>— <a href="https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#6-contributions-under-repository-license" target="_blank" rel="external"><cite>GitHub Terms of Service</cite> / 6. Contributions Under Repository License</a> (<a href="https://web.archive.org/web/20220620031107/https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#6-contributions-under-repository-license" target="_blank" rel="external"><time>2020-11-16</time> revision</a>)</figcaption>
+			</figure>
+		</section>
+	</section>
+	<section>
+		<h3>The <a href="https://git-scm.com/" target="_blank" rel="external"><cite>Git</cite></a> project itself</h3>
+		<p><cite>Git</cite> <a href="https://git-scm.com/docs/MyFirstContribution#_gitvger_kernel_org" target="_blank" rel="external" hreflang="en">is developed on</a> <a href="mailto:git@vger.kernel.org" target="_blank" rel="external" hreflang="en">a mailing list</a>. <a href="https://lore.kernel.org/git/" target="_blank" rel="external" hreflang="en">That mailing list is available as a public-inbox</a> <a href="https://git-scm.com/docs/MyFirstContribution#ready-to-share" target="_blank" rel="external">where people contribute to <cite>Git</cite> by submitting patches</a>. This means that the <cite>Git</cite> project does something very similar to what I want to do.</p>
+		<p>From what I can tell, the <cite>Git</cite> project doesn’t explicitly get permission to distribute most mailing list posts. It’s possible that sending an email to <a href="mailto:git@vger.kernel.org" target="_blank" rel="external" hreflang="en">git@vger.kernel.org</a> gives the <cite>Git</cite> project an implied copyright license to distribute that email. That license probably wouldn’t give others permission to mirror the project’s public-inbox. Additionally, <a href="https://lore.kernel.org/git/425DA1D0.5080104@zytor.com/T/" target="_blank" rel="external" hreflang="en">the earliest email that I found in the archive is from 2005</a>, long before <a href="https://public-inbox.org/public-inbox.git/commit/?id=3e96cf129ba5fc2834b691314c504aa363fd5cf4" target="_blank" rel="external" hreflang="en">the <cite>public-inbox</cite> project was started</a>. While it’s possible that in 2005, posting to the <cite>Git</cite> mailing list gave the project an implied license to distribute the messages in an archive, I doubt that that license would give others permission to redistribute <cite>Git</cite>’s public-inbox.</p>
+		<p>Patches, on the other hand, are different. The <cite>Git</cite> project very explicitly gets permission to incorporate patches:</p>
+		<figure>
+			<blockquote>
+				<p>To improve tracking of who did what, we ask you to certify that you wrote the patch or have the right to pass it on under the same license as ours, by "signing off" your patch.  Without sign-off, we cannot accept your patches.</p>
+			</blockquote>
+			<figcaption>— <a href="https://git-scm.com/docs/SubmittingPatches" target="_blank" rel="external" hreflang="en">SubmittingPatches</a> (<a href="https://git.kernel.org/pub/scm/git/git.git/tree/Documentation/SubmittingPatches?h=v2.36.1" target="_blank" rel="external" hreflang="en">from <cite>Git</cite> v2.36.1</a>)</figcaption>
+		</figure>
+		<p>SubmittingPatches goes on to explain that signing off on a commit indicates that the author of the commit agrees to <a href="https://developercertificate.org/" target="_blank" rel="external" hreflang="en">the Developer Certificate of Origin</a>. The <abbr title="Developer Certificate of Origin">DCO</abbr> makes contributors certify that are legally able to offer an appropriate license for their contributions.</p>
+		<p>Initially, I thought about using the <abbr title="Developer Certificate of Origin">DCO</abbr> for my projects. It wouldn’t be a complete solution, but it would offer some legal clarity for patches. Plus, it’s relatively well known among <abbr title="Free and open-source software">FOSS</abbr> contributors. Unfortunately, the <abbr title="Developer Certificate of Origin">DCO</abbr> doesn’t really work the way I want it to:</p>
+		<ul>
+			<li>The <abbr title="Developer Certificate of Origin">DCO</abbr> has contributors certify that they have the <em>right</em> to submit their contribution under an appropriate license. It doesn’t make them certify that their contribution is actually under an appropriate license.</li>
+			<li>The <abbr title="Developer Certificate of Origin">DCO</abbr> only works for <em>open-source licenses</em>. Many of the files in my projects are dedicated to the public domain under <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external">🅭🄍</a>. <a href="https://creativecommons.org/faq/#how-do-cc-licenses-operate" target="_blank" rel="external">🅭🄍 is a public domain dedication, not a license.</a> If 🅭🄍 was a license, then it <a href="https://opensource.org/faq#public-domain" target="_blank" rel="external">probably wouldn’t</a> be <a href="https://opensource.org/faq#cc-zero" target="_blank" rel="external">an open-source one</a>.</li>
+			<li>The <abbr title="Developer Certificate of Origin">DCO</abbr> only works for <q>[…]the open source license <em>indicated in the file</em></q>. I try to make many of the files in my projects indicate their license or public domain dedication, but there are some files where that simply isn’t the best option. I’m sure that it’s possible to embed licensing metadata in an image file, but I doubt that many people would know how to access that metadata. Plus, there’s definitely some file formats where you couldn’t add licensing metadata in a reasonable way.</li>
+		</ul>
+	</section>
+	<section>
+		<h3>Others</h3>
+		<p>While every project and service is different, my research indicates that most projects fall into one or more of these categories:</p>
+		<ul>
+			<li>projects that rely on implied licenses,</li>
+			<li>projects that let their centralized hosting platform handle it (by requiring pull requests or agreement to a ToS) or</li>
+			<li>projects that have some sort of <abbr title="Contributor License Agreement">CLA</abbr> (like the <abbr title="Developer Certificate of Origin">DCO</abbr>).</li>
+		</ul>
+	</section>
+</section>
+<section>
+	<h2>How I’m solving these legal issues</h2>
+	<p>It would be nice if there was a <abbr title="Contributor License Agreement">CLA</abbr> that</p>
+	<ul>
+		<li>applied to both patches and comments and</li>
+		<li>worked well with both licenses and public domain dedications.</li>
+	</ul>
+	<p>
+		I couldn’t find one, so I decided to make my own. (If you know of another one, then
+		{#
+		Thanks, Trevor Robinson (<https://stackoverflow.com/users/123336/trevor-robinson>).
+		<https://stackoverflow.com/a/43324047/7593853>
+		#}
+		<a href="mailto:?to=Jason%20Yundt%20%3cjason@jasonyundt.email%3e" rel="author external">please email me</a>). You can find it <a href="{{ generate_relative_url(relative_to_base, "jppa.html") }}" hreflang="en-US" type="text/html;charset=utf-8">here</a>.
+	</p>
+	<p>In my next post, I’m going to break down the agreement that I created, and explain why I wrote it the way I did. After that, I’m going to:</p>
+	<ol>
+		<li>write instructions for how to submit patches to my public-inbox,</li>
+		<li>test that patch submission process with a regular inbox,</li>
+		<li>switch my Web server to <a href="https://nixos.org/" target="_blank" rel="external" hreflang="en">NixOS</a> and then</li>
+		<li>create a public-inbox for accepting patches.</li>
+	</ol>
+	<p>It’ll be a while before I get back to working on <a href="{{ generate_relative_url(relative_to_base, "posts/3-or-4.html") }}" hreflang="en-US" type="text/html;charset=utf-8">Jason’s Ring-Con Project</a>. Once more of that project is complete, it will hopefully become more clear why I’m spending so much time on this process.</p>
+</section>
+{% endblock %}

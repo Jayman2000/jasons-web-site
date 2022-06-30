@@ -1,0 +1,11 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "_base_page.html" %}
+
+{% block body_content %}
+<h1>{% block title %}Jason’s Public-inbox Posting Agreement{% endblock %}</h1>
+<p>You can submit feedback, bug reports and patches to my public-inbox. The first time you send a message to that address, you’ll be greeted with the following message:</p>
+<pre>{{ include_static(Path("_jppa.txt")) }}</pre>
+{% endblock %}

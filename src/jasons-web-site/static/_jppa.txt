@@ -1,0 +1,103 @@
+Subject: Your post is queued. Here’s what you need to do.
+
+Hello!
+
+
+Your message was received, but there’s something that I need you to do before
+I make it public. I want to make sure that:
+
+	• anyone can legally use the patches posted here and that
+	• anyone can legally mirror this public-inbox.
+
+If you want your message be put into this public-inbox, then you need to agree
+to the following:
+
+	Definitions:
+		“GPLed” — available under some version of the GNU General
+		Public License. See <https://www.gnu.org/licenses/gpl.html>.
+
+		“MIT Licensed” — available under some version of the MIT
+		License. See <https://fedoraproject.org/wiki/Licensing:MIT>.
+
+		“proposed addition” — data that indicates that a file should
+		be created or that something should be added to a file.
+
+		“proposed removal” — data that indicates that a file should be
+		deleted or that something should be removed from a file.
+
+		“proposed change” — a proposed addition or proposed removal.
+
+		“patch” — a set of proposed changes optionally with extra
+		data. The extra data might include a commit message, the names
+		of any authors, file attributes or the version of Git used.
+
+		“patch metadata” — the parts of a patch that aren’t proposed
+		changes and aren’t quoting files to give context to proposed
+		changes.
+
+		“repo” — repository.
+
+	1. Any patches submitted to this address will be available under
+	appropriate legal terms. Specifically:
+		• The legal terms that apply to a submitted patch’s proposed
+		additions will be the legal terms that the repo indicates
+		after the patch has been applied. Examples:
+			◦ Repo A indicates that all of its files are GPLed. A
+			patch for repo A is submitted. The patch doesn’t
+			mention anything about copying information. In this
+			situation, all of the patch’s proposed additions are
+			GPLed.
+
+			◦ Repo B indicates that all of its files are GPLed. A
+			patch for repo B is submitted. Applying the patch
+			changes repo B’s copying information. It makes repo B
+			indicate that every file, except for foo.txt, is
+			GPLed. It also makes repo B indicate that foo.txt is
+			MIT Licensed. In this situation, the patch’s proposed
+			additions to foo.txt would be MIT Licensed. Any other
+			proposed additions would be GPLed.
+
+			◦ Repo C indicates that everything in foo.c is GPLed
+			except for the bar() function. Repo C also indicates
+			that bar() is MIT Licensed. A patch for repo C is
+			submitted. The patch doesn’t mention anything about
+			copying information. In this situation, any proposed
+			additions to foo.c would be GPLed unless they add to
+			bar(). Any proposed additions to the bar() function
+			would be MIT Licensed.
+		• All submitted patch metadata will be dedicated to the public
+		domain under 🅭🄍1.0 (see
+		<https://creativecommons.org/publicdomain/zero/1.0/>).
+
+	2. Emails sent to this address that aren’t patches will be available
+	under 🅭🅯🄏🄎4.0 (see
+	<https://creativecommons.org/licenses/by-nc-sa/4.0/>).
+
+	3. If an email sent to this address contains one or more patches, but
+	also contains stuff that isn’t part of a patch, then the stuff that
+	isn’t part of a patch will be available under 🅭🅯🄏🄎4.0 (see
+	<https://creativecommons.org/licenses/by-nc-sa/4.0/>).
+
+If you agree, reply to this email with the magic phrase:
+
+	“Yes, I agree.”
+
+Put the phrase on its own line. Don’t include any whitespace before the word
+“yes” or any quotation marks.
+
+Once you do so, I’ll add your email address to the list of people who have
+agreed and make your original message public. You won’t have to go through
+this process again, unless I update this agreement. (This is version -1 by the
+way).
+
+If you don’t agree, that’s OK. You can still contribute by sending feedback
+and pull requests to
+
+	Jason Yundt <jason@jasonyundt.email>
+
+Use git-request-pull to create pull requests. See
+<https://www.git-scm.com/docs/git-request-pull>.
+
+
+Sorry for writing War and Peace,
+Jason Yundt

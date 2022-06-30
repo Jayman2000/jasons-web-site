@@ -11,6 +11,6 @@ pkgs.mkShell {
 		nodejs
 		python38
 		pipenv
-                rustc
+		rustc
 	];
 }

@@ -2,6 +2,8 @@
 /*
 SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+
+REMEMBER: If you need styling for <samp> and friends, then move it from public-inbox-copyright-concerns.css to here.
 */
 @import url('cc-symbols-font.css');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Source+Code+Pro:wght@400;700&display=swap');
@@ -57,6 +59,21 @@ These color schemes are based on the Breeze Dark and Breeze Light themes:
 	{
 		color: #5d366e;
 	}
+
+	nav a
+	{
+		background: linear-gradient(#eff0f1, #e8e9ea);
+	}
+
+	nav a:hover
+	{
+		background: #eff0f1;
+	}
+
+	nav span
+	{
+		color: #232627;
+	}
 }
 
 @media (prefers-color-scheme: dark)
@@ -90,6 +107,21 @@ These color schemes are based on the Breeze Dark and Breeze Light themes:
 	a:hover:visited
 	{
 		color: #d87dff;
+	}
+
+	nav a
+	{
+		background: linear-gradient(#373c41, #303539);
+	}
+
+	nav a:hover
+	{
+		background: #31363b;
+	}
+
+	nav span
+	{
+		color: #fcfcfc;
 	}
 }
 
@@ -144,4 +176,45 @@ blockquote > figure:last-child > figcaption::after
 dfn {
 	font-style: italic;
 	font-weight: bold;
+}
+
+nav ul
+{
+	list-style: none;
+	padding: 0;
+}
+
+nav li
+{
+	display: inline-block;
+	min-width: 10ch;
+	height: 5ch;
+	margin-left: 1ex;
+	margin-right: 1ex;
+}
+
+nav a
+{
+	display: table-cell;
+	min-width: inherit;
+	height: inherit;
+
+	text-align: center;
+	vertical-align: middle;
+
+	text-decoration-line: none;
+
+	outline: solid;
+	border-radius: 0.5ex;
+	outline-color: #727679;
+}
+
+nav a:hover
+{
+	outline-color: #3daee9;
+}
+
+nav span
+{
+	line-height: 3ex;
 }
