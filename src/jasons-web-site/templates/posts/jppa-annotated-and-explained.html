@@ -1,0 +1,501 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block title %}<abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> Annotated and Explained{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "jppa-annotated-and-explained.css") }}{% endblock %}
+{% block completion_time %}2022-07-02T21:07:29-04:00{% endblock %}
+
+{% block post_content %}
+	<p>In my <a href="{{ generate_relative_url(relative_to_base, "posts/how-should-i-get-permission-to-use-contributions.html" ) }}" hreflang="en-US" type="text/html;charset=utf-8">previous post</a>, I wrote about why I chose to create <a href="{{ generate_relative_url(relative_to_base, "jppa.html" ) }}" hreflang="en-US" type="text/html;charset=utf-8">Jason’s Public-inbox Posting Agreement</a>. In this post, I’m going to go through each part of the agreement and explain why I wrote it the way I did. Specifically, this post will break down the first version of the agreement. In the future, if I update the agreement, I might make another blog post breaking down the new version.</p>
+	<blockquote><pre>Hello!
+
+
+Your message was received, but there’s something that I need you to do before
+I make it public. I want to make sure that:
+
+	• anyone can legally use the patches posted here and that
+	• anyone can legally mirror this public-inbox.</pre>
+	</blockquote>
+
+	<p>People should be suspicious of legal agreements. That sentence explains why I’m asking people to agree to <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> so that they can judge for themselves whether or not I’m trying to pull one over on them.</p>
+
+	<blockquote><pre>If you want your message be put into this public-inbox, then you need to agree
+to the following:</pre>
+	</blockquote>
+
+	<p>That sentence gives me the opportunity to indent the main portion of the agreement. Indenting the main portion of the agreement makes the important parts of this message stand out.</p>
+
+	<blockquote><pre>
+	Definitions:
+		“GPLed” — available under some version of the GNU General
+		Public License. See &lt;https://www.gnu.org/licenses/gpl.html&gt;.
+
+		“MIT Licensed” — available under some version of the MIT
+		License. See &lt;https://fedoraproject.org/wiki/Licensing:MIT&gt;.</pre></blockquote>
+
+	<p>These two definitions aren’t necessary, but I included them for clarity. I only use them in the examples for number 1 bullet 1. That bullet point is the part of the agreement that’s most difficult to understand.</p>
+
+	<blockquote><pre>
+		“proposed addition” — data that indicates that a file should
+		be created or that something should be added to a file.
+
+		“proposed removal” — data that indicates that a file should be
+		deleted or that something should be removed from a file.
+
+		“proposed change” — a proposed addition or proposed removal.</pre>
+	</blockquote>
+
+	<p>Technically, I didn’t need to define proposed removal or proposed change. “Proposed removal” only gets used in the definition for “proposed change”, and “proposed change” only gets used in the definition for “patch”. I chose to define “patch” in terms of proposed changes because I felt like it made the agreement easier to understand.</p>
+
+	<blockquote><pre>
+		“patch” — a set of proposed changes optionally with extra
+		data. The extra data might include a commit message, the names
+		of any authors, file attributes or the version of Git used.
+
+		“patch metadata” — the parts of a patch that aren’t proposed
+		changes and aren’t quoting files to give context to proposed
+		changes.</pre>
+	</blockquote>
+
+	<p>I defined these two terms carefully. I wanted there to be a clear distinction between these different parts of a patch:</p>
+
+	<ol>
+		<li>the parts that the contributor has to release as <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external">🅭🄍</a> (the patch metadata),</li>
+		<li>the parts that the contributor has to release under whatever terms the repo indicates (the proposed additions) and</li>
+		<li>the parts that were potentially created by someone else (the proposed removals and the parts that are quoting files to give context).</li>
+	</ol>
+
+	<p>Additionally, I tried to define “proposed addition”, “proposed removal”, “proposed change”, “patch” and “patch metadata” in a technology neutral way. I don’t want <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> to be an obstacle if I ever decide to experiment with a new <abbr title="version control system">VCS</abbr> or patch format.</p>
+
+	<blockquote><pre>
+		“repo” — repository.</pre>
+	</blockquote>
+
+	<p>This definition is probably unnecessary. When I was considering including this definition, I did a Web search for “repo definition” and got <a href="https://www.investopedia.com/terms/r/repurchaseagreement.asp" target="_blank" rel="external" hreflang="en-US">information about repurchase agreements</a>. That’s the only reason I chose to keep this definition.</p>
+
+	<blockquote><pre>
+	1. Any patches submitted to this address will be available under
+	appropriate legal terms. Specifically:
+		• The legal terms that apply to a submitted patch’s proposed
+		additions will be the legal terms that the repo indicates
+		after the patch has been applied. Examples:</pre>
+	</blockquote>
+
+	<p>This is the trickiest part right here. The goal of this part is to make sure that <a href="https://opensource.com/law/11/7/trouble-harmony-part-1#contribution-policies-and-free-software-tradition" target="_blank" rel="external" hreflang="en-US">the inbound=outbound rule applies</a>. In one draft, this provision applied to entire <a href="https://www.gnu.org/software/diffutils/manual/html_node/Hunks.html" target="_blank" rel="external">hunks</a> rather than just proposed additions. I changed it when I considered hunks like this one:</p>
+
+	<figure>
+		<figcaption>Hunk from <a href="https://lists.sr.ht/~radicle-link/dev/patches/29349" target="_blank" rel="external" hreflang="en-US">a patch that I submitted to one of the</a> <a href="https://radicle.network/" target="_blank" rel="external">Radicle</a> projects.</figcaption>
+		<blockquote><pre>
+@@ -36,6 +36,6 @@ If you are considering to contribute to this project, please review the
+ [annml]: https://lists.sr.ht/~radicle-link/announce
+ [devml]: https://lists.sr.ht/~radicle-link/dev
+ [rustup]: https://rustup.rs
+-[GPLv3]: https://www.gnu.org/licenses/gpl-3.0.txt
++[GPLv3]: https://www.gnu.org/licenses/gpl-3.0
+ [LICENSE]: ./LICENSE
+ [contributing]: ./CONTRIBUTING.md
+</pre>
+		</blockquote>
+	</figure>
+
+	<p>Most of that hunk is lines that were created by someone else. I shouldn’t ask contributors to apply legal terms to something that they didn’t create, so I changed number 1 bullet 1 to only apply to proposed additions. I also made sure that <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> doesn’t explicitly mention what the legal terms for proposed removals and context lines should be. The thought is that the repo itself should have already provided legal terms for those lines.</p>
+
+	<p>You may have noticed that I keep using the phrase “legal terms” instead of “license”. This in on purpose. Many of the files in my projects are dedicated to the public domain using 🅭🄍 <a href="https://creativecommons.org/faq/#how-do-cc-licenses-operate" target="_blank" rel="external">which isn’t a license</a>. Additionally, many software licenses are more than just licenses. In the <abbr title="free and open-source software">FOSS</abbr> world, the term “license” is generally understood to mean “copyright license”, but <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="external" hreflang="en-US">some</a> <a href="https://www.gnu.org/licenses/gpl-3.0.html#section11" target="_blank" rel="external" hreflang="en-US"><abbr title="free and open-source software">FOSS</abbr></a> <a href="https://opensource.org/licenses/BSDplusPatent" target="_blank" rel="external" hreflang="en-US">licenses</a> contain patent licenses. Even if the term “<abbr title="free and open-source software">FOSS</abbr> license” did refer to both copyright and patent licenses, it’s a stretch to say that it refers to contracts as well. In fact, <a href="https://www.gnu.org/philosophy/free-sw.html.en#contracts" target="_blank" rel="external" hreflang="en-US">the free software definition discourages the use of contracts</a> despite the fact that <a href="https://sfconservancy.org/news/2022/may/16/vizio-remand-win/" target="_blank" rel="external" hreflang="en-US">the GNU Project’s own GPL is a contract</a>.</p>
+
+	<blockquote><pre>
+		[…]after the patch has been applied. Examples:
+			◦ Repo A indicates that all of its files are GPLed. A
+			patch for repo A is submitted. The patch doesn’t
+			mention anything about copying information. In this
+			situation, all of the patch’s proposed additions are
+			GPLed.
+
+			◦ Repo B indicates that all of its files are GPLed. A
+			patch for repo B is submitted. Applying the patch
+			changes repo B’s copying information. It makes repo B
+			indicate that every file, except for foo.txt, is
+			GPLed. It also makes repo B indicate that foo.txt is
+			MIT Licensed. In this situation, the patch’s proposed
+			additions to foo.txt would be MIT Licensed. Any other
+			proposed additions would be GPLed.
+
+			◦ Repo C indicates that everything in foo.c is GPLed
+			except for the bar() function. Repo C also indicates
+			that bar() is MIT Licensed. A patch for repo C is
+			submitted. The patch doesn’t mention anything about
+			copying information. In this situation, any proposed
+			additions to foo.c would be GPLed unless they add to
+			bar(). Any proposed additions to the bar() function
+			would be MIT Licensed.</pre>
+	</blockquote>
+
+	<p>Like I mentioned before, number 1 bullet 1 is the most difficult part of the agreement. I included these examples to (hopefully) make the agreement more clear.</p>
+
+	<blockquote><pre>
+	1. Any patches submitted to this address will be available under
+	appropriate legal terms. Specifically:
+	[…]
+		• All submitted patch metadata will be dedicated to the public
+		domain under 🅭🄍1.0 (see
+		&lt;https://creativecommons.org/publicdomain/zero/1.0/&gt;).</pre>
+	</blockquote>
+
+	<p>The goal of this bullet is to align the law with contributor expectations. Contributors generally don’t think about the copyright of commit messages. They might make sure they have the right to mirror the software itself somewhere, but they don’t make sure they have the right to mirror the commit messages. Using 🅭🄍 here makes sure that they don’t have to think about commit message copyright before they push.</p>
+
+	<blockquote><pre>
+	2. Emails sent to this address that aren’t patches will be available
+	under 🅭🅯🄏🄎4.0 (see
+	&lt;https://creativecommons.org/licenses/by-nc-sa/4.0/&gt;).</pre>
+	</blockquote>
+
+	<p>The actual legal provision here is pretty simple. The reason why I chose <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external">🅭🅯🄏🄎</a> is a little bit complicated. I chose that license by balancing two competing values. The first is <cite>The Little Red Hen</cite> principle: if I spend time creating a valuable work, then it’s fair for me to decide what I do with the work. The second is the forkability principle: <a href="https://public-inbox.org/reproducibility.html" target="_blank" rel="external" hreflang="en-US">a project should be forkable to keep its leadership in check</a>. <cite>The Little Red Hen</cite> principle is easy to satisfy. <a href="https://copyright.gov/what-is-copyright/" target="_blank" rel="external" hreflang="en-US">Copyright gives authors a lot of power over their works by default.</a> That power is mainly used as leverage to help authors make deals. The question is: how much of that power do we take away to satisfy the forkability principle? Firstly, others have to be able to redistribute the emails (see <a href="https://public-inbox.org/reproducibility.html" target="_blank" rel="external" hreflang="en-US"><cite>reproducibility => forkability</cite></a>). Secondly, others would probably benefit from being able to modify the emails. A fork might want to retroactively censor foul language. A fork might want to automatically reformat messages and turn them into pull requests and bug tracker tickets. Plus, regular participants are probably going to cut up quotes while replying to emails. Importantly, giving others those two powers doesn’t take very much leverage away from authors at the bargaining table (it’s unlikely that someone would pay for a copy of an email or pay for rights to modify an email). That’s why I chose 🅭🅯🄏🄎. It gives just enough permission and no more.</p>
+
+	<blockquote><pre>
+	3. If an email sent to this address contains one or more patches, but
+	also contains stuff that isn’t part of a patch, then the stuff that
+	isn’t part of a patch will be available under 🅭🅯🄏🄎4.0 (see
+	&lt;https://creativecommons.org/licenses/by-nc-sa/4.0/&gt;).</pre>
+	</blockquote>
+
+	<p>This provision was originally written to accommodate <a href="https://git-scm.com/docs/git-mailinfo#Documentation/git-mailinfo.txt---scissors" target="_blank" rel="external"><cite>Git</cite>’s scissors notation</a>. Later, I realized that it also helps in the following situations:</p>
+
+	<ol>
+		<li>When a patch is submitted using <a href="https://git-scm.com/docs/git-send-email" target="_blank" rel="external"><code>git-send-email</code></a>. At first glance, it looks like the entire email itself is a patch. In reality, each of those emails contains extra metadata that isn’t part of the patch (example: the <abbr title="carbon copy">CC</abbr> list).</li>
+		<li>When a patch is submitted as an attachment. In this situation, the main portion of the email would be something other than a patch.</li>
+	</ol>
+
+	<blockquote><pre>
+If you agree, reply to this email with the magic phrase:
+
+	“Yes, I agree.”
+
+Put the phrase on its own line. Don’t include any whitespace before the word
+“yes” or any quotation marks.</pre>
+	</blockquote>
+
+	<p>At the moment, the current plan is to manually read every message, see if the author needs to agree to <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr>, and then only move their message into the public-inbox if they agree. In the future, I would like to automate the process. Most people will quote the message they’re replying to when they reply, meaning that the magic phrase “Yes, I agree.” will be present in their message whether or not they added it themselves. The special instructions (<q>Don’t include any whitespace before the word ‘yes’ or any quotation marks.</q>) are there to make it easy for a program to tell the difference between an actual “Yes, I agree.” and a quoted one.</p>
+
+	<blockquote><pre>
+Once you do so, I’ll add your email address to the list of people who have
+agreed and make your original message public. You won’t have to go through
+this process again, unless I update this agreement. (This is version -1 by the
+way).</pre>
+	</blockquote>
+
+	<p>I want to make sure that I have a good way of updating <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr>. This way I can, for example, switch to new versions of <a href="https://github.com/creativecommons/cc-legal-tools-data" target="_blank" rel="external" hreflang="en-US">the Creative Commons legal tools</a> (I know that <a href="https://github.com/creativecommons/creativecommons.org/issues/1143" target="_blank" rel="external" hreflang="en">there’s a 🅭🄍1.1 in the works</a>, but it appears to be stalled while <abbr title="Creative Commons">CC</abbr> works on <a href="https://github.com/creativecommons/project_creativecommons.org" target="_blank" rel="external" hreflang="en">their new Web site</a>). Also, I made this first version version -1 as a test. I’m going to arbitrarily bump it to version 0 at some point to test out my system to keeping track of who agreed to what version.</p>
+
+	<blockquote><pre>
+If you don’t agree, that’s OK. You can still contribute by sending feedback
+and pull requests to
+
+	Jason Yundt &lt;jason@jasonyundt.email&gt;
+
+Use git-request-pull to create pull requests. See
+&lt;https://www.git-scm.com/docs/git-request-pull&gt;.</pre>
+	</blockquote>
+
+	<p>No matter what, people are going to be suspicious of or have objections to <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr>, and I don’t blame them. I think that it’s important to allow everyone to contribute, especially when they disagree. Interestingly, this part would allow someone to have an objection to <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> and then submit a pull request that fixes their objection. I don’t know of any other <abbr title="contributor license agreements">CLAs</abbr> that allow you to do that.</p>
+
+	<blockquote><pre>
+Sorry for writing War and Peace,
+Jason Yundt</pre>
+	</blockquote>
+
+	<p>This last part is just a reference to the fact that <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> (like most of what I write) is so long that people aren’t likely to read it.</p>
+
+	<section>
+		<h2 id="highlighted-examples">Highlighted examples</h2>
+		<p>Here are <a href="https://lore.kernel.org/git/20220308155612.105957-1-jason@jasonyundt.email/" target="_blank" rel="external" hreflang="en-US">some emails that I sent to</a> <a href="https://git-scm.com/" target="_blank" rel="external">the <cite>Git</cite> project</a>’s <a href="mailto:git@vger.kernel.org" target="_blank" rel="external" hreflang="en">mailing list</a>. Pretend that these emails were sent to my public-inbox. Here’s what <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> would do to them.</p>
+		<p>One thing to note is that (for clarity) I’m presenting the raw messages themselves. If you’re not an email expert, then these will probably be a bit difficult to read at first.</p>
+		<figure>
+			<figcaption>Highlight color key:</figcaption>
+			<ul>
+				<li><mark class="non_patch">This is available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external">🅭🅯🄏🄎4.0 </a>.</mark></li>
+				<li><mark class="patch_metadata">This is dedicated to the public domain using <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external">🅭🄍1.0</a>.</mark></li>
+				<li><mark class="proposed_addition">This is a proposed addition. Apply the patch then read the repo’s copying information to find out a proposed addition’s legal terms.</mark></li>
+				<li><mark class="potentially_someone_else">This is something that <abbr title="Jason’s Public-inbox Posting Agreement">JPPA</abbr> doesn’t affect directly. The upstream repo probably provides a license or public domain dedication for this.</mark></li>
+			</ul>
+		</figure>
+
+		<details>
+			<summary>Email #1 (<a href="https://lore.kernel.org/git/20220308155612.105957-1-jason@jasonyundt.email/" target="_blank" rel="external" hreflang="en-US">[PATCH v3 0/2] gitweb: remove invalid http-equiv="content-type"</a>)</summary>
+		<pre><mark class="non_patch">From mboxrd@z Thu Jan  1 00:00:00 1970
+Return-Path: &lt;git-owner@kernel.org&gt;
+X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
+	aws-us-west-2-korg-lkml-1.web.codeaurora.org
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19773C433EF
+	for &lt;git@archiver.kernel.org&gt;; Tue,  8 Mar 2022 15:59:01 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1344618AbiCHP7y (ORCPT &lt;rfc822;git@archiver.kernel.org&gt;);
+        Tue, 8 Mar 2022 10:59:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34680 &quot;EHLO
+        lindbergh.monkeyblade.net&quot; rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348890AbiCHP6s (ORCPT &lt;rfc822;git@vger.kernel.org&gt;);
+        Tue, 8 Mar 2022 10:58:48 -0500
+Received: from box.jasonyundt.email (box.jasonyundt.email [206.189.182.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A8917E38
+        for &lt;git@vger.kernel.org&gt;; Tue,  8 Mar 2022 07:57:49 -0800 (PST)
+Received: from authenticated-user (box.jasonyundt.email [206.189.182.84])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by box.jasonyundt.email (Postfix) with ESMTPSA id CDAE77E74B;
+        Tue,  8 Mar 2022 10:57:15 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jasonyundt.email;
+        s=mail; t=1646755037;
+        bh=zCx2flGBIpny1UFiEgIznxuJoy4t17Oh7vY6amcIy68=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=fHHMVMX/R99+nv6fi3nQ1JmQGfocvg5z0LnFAZMsDrIV6qJmE4KxDP/Ya9E/aMCh3
+         b4OK36qISrYaBzHB3b+sGGpDkkAHQ7uy6z0MJmyimRnnEnlB+oQeGN3n88Vw/HWARp
+         qBRlYbP8cWk3i1rGXfxi8eJSlmfPwz6Xwlj0yXWT7WLmIVvROegMRAdPXvMXNGe+xG
+         S5cKqcnrS9HLfLE0Pmtxs4MqTio+AxG2hgLoX1XEsbGauNoHZ5GY8V3UoBTMZcN2++
+         eKrE8F7XrzAGIFdDzQ1azqVcvIs+Du3AcBSYPbdoIc+uxLQNG/cbpsVlu1XiPYSvo9
+         O4bhiaKAqXj7g==
+From:   Jason Yundt &lt;jason@jasonyundt.email&gt;
+To:     git@vger.kernel.org
+Cc:     =?UTF-8?q?=C3=86var=20Arnfj=C3=B6r=C3=B0=20Bjarmason?=
+        &lt;avarab@gmail.com&gt;,
+        &quot;brian m. carlson&quot; &lt;sandals@crustytoothpaste.net&gt;,
+        Junio C Hamano &lt;gitster@pobox.com&gt;,
+        Jeff King &lt;peff@peff.net&gt;, Jason Yundt &lt;jason@jasonyundt.email&gt;
+Subject: [PATCH v3 0/2] gitweb: remove invalid http-equiv=&quot;content-type&quot;
+Date:   Tue,  8 Mar 2022 10:56:10 -0500
+Message-Id: &lt;20220308155612.105957-1-jason@jasonyundt.email&gt;
+In-Reply-To: &lt;20220308010711.61817-1-jason@jasonyundt.email&gt;
+References: &lt;20220308010711.61817-1-jason@jasonyundt.email&gt;
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Precedence: bulk
+List-ID: &lt;git.vger.kernel.org&gt;
+X-Mailing-List: git@vger.kernel.org
+
+See the second commit's message for more details. Compared to the second
+version of this patch, this one
+
+- removes the extra variable again,
+- doesn't include a &lt;meta charset=&quot;utf-8&quot;/&gt; and
+- corrects a technical error in the second commit&rsquo;s message.
+
+Jason Yundt (2):
+  comment: fix typo
+  gitweb: remove invalid http-equiv=&quot;content-type&quot;
+
+ gitweb/gitweb.perl                        |  4 +---
+ t/t9502-gitweb-standalone-parse-output.sh | 15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+--
+2.35.1
+
+
+</mark></pre>
+		</details>
+		<details>
+			<summary>Email #2 (<a href="https://lore.kernel.org/git/20220308155612.105957-2-jason@jasonyundt.email/" target="_blank" rel="external" hreflang="en-US">[PATCH v3 1/2] comment: fix typo</a>)</summary>
+			<pre><mark class="non_patch">From mboxrd@z Thu Jan  1 00:00:00 1970
+Return-Path: &lt;git-owner@kernel.org&gt;
+X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
+	aws-us-west-2-korg-lkml-1.web.codeaurora.org
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52292C433F5
+	for &lt;git@archiver.kernel.org&gt;; Tue,  8 Mar 2022 15:59:02 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1348116AbiCHP75 (ORCPT &lt;rfc822;git@archiver.kernel.org&gt;);
+        Tue, 8 Mar 2022 10:59:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34682 &quot;EHLO
+        lindbergh.monkeyblade.net&quot; rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348889AbiCHP6s (ORCPT &lt;rfc822;git@vger.kernel.org&gt;);
+        Tue, 8 Mar 2022 10:58:48 -0500
+Received: from box.jasonyundt.email (box.jasonyundt.email [206.189.182.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C291A397
+        for &lt;git@vger.kernel.org&gt;; Tue,  8 Mar 2022 07:57:50 -0800 (PST)
+Received: from authenticated-user (box.jasonyundt.email [206.189.182.84])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by box.jasonyundt.email (Postfix) with ESMTPSA id 28F247E74F;
+        Tue,  8 Mar 2022 10:57:18 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jasonyundt.email;
+        s=mail; t=1646755039;
+        bh=95BIkyMQt6Z4KiVGKY5Jx7I4AEIXX/lRj9IdAUbikY0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=kfKZsp9fM2EcD1vRzHm3syK/0DHo9W4fh3248boQz9rxiGbZjYiQdJAwJHG1FDaGl
+         K1l3N7dzxdZz1o3Tq0vUquB9Gvzfwmpvwr6bOUB79E4M8DKtKH0wkfIOpkWI5nz6Ee
+         2VGlYOacl83qrC0v//wUYsQ43T/RwGglbCGsN4wgPXTr8ZVHthKNLJ7571tT+7uvas
+         +4stWSAmRSXZ1Hr19VCowMiZLMK6cT/BwCSeD61ofjuRlqLJwRh/ymvr2ZIbm2O8nS
+         47KAnoyNKLKVmcrjzT1eqiTwQw+UC6v77f+6v4yZm7gCYPOR35fNw+IC8rBmnb3phe
+         lS49aMn1oKWQA==
+From:   Jason Yundt &lt;jason@jasonyundt.email&gt;
+To:     git@vger.kernel.org
+Cc:     =?UTF-8?q?=C3=86var=20Arnfj=C3=B6r=C3=B0=20Bjarmason?=
+        &lt;avarab@gmail.com&gt;,
+        &quot;brian m. carlson&quot; &lt;sandals@crustytoothpaste.net&gt;,
+        Junio C Hamano &lt;gitster@pobox.com&gt;,
+        Jeff King &lt;peff@peff.net&gt;, Jason Yundt &lt;jason@jasonyundt.email&gt;
+</mark><mark class="patch_metadata">Subject: [PATCH v3 1/2] comment: fix typo
+Date:   Tue,  8 Mar 2022 10:56:11 -0500
+</mark><mark class="non_patch">Message-Id: &lt;20220308155612.105957-2-jason@jasonyundt.email&gt;
+In-Reply-To: &lt;20220308155612.105957-1-jason@jasonyundt.email&gt;
+References: &lt;20220308010711.61817-1-jason@jasonyundt.email&gt;
+ &lt;20220308155612.105957-1-jason@jasonyundt.email&gt;
+</mark><mark class="patch_metadata">MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+</mark><mark class="non_patch">Precedence: bulk
+List-ID: &lt;git.vger.kernel.org&gt;
+X-Mailing-List: git@vger.kernel.org
+</mark><mark class="patch_metadata">
+Signed-off-by: Jason Yundt &lt;jason@jasonyundt.email&gt;
+---
+ t/t9502-gitweb-standalone-parse-output.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/t9502-gitweb-standalone-parse-output.sh b/t/t9502-gitweb-standalone-parse-output.sh
+index 3167473b30..e7363511dd 100755
+--- a/t/t9502-gitweb-standalone-parse-output.sh
++++ b/t/t9502-gitweb-standalone-parse-output.sh
+@@ -34,7 +34,7 @@ EOF
+</mark><mark class="potentially_someone_else"> #
+ # This will check that gitweb HTTP header contains proposed filename
+ # as &lt;basename&gt; with '.tar' suffix added, and that generated tarfile
+-# (gitweb message body) has &lt;prefix&gt; as prefix for al files in tarfile
+</mark><mark class="proposed_addition">+# (gitweb message body) has &lt;prefix&gt; as prefix for all files in tarfile
+</mark><mark class="potentially_someone_else"> #
+ # &lt;prefix&gt; default to &lt;basename&gt;
+ check_snapshot () {
+</mark><mark class="patch_metadata">--
+2.35.1
+
+
+</mark></pre>
+		</details>
+		<details>
+			<summary>Email #3 (<a href="https://lore.kernel.org/git/20220308155612.105957-3-jason@jasonyundt.email/" target="_blank" rel="external" hreflang="en-US">[PATCH v3 2/2] gitweb: remove invalid http-equiv="content-type"</a>)</summary>
+			<pre><mark class="non_patch">From mboxrd@z Thu Jan  1 00:00:00 1970
+Return-Path: &lt;git-owner@kernel.org&gt;
+X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
+	aws-us-west-2-korg-lkml-1.web.codeaurora.org
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EF4C433EF
+	for &lt;git@archiver.kernel.org&gt;; Tue,  8 Mar 2022 15:58:24 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1348059AbiCHP7S (ORCPT &lt;rfc822;git@archiver.kernel.org&gt;);
+        Tue, 8 Mar 2022 10:59:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34740 &quot;EHLO
+        lindbergh.monkeyblade.net&quot; rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348901AbiCHP6t (ORCPT &lt;rfc822;git@vger.kernel.org&gt;);
+        Tue, 8 Mar 2022 10:58:49 -0500
+Received: from box.jasonyundt.email (box.jasonyundt.email [206.189.182.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D06BC81
+        for &lt;git@vger.kernel.org&gt;; Tue,  8 Mar 2022 07:57:51 -0800 (PST)
+Received: from authenticated-user (box.jasonyundt.email [206.189.182.84])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by box.jasonyundt.email (Postfix) with ESMTPSA id 764CA7E750;
+        Tue,  8 Mar 2022 10:57:19 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jasonyundt.email;
+        s=mail; t=1646755040;
+        bh=FuOnXb8KScr1/NHpF2ybAY9UsDefTEcbtqLu1BTn41w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=dJ/FG7kfDNWTUZC4BAAEkrUCNDh9+kWGjWrfRoyYYIQPOfi669XhPTgU46LaADzp7
+         RPSoGzrslGf9OQcVVoQl31i5aEBukhzNMsE73t475usMrcms3jIaCq9BzfvSEgEMht
+         wZ/J2vxjEiQCA/N9B6plx0mnyrvRvXeX9mVpIUeRMpIuqvVuTvSiit0BPTWdjlmXzJ
+         uRIArT142jiDt3qG/9tpiX54Fu4Vw3V0t6yE3mdyvZmvjglmOUWz3HEcgADKUVKgap
+         Bsg0Dw5eyGqWo0lr/XVGMOWhCpqc+9k1hwg6hIESWGvYnYYJ8VcKkidpM8t4cKDNMH
+         FW3GoA6GpZrcA==
+From:   Jason Yundt &lt;jason@jasonyundt.email&gt;
+To:     git@vger.kernel.org
+Cc:     =?UTF-8?q?=C3=86var=20Arnfj=C3=B6r=C3=B0=20Bjarmason?=
+        &lt;avarab@gmail.com&gt;,
+        &quot;brian m. carlson&quot; &lt;sandals@crustytoothpaste.net&gt;,
+        Junio C Hamano &lt;gitster@pobox.com&gt;,
+        Jeff King &lt;peff@peff.net&gt;, Jason Yundt &lt;jason@jasonyundt.email&gt;
+</mark><mark class="patch_metadata">Subject: [PATCH v3 2/2] gitweb: remove invalid http-equiv=&quot;content-type&quot;
+Date:   Tue,  8 Mar 2022 10:56:12 -0500
+</mark><mark class="non_patch">Message-Id: &lt;20220308155612.105957-3-jason@jasonyundt.email&gt;
+In-Reply-To: &lt;20220308155612.105957-1-jason@jasonyundt.email&gt;
+References: &lt;20220308010711.61817-1-jason@jasonyundt.email&gt;
+ &lt;20220308155612.105957-1-jason@jasonyundt.email&gt;
+</mark><mark class="patch_metadata">MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+</mark><mark class="non_patch">Precedence: bulk
+List-ID: &lt;git.vger.kernel.org&gt;
+X-Mailing-List: git@vger.kernel.org
+</mark><mark class="patch_metadata">
+Before this change, gitweb would generate pages which included:
+
+	&lt;meta http-equiv=&quot;content-type&quot; content=&quot;application/xhtml+xml; charset=utf-8&quot;/&gt;
+
+When a meta's http-equiv equals &quot;content-type&quot;, the http-equiv is said
+to be in the &quot;Encoding declaration state&quot;. According to the HTML
+Standard,
+
+	The Encoding declaration state may be used in HTML documents,
+	but elements with an http-equiv attribute in that state must not
+	be used in XML documents.
+
+	Source: &lt;https://html.spec.whatwg.org/multipage/semantics.html#attr-meta-http-equiv-content-type&gt;
+
+This change removes that meta element since gitweb always generates XML
+documents.
+
+Signed-off-by: Jason Yundt &lt;jason@jasonyundt.email&gt;
+---
+ gitweb/gitweb.perl                        |  4 +---
+ t/t9502-gitweb-standalone-parse-output.sh | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/gitweb/gitweb.perl b/gitweb/gitweb.perl
+index fbd1c20a23..606b50104c 100755
+--- a/gitweb/gitweb.perl
++++ b/gitweb/gitweb.perl
+@@ -4213,8 +4213,7 @@ </mark><mark class="potentially_someone_else">sub git_header_html {
+ 	my %opts = @_;
+
+ 	my $title = get_page_title();
+-	my $content_type = get_content_type_html();
+-	print $cgi-&gt;header(-type=&gt;$content_type, -charset =&gt; 'utf-8',
+</mark><mark class="proposed_addition">+	print $cgi-&gt;header(-type=&gt;get_content_type_html(), -charset =&gt; 'utf-8',
+</mark><mark class="potentially_someone_else"> 	                   -status=&gt; $status, -expires =&gt; $expires)
+ 		unless ($opts{'-no_http_header'});
+ 	my $mod_perl_version = $ENV{'MOD_PERL'} ? &quot; $ENV{'MOD_PERL'}&quot; : '';
+</mark><mark class="patch_metadata">@@ -4225,7 +4224,6 @@ </mark><mark class="potentially_someone_else">sub git_header_html {
+ &lt;!-- git web interface version $version, (C) 2005-2006, Kay Sievers &lt;kay.sievers\@vrfy.org&gt;, Christian Gierke --&gt;
+ &lt;!-- git core binaries version $git_version --&gt;
+ &lt;head&gt;
+-&lt;meta http-equiv=&quot;content-type&quot; content=&quot;$content_type; charset=utf-8&quot;/&gt;
+ &lt;meta name=&quot;generator&quot; content=&quot;gitweb/$version git/$git_version$mod_perl_version&quot;/&gt;
+ &lt;meta name=&quot;robots&quot; content=&quot;index, nofollow&quot;/&gt;
+ &lt;title&gt;$title&lt;/title&gt;
+</mark><mark class="patch_metadata">diff --git a/t/t9502-gitweb-standalone-parse-output.sh b/t/t9502-gitweb-standalone-parse-output.sh
+index e7363511dd..8cb582f0e6 100755
+--- a/t/t9502-gitweb-standalone-parse-output.sh
++++ b/t/t9502-gitweb-standalone-parse-output.sh
+@@ -207,4 +207,17 @@ </mark><mark class="potentially_someone_else">test_expect_success 'xss checks' '
+ 	xss &quot;&quot; &quot;$TAG+&quot;
+ '
+
+</mark><mark class="proposed_addition">+no_http_equiv_content_type() {
++	gitweb_run &quot;$@&quot; &amp;&amp;
++	! grep -E &quot;http-equiv=['\&quot;]?content-type&quot; gitweb.body
++}
++
++# See: &lt;https://html.spec.whatwg.org/dev/semantics.html#attr-meta-http-equiv-content-type&gt;
++test_expect_success 'no http-equiv=&quot;content-type&quot; in XHTML' '
++	no_http_equiv_content_type &amp;&amp;
++	no_http_equiv_content_type &quot;p=.git&quot; &amp;&amp;
++	no_http_equiv_content_type &quot;p=.git;a=log&quot; &amp;&amp;
++	no_http_equiv_content_type &quot;p=.git;a=tree&quot;
++'
++
+</mark><mark class="potentially_someone_else"> test_done
+</mark><mark class="patch_metadata">--
+2.35.1
+
+
+</mark></pre>
+		</details>
+	</section>
+{% endblock %}
