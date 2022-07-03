@@ -56,8 +56,15 @@ mean that `./a/foo.txt` is a documentation file. That piece of information
 alone tells you nothing about `./a/foo.txt.spdx-meta`.
 
 All SPDX Metadata Files in this repo are dedicated to the public domain using
-[the CC0 1.0 Universal Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/).
+[the CC0 1.0 Universal Public Domain Dedication].
+
+## Commit metadata
+
+All of the commit metadata in this repo is dedicated to the public domain using
+[the CC0 1.0 Universal Public Domain Dedication]. Examples of commit metadata
+are commit messages, the names of any authors and file attributes.
 
 [JSON]: https://www.json.org/json-en.html
 [SPDX file tag]: https://spdx.github.io/spdx-spec/file-tags/
 [SPDX file tags]: https://spdx.github.io/spdx-spec/file-tags/
+[the CC0 1.0 Universal Public Domain Dedication]: https://creativecommons.org/publicdomain/zero/1.0/
