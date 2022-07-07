@@ -1,0 +1,330 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
+#}
+{% extends "_base_page.html" %}
+
+{% block title %}How to Submit Patches to Jason’s Projects{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "submitting-patches.css") }}{% endblock %}
+{% block body_content %}
+	<h1>{{ self.title() }}</h1>
+	<p>First of all, thank you for taking an interest in contributing to my projects. While every project is different, the process generally looks like this:</p>
+	<ol>
+		<li><a href="#clone">{% block clone_title %}Get a copy of the repository on your system{% endblock %}</a>.</li>
+		<li><a href="#run">{% block run_title %}Try out the project on your system{% endblock %}</a>.</li>
+		<li><a href="#branch">{% block branch_title %}Create a branch that contains your proposed changes{% endblock %}</a>.</li>
+		<li><a href="#send">{% block send_title %}Send your patch to me{% endblock %}</a>.</li>
+	</ol>
+	<aside>I’m using the term “patch” slightly incorrectly here. When I say “patch”, I just mean a set of proposed changes. A “patch” could be a <a href="https://www.gnu.org/software/diffutils/manual/html_node/Overview.html" target="_blank" rel="external">literal patch</a>, but it could also be a <a href="https://kernelnewbies.org/PatchPhilosophy#What_is_a_patchset.3F" target="_blank" rel="external">patchset</a>, a <a href="https://git-scm.com/docs/git-request-pull" target="_blank" rel="external">pull request</a>, a <a href="https://docs.gitlab.com/ee/user/project/merge_requests/" target="_blank" rel="external">merge request</a>, etc.</aside>
+	<p>The entire process is centered around <a href="https://git-scm.com/" target="_blank" rel="external"><cite>Git</cite></a>. If you’re new to <cite>Git</cite>, then this process will probably be overwhelming. If you already have experience with <cite>Git</cite>, then you’ll probably want to skim through this document and only read the parts that look unfamiliar to you.</p>
+	<section id="clone">
+		<h2>{{ self.clone_title() }}</h2>
+		<p>The first thing you’ll need to do is <a href="https://git-scm.com/docs/git-clone" target="_blank" rel="external">clone</a> the project’s repo. Run this command in a <a href="https://en.wikipedia.org/wiki/Command-line_interface" target="_blank" rel="external" hreflang="en">terminal</a>:</p>
+		<pre><code>git clone &lt;repo-<abbr title="Uniform Resource Locator">URL</abbr>&gt;</code></pre>
+		<p>Here’s where you can find a project’s repo’s <abbr title="Uniform Resource Locator">URL</abbr>…</p>
+		<ul class="no-bullets">
+			<li>
+				<details>
+					<summary>…if the project is hosted on <a type="text/html;charset=utf-8" href=index.html hreflang=en-US>Jason’s Web Site</a>.</summary>
+					<ol>
+						<li>
+							<figure>
+								<figcaption>Go to my <cite>Git</cite> repo list.</figcaption>
+								{#
+								This <picture> element is a bit tricky. The markup basically says “If the user prefers dark mode, use image A. Otherwise, use image B.” The image that dark mode users get is a light image. The image that light mode users get is a dark image. This is backwards on purpose. I want the image to contrast with the page’s background so that users don’t think that the buttons in the image are clickable.
+								#}
+								<picture>
+									<source type="image/webp" media="(prefers-color-scheme: dark)" srcset="{{ generate_relative_url(relative_to_base, 'jws-git-repos-button-light.webp') }}">
+									<img alt="The Git repos list is in the nav bar at the top of the page." src="{{ generate_relative_url(relative_to_base, 'jws-git-repos-button-dark.webp') }}">
+								</picture>
+							</figure>
+						</li>
+						<li>
+							<figure>
+								<figcaption>Select a project.</figcaption>
+								<img alt="Click on a project’s name to select it." src="{{ generate_relative_url(relative_to_base, 'jws-select-a-project.webp') }}">
+							</figure>
+						</li>
+						<li>
+							<figure>
+								<figcaption>Choose one of the repo’s <abbr title="Uniform Resource Locators">URLs</abbr>. I recommend using the <code><abbr title="Hypertext Transfer Protocol Secure">https</abbr>://</code> one.</figcaption>
+								<img alt="The URL list will be underneath the project description and last change date." src="{{ generate_relative_url(relative_to_base, 'jws-repo-urls.webp') }}">
+							</figure>
+						</li>
+					</ol>
+				</details>
+			</li>
+			<li>
+				<details>
+					<summary>…if the project is hosted on <a href="https://pagure.io/user/jayman/projects" target="_blank" rel="external"><code>pagure.io</code></a>.</summary>
+					<ol>
+						<li>
+							<figure>
+								<figcaption>Navigate to the project’s page.</figcaption>
+								<img alt="From a Pagure project list, click on a project’s name to get to its page." src="{{ generate_relative_url(relative_to_base, 'pagure-project-list.webp') }}">
+							</figure>
+						</li>
+						<li>
+							<figure>
+								<figcaption>Click on the clone button to reveal the repo’s <abbr title="Uniform Resource Locator">URL</abbr>.</figcaption>
+								<img alt="The clone button is in the project page’s upper right corner." src="{{ generate_relative_url(relative_to_base, 'pagure-clone-button.webp') }}">
+							</figure>
+						</li>
+					</ol>
+				</details>
+			</li>
+			<li>
+				<details>
+					<summary>…if the project is hosted on <a href="https://gitlab.com/users/Jayman2000/projects" target="_blank" rel="external"><code>gitlab.com</code></a>.</summary>
+					<p>See <cite>GitLab</cite>’s <a href="https://docs.gitlab.com/ee/tutorials/make_your_first_git_commit.html#clone-the-repository" target="_blank" rel="external">official</a> <a href="https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html" target="_blank" rel="external">documentation</a>.</p>
+				</details>
+			</li>
+			<li>
+				<details>
+					<summary>…if the project is hosted on <a href="https://github.com/Jayman2000?tab=repositories" target="_blank" rel="external"><code>github.com</code></a>.</summary>
+					<p>See <cite>GitHub</cite>’s <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository" target="_blank" rel="external">official documentation</a>.</p>
+				</details>
+			</li>
+		</ul>
+	</section>
+	<section id="run">
+		<h2>{{ self.run_title() }}</h2>
+		<p>Eventually, you’re (probably) going to want to test out your changes. Before you do, it’s a good idea to test out an unchanged version of the project. Every project is different, so open up the repo you just cloned and start looking through the README. You should be able to figure out how to run or use the project by reading the README or by reading files that the README references. If you can’t, then please <a href="mailto:?to=Jason%20Yundt%20%3cjason@jasonyundt.email%3e" rel="author external">email me</a> questions because the project’s documentation should probably be improved.</p>
+	</section>
+	<section id="branch">
+		<h2>{{ self.branch_title() }}</h2>
+		<p>In <cite>Git</cite>, a <a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch" target="_blank" rel="external">branch</a> is like a timeline. Each branch contains a sequence of snapshots. Each of those snapshots is a single event in the branch’s history.</p>
+		<p>Open a terminal in your clone’s directory, and run this command:</p>
+		<pre><code>git branch</code></pre>
+		<p><cite>Git</cite> will then tell you what branch you’re currently on. It will also list any other branches that you add to your clone. Your current branch will probably be named “main” (I think that the default branch for most of my repos is named “main”). To stay organized, it’s a good idea to create a new branch for each of your patches. To do so:</p>
+		<ol>
+			<li>
+				Determine what branch you’re currently on:
+				<pre><code>git branch</code></pre>
+			</li>
+			<li>
+				If you’re not on the default branch, the switch to it:
+				<pre><code>git checkout main</code></pre>
+				<p>If the repo doesn’t have a branch named “main”, then adjust that command accordingly.</p>
+			</li>
+			<li>
+				Create a copy of your current branch:
+				<pre><code>git branch &lt;branch-name&gt;</code></pre>
+			</li>
+			<li>
+				Switch to your new branch:
+				<pre><code>git checkout &lt;branch-name&gt;</code></pre>
+			</li>
+		</ol>
+		<p>At this point, you’ve created your own branch but haven’t added anything to it yet. At the moment, your branch is identical to the main branch. Now it’s time to get to work. Create new files, delete old files or edit existing files. Don’t worry too much about making an unwanted change because <cite>Git</cite> is already holding onto multiple <a href="https://github.blog/2020-12-17-commits-are-snapshots-not-diffs/" target="_blank" rel="external" hreflang="en-US">snapshots of the files in the repo</a>. Every so often, you should create one of these snapshots. To do so:</p>
+		<ol>
+			<li>
+				Determine what files have been created, deleted or edited:
+				<pre><code>git status</code></pre>
+			</li>
+			<li>
+				Before you can take a snapshot, you have to “stage” your changes. Changes that aren’t staged won’t make it into the snapshot.
+				<ul>
+					<li>
+						If you created or edited a file, then run:
+						<pre><code>git add &lt;path-to-file&gt;</code></pre>
+					</li>
+					<li>
+						If you deleted a file, then run:
+						<pre><code>git rm &lt;path-to-file&gt;</code></pre>
+					</li>
+					<li>
+						If you renamed or moved a file, then run:
+						<pre><code>git mv &lt;old-path&gt; &lt;new-path&gt;</code></pre>
+					</li>
+				</ul>
+				You can run <code>git status</code> again to see what changes are staged and unstaged.
+			</li>
+			<li>
+				Take the snapshot:
+				<pre><code>git commit</code></pre>
+				This will create a new commit and put it at the tip of your current branch. In <cite>Git</cite>, snapshots are called “<a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefcommitacommit" target="_blank" rel="external" hreflang="en-US">commits</a>”.
+		</ol>
+		<p>
+	</section>
+	<section id="send">
+		<h2>{{ self.send_title() }}</h2>
+		<p>Once you’ve created one or more commits, it’s time to turn those commits into a patch and send them to me.</p>
+		<ul class="no-bullets">
+			<li>
+				<details>
+					<summary>What to do if the repo is hosted on <a type="text/html;charset=utf-8" href=index.html hreflang=en-US>Jason’s Web Site</a>.</summary>
+					<p>You have four different options. For your first patch I recommend choosing the first one.</p>
+					<ul class="no-bullets"> {# TODO: Change the marker that gets used #}
+						<li>
+							<details>
+								<summary>Easiest: <code>git-bundle</code></summary>
+								<ol>
+									{% block remember_branch %}
+										<li>
+											Remember the name of the branch you created before. If you don’t remember it off of the top of your head, then you can run
+											<pre><code>git branch</code></pre>
+											to get a list of branches.
+										</li>
+									{% endblock %}
+									<li>
+										Create a bundle that contains your changes:
+										<pre><code>git bundle create {% block filename %}{% block your_branch %}&lt;your-branch&gt;{% endblock %}.bundle{% endblock %} {% block rev_list %}main..{{ self.your_branch() }}{% endblock %}</code></pre>
+										That command is a little bit tricky. It creates a bundle file named “<code>{{ self.filename() }}</code>”. The last part of the command tells <cite>Git</cite> what to put into your bundle. {% block rev_list_explanation %}“<code>{{ self.rev_list() }}</code>” means “every commit that’s in <code>{{ self.your_branch() }}</code>, but isn’t in main yet”.{% endblock %}
+									</li>
+									{# TODO: Once my public-inbox is up and running, update this link. #}
+									<li><a href="mailto:?To=Jason%20Yundt%20%3cjason@jasonyundt.email%3e&Subject=%5bBUNDLE%20%3crepo-name%3e%5d%20%3csummary%3e&body=Don’t%20forget%20to%20edit%20this%20message’s%20subject%20line%20and%20to%20attach%20your%20bundle%20file." target="_blank" rel="author external">Email me the bundle.</a> {% block mailto_fallback %}(If that links doesn’t work on your system, send it to “{% block patch_recipient %}Jason Yundt &lt;jason@jasonyundt.email&gt;{% endblock %}”).{% endblock %}</li>
+								</ol>
+							</details>
+						</li>
+						<li>
+							<details id="git-format-patch">
+								<summary>Easy: <code>git-format-patch</code> + compression</summary>
+								<ol>
+									{{ self.remember_branch() }}
+									<li>In your clone’s root directory, create a folder named “patch-v1”.</li>
+									<li>
+										Generate patch files:
+										<pre><code>{% block gfp1 %}git format-patch{% endblock %} \
+	{% block gfp2 %}-o patch-v1{% endblock %} \
+	{% block gfp3 %}--to='{{ self.patch_recipient() }}'{% endblock %} \
+	{% block gfp4 %}--subject-prefix='PATCH &lt;repo-name&gt;'{% endblock %} \
+	{% block gfp5 %}{{ self.rev_list() }}{% endblock %}
+</code></pre>
+										<details>
+											<summary>If you’re interested in what that command does, then click here.</summary>
+											<ul>
+												<li>
+													<figure>
+														<code>\</code>
+														<figcaption>At the end of every line (except for the last one) is a backslash. Those backslashes allow me to break up the command over multiple lines. The last line doesn’t have a backslash, so <a href="https://www.gnu.org/software/bash/" target="_blank" rel="external"><cite>Bash</cite></a> interprets the final newline as the end of the command.</figcaption>
+													</figure>
+												</li>
+												<li>
+													<figure>
+														<code>{{ self.gfp1() }}</code>
+														<figcaption>This tells <cite>Git</cite> to create a series of patch files. <cite>Git</cite> will convert each commit that is specified into a patch file. A commit is a snapshot, it contains everything that was in the repo at the time it was taken. A patch file is a diff, it only contains information about what was changed. I’ll be able to (approximately) recreate your commits using the patch files that you generate.</figcaption>
+													</figure>
+												</li>
+												<li>
+													<figure>
+														<code>{{ self.gfp2() }}</code>
+														<figcaption>This part is optional. It tells <cite>Git</cite> to put the patch files into a folder named “patch-v1”. I like to do this to stay organized.</figcaption>
+													</figure>
+												</li>
+												<li>
+													<figure>
+														<code>{{ self.gfp3() }}</code>
+														<figcaption>{% block optional_for_gse %}This part is optional. It’s only really useful when sending patches using <a href="https://git-scm.com/docs/git-send-email" target="_blank" rel="external"><code>git-send-email</code></a>.{% endblock %} All it does is add a “To” field to each of the patch files. I include it because I think that it’s a good habit.</figcaption>
+													</figure>
+												</li>
+												<li>
+													<figure>
+														<code>{{ self.gfp4() }}</code>
+														<figcaption>{{ self.optional_for_gse() }} This changes what goes in front of the patch files’s “subject line”. It’s useful for making sure that the recipient knows what repo the patch files are for.</figcaption>
+													</figure>
+												</li>
+												<li>
+													<figure>
+														<code>{{ self.gfp5() }}</code>
+														<figcaption>This part specifies which commits should be turned into patch files. {{ self.rev_list_explanation() }}</figcaption>
+													</figure>
+												</li>
+											</ul>
+										</details>
+									</li>
+									<li>
+										Compress the patch-v1 folder. You can do so by running this command:
+										<pre><code>tar -cf patch-v1-compressed.tar.zst --zstd patch-v1</code></pre>
+										or you can use another method that you’re more familiar with.
+									</li>
+									<li><a href="mailto:?To=Jason%20Yundt%20%3cjason@jasonyundt.email%3e&Subject=%5bPATCH%20ARCHIVE%20%3crepo-name%3e%5d%20%3csummary%3e&body=Don’t%20forget%20to%20edit%20this%20message’s%20subject%20line%20and%20to%20attach%20your%20patch%20archive." target="_blank" rel="author external">Email me the compressed archive.</a> {{ self.mailto_fallback() }}</li>
+								</ol>
+							</details>
+						</li>
+						<li>
+							<details>
+								<summary>Medium: <code>git-request-pull</code></summary>
+								<p>This strategy is good for people who already have some experience with <cite>Git</cite>. It’s not recommended for new users.</p>
+								<ol>
+									<li>If you don’t already have one that you want to use, create a public <a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefremotearemoterepository" target="_blank" rel="external">remote repository</a>. If you’re not sure how or where to do this, then <a href="https://docs.codeberg.org/getting-started/first-repository/" target="_blank" rel="external">follow this guide to create a new repo on Codeberg</a>.</li>
+									<li>
+										If you haven’t already, tell your local clone about your remote repo:
+										<pre><code>git remote add pr {% block remote_repo %}&lt;remote-repo-<abbr title="Uniform Resource Locator">URL</abbr>&gt;{% endblock %}</code></pre>
+										Make sure that <code>{{ self.remote_repo() }}</code> is a publicly accessible <abbr title="Uniform Resource Locator">URL</abbr> (use <abbr title="Hypertext Transfer Protocol Secure">HTTPS</abbr>, not <abbr title="Secure Shell">SSH</abbr>).
+									</li>
+									{{ self.remember_branch() }}
+									<li>
+										Make sure that an up-to-date copy of your branch is available on the remote:
+										<pre><code>git push pr {{ self.your_branch() }}</code></pre>
+									</li>
+									<li><em>(Optional)</em> Resize your terminal to 78 characters wide.</li>
+									<li>
+										Generate the pull request message:
+										<pre><code>git request-pull main pr {{ self.your_branch() }}</code></pre>
+									</li>
+									<li>Copy the pull request message and <a href="mailto:?To=Jason%20Yundt%20%3cjason@jasonyundt.email%3e&Subject=%5bGIT%20PULL%20%3crepo-name%3e%5d%20%3csummary%3e&body=Don’t%20forget%20to%20edit%20this%20message’s%20subject%20line%20and%20to%20replace%20the%20body%20with%20the%20pull%20request%20message." target="_blank" rel="author external">email it to me.</a> {{ self.mailto_fallback() }}</li>
+								</ol>
+							</details>
+						</li>
+						<li>
+							<details>
+								<summary>Hard: <code>git-format-patch</code> + <code>git-send-email</code></summary>
+								<p>Patches should be sent to “{{ self.patch_recipient() }}”. If you don’t already know how to use <a href="https://git-scm.com/docs/git-send-email" target="_blank" rel="external"><code>git-send-email</code></a>, then check out <a href="https://git-scm.com/docs/git-send-email" target="_blank" rel="external"><code>git-send-email.io</code></a>. I’ll give you some advice that <code>git-send-email.io</code> doesn’t mention: you can <a href="#git-format-patch">generate patch files using <code>git-format-patch</code></a> (don’t compress them), and then send them using <code>git-send-email</code>:</p>
+								<pre id="gse-command"><code>git send-email &lt;directory-that-contains-patch-files&gt;</code></pre>
+								<p>Most of the options that you can pass to <code>git-send-email</code> (like <a href="https://git-scm.com/docs/git-send-email#Documentation/git-send-email.txt---toltaddressgt82308203" target="_blank" rel="external"><code>--to</code></a>, <a href="https://git-scm.com/docs/git-send-email#Documentation/git-send-email.txt---ccltaddressgt82308203" target="_blank" rel="external"><code>--cc</code></a> or <a href="https://git-scm.com/docs/git-format-patch#Documentation/git-format-patch.txt--vltngt" target="_blank" rel="external"><code>-v2</code></a>) can also be passed to <code>git-format-patch</code>.</p>
+							</details>
+						</li>
+					</ul>
+				</details>
+			</li>
+			<li>
+				<details>
+					<summary>What to do if the repo is hosted on <a href="https://pagure.io/user/jayman/projects" target="_blank" rel="external"><code>pagure.io</code></a>.</summary>
+					<ol>
+						<li>If you don’t already have one, <a href="https://docs.pagure.org/pagure/usage/forks.html#create-a-fork-on-pagure" target="_blank" rel="external">create a fork of the upstream project</a>.</li>
+						{% block add_remote %}
+							<li>
+								If you haven’t already, tell your local clone about your fork by adding it as a <a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefremotearemoterepository" target="_blank" rel="external">remote</a>:
+								<pre><code>git remote add pr &lt;your-fork’s-<abbr title="Uniform Resource Locator">URL</abbr>&gt;</code></pre>
+								“pr” is just a name. You can call your remote whatever you want.
+							</li>
+						{% endblock %}
+						{{ self.remember_branch() }}
+						{% block push %}
+							<li>
+								<a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpushapush" target="_blank" rel="external">Push</a> your local changes from your local repo to your remote fork:
+								<pre><code>git push pr {{ self.your_branch() }}</code></pre>
+							</li>
+						{% endblock %}
+						<li>On the upstream repo’s page, <a href="https://docs.pagure.org/pagure/usage/pull_requests.html" target="_blank" rel="external">create a pull request</a>.</li>
+					</ol>
+				</details>
+			</li>
+			<li>
+				<details>
+					<summary>What to do if the repo is hosted on <a href="https://gitlab.com/users/Jayman2000/projects" target="_blank" rel="external"><code>gitlab.com</code></a>.</summary>
+					<ol>
+						<li>If you don’t already have one, <a href="https://docs.gitlab.com/ee/user/project/repository/forking_workflow.html#creating-a-fork" target="_blank" rel="external">create a fork of the upstream project</a>.</li>
+						{{ self.add_remote() }}
+						{{ self.remember_branch() }}
+						{{ self.push() }}
+						<li>On the upstream repo’s page, <a href="https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html" target="_blank" rel="external">create a merge request</a>.</li>
+					</ol>
+				</details>
+			</li>
+			<li>
+				<details>
+					<summary>What to do if the repo is hosted on <a href="https://github.com/Jayman2000?tab=repositories" target="_blank" rel="external"><code>github.com</code></a>.</summary>
+					<ol>
+						<li>If you don’t already have one, <a href="https://docs.github.com/en/get-started/quickstart/fork-a-repo" target="_blank" rel="external">create a fork of the upstream project</a>.</li>
+						{{ self.add_remote() }}
+						{{ self.remember_branch() }}
+						{{ self.push() }}
+						<li>On the upstream repo’s page, <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request" target="_blank" rel="external">create a pull request</a>.</li>
+					</ol>
+				</details>
+			</li>
+		</ul>
+	</section>
+{% endblock %}
