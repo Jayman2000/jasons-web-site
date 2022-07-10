@@ -5,6 +5,14 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
 
 # [Jason’s Web Site](https://jasonyundt.website/)
 
+## Branch for testing out my submitting patches guide
+
+At the moment, I’m working on a guide that explains how to contribute to
+my projects. I’m going to submit patches that modify this branch in
+order to test out my guide.
+
+You probably want to be looking at a different branch.
+
 ## Building
 
 ### Prerequisites
