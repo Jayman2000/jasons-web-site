@@ -7,6 +7,7 @@ SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
 
 summary
 {
+	cursor: pointer;
 	list-style-type: "▶ ";
 }
 
