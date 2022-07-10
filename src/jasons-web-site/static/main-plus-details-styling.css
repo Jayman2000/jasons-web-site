@@ -5,6 +5,11 @@ SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
 */
 @import url('main.css');
 
+details > :not(summary)
+{
+	margin-left: 8ch;
+}
+
 summary
 {
 	cursor: pointer;
