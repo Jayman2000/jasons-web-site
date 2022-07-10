@@ -199,4 +199,6 @@ nav a:hover
 nav span
 {
 	line-height: 3ex;
+	margin-left: 1ch;
+	margin-right: 1ch;
 }
