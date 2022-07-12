@@ -1,0 +1,57 @@
+@charset "utf-8";
+/*
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
+*/
+@import url('main-plus-details-styling.css');
+
+.no-bullets
+{
+	list-style-type: none;
+}
+
+/*
+Regular sized white arrows.
+*/
+details details summary
+{
+	list-style-type: "▷ ";
+}
+details details[open] > summary
+{
+	list-style-type: "▽ ";
+}
+
+/*
+Medium sized black arrows.
+*/
+details details details summary
+{
+	list-style-type: "⏵ ";
+}
+details details details[open] > summary
+{
+	list-style-type: "⏷ ";
+}
+
+ol ol
+{
+	list-style-type: upper-alpha;
+}
+
+pre
+{
+	margin-left: 8ch;
+}
+#gse-command
+{
+	/*
+	The majority of the <pre> elements have no siblings, so they appear indented one more time than the content around them. This one specific <pre> does have siblings, so we have to double its margin. If we didn’t double its margin, then it would appear at the same indentation level as the content around it.
+	*/
+	margin-left: 16ch;
+}
+
+figure
+{
+	margin-left: 0;
+}

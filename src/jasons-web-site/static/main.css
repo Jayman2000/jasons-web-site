@@ -4,6 +4,7 @@ SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using t
 SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 
 REMEMBER: If you need styling for <samp> and friends, then move it from public-inbox-copyright-concerns.css to here.
+REMEMBER: If you need styling for nested lists, then move it from submitting-patches.css to here.
 */
 @import url('cc-symbols-font.css');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Source+Code+Pro:wght@400;700&display=swap');
@@ -198,4 +199,6 @@ nav a:hover
 nav span
 {
 	line-height: 3ex;
+	margin-left: 1ch;
+	margin-right: 1ch;
 }
