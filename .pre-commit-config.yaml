@@ -105,7 +105,9 @@ repos:
                         font and released it into the 🅮 public domain|
                         I believe that my use of this file is fair use, but you
                         might disagree. If you do disagree, send me an email and
-                        I’ll be more than happy to take it down)\.
+                        I’ll be more than happy to take it down|
+                        Please extract this archive for additional copying
+                        information)\.
                     - --pattern
                     - >
                         SPDX-FileContributor:
