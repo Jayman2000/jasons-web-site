@@ -6,6 +6,8 @@ SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
 
 {% block title %}How to Submit Patches to Jason’s Projects{% endblock %}
 {% block css_url %}{{ generate_relative_url(relative_to_base, "submitting-patches.css") }}{% endblock %}
+{% block additional_csp %}img-src {{ csp_self_source }};{% endblock %}
+
 {% block body_content %}
 	<h1>{{ self.title() }}</h1>
 	<p>First of all, thank you for taking an interest in contributing to my projects. While every project is different, the process generally looks like this:</p>
