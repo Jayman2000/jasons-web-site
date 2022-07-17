@@ -41,12 +41,12 @@ These color schemes are based on the Breeze Dark and Breeze Light themes:
 		color: #ffffff;
 	}
 
-	a
+	a, summary
 	{
 		color: #2980b9;
 	}
 
-	a:hover
+	a:hover, summary:hover
 	{
 		color: #194d6e;
 	}
@@ -90,12 +90,12 @@ These color schemes are based on the Breeze Dark and Breeze Light themes:
 		color: #fcfcfc;
 	}
 
-	a
+	a, summary
 	{
 		color: #2980b9;
 	}
 
-	a:hover
+	a:hover, summary:hover
 	{
 		color: #39b3ff;
 	}
