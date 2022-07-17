@@ -92,8 +92,8 @@ Put the phrase on its own line. Don’t include any whitespace before the word
 
 Once you do so, I’ll add your email address to the list of people who have
 agreed and make your original message public. You won’t have to go through
-this process again, unless I update this agreement. (This is version -1 (TODO: bump) by the
-way).
+this process again, unless I significantly update this agreement. (This is
+version -1 (TODO: bump) by the way).
 
 If you don’t agree, that’s OK. You can still contribute by sending feedback
 and pull requests to
