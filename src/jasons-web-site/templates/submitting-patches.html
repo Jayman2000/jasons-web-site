@@ -175,7 +175,7 @@ SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
 										That command is a little bit tricky. It creates a bundle file named “<code>{{ self.filename() }}</code>”. The last part of the command tells <cite>Git</cite> what to put into your bundle. {% block rev_list_explanation %}“<code>{{ self.rev_list() }}</code>” means “every commit that’s in <code>{{ self.your_branch() }}</code>, but isn’t in main yet”.{% endblock %}
 									</li>
 									{# TODO: Once my public-inbox is up and running, update this link. #}
-									<li><a href="mailto:?To=Jason%20Yundt%20%3cjason@jasonyundt.email%3e&Subject=%5bBUNDLE%20%3crepo-name%3e%5d%20%3csummary%3e&body=Don’t%20forget%20to%20edit%20this%20message’s%20subject%20line%20and%20to%20attach%20your%20bundle%20file." target="_blank" rel="author external">Email me the bundle.</a> {% block mailto_fallback %}(If that links doesn’t work on your system, send it to “{% block patch_recipient %}Jason Yundt &lt;jason@jasonyundt.email&gt;{% endblock %}”).{% endblock %}</li>
+									<li><a href="mailto:?To=Jason%20Yundt%20%3cjason@jasonyundt.email%3e&Subject=%5bBUNDLE%20%3crepo-name%3e%5d%20%3csummary%3e&body=Don’t%20forget%20to%20edit%20this%20message’s%20subject%20line%20and%20to%20attach%20your%20bundle%20file." target="_blank" rel="author external">Email me the bundle.</a> {% block mailto_fallback %}(If that links doesn’t work on your system, send it to “{% block patch_recipient %}jason@jasonyundt.email{% endblock %}”).{% endblock %}</li>
 								</ol>
 							</details>
 						</li>
