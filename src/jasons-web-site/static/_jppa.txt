@@ -39,6 +39,10 @@ to the following:
 
 	1. Any patches submitted to this address will be available under
 	appropriate legal terms. Specifically:
+		• All submitted patch metadata will be dedicated to the public
+		domain under 🅭🄍1.0 (see
+		<https://creativecommons.org/publicdomain/zero/1.0/>).
+
 		• The legal terms that apply to a submitted patch’s proposed
 		additions will be the legal terms that the repo indicates
 		after the patch has been applied. Examples:
@@ -65,9 +69,6 @@ to the following:
 			additions to foo.c would be GPLed unless they add to
 			bar(). Any proposed additions to the bar() function
 			would be MIT Licensed.
-		• All submitted patch metadata will be dedicated to the public
-		domain under 🅭🄍1.0 (see
-		<https://creativecommons.org/publicdomain/zero/1.0/>).
 
 	2. Emails sent to this address that aren’t patches will be available
 	under 🅭🅯🄏🄎4.0 (see
@@ -87,7 +88,7 @@ Put the phrase on its own line. Don’t include any whitespace before the word
 
 Once you do so, I’ll add your email address to the list of people who have
 agreed and make your original message public. You won’t have to go through
-this process again, unless I update this agreement. (This is version -1 by the
+this process again, unless I update this agreement. (This is version -1 (TODO: bump) by the
 way).
 
 If you don’t agree, that’s OK. You can still contribute by sending feedback
