@@ -79,6 +79,10 @@ to the following:
 	isn’t part of a patch will be available under 🅭🅯🄏🄎4.0 (see
 	<https://creativecommons.org/licenses/by-nc-sa/4.0/>).
 
+You can find some examples of how this agreement will affect your emails here:
+<https://jasonyundt.website/posts/jppa-annotated-and-explained.html#highlighted-examples>.
+Hopefully, those examples will make this agreement more clear.
+
 If you agree, reply to this email with the magic phrase:
 
 	“Yes, I agree.”
