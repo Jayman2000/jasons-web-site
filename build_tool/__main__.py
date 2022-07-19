@@ -32,6 +32,21 @@ ARGUMENT_PARSER.add_argument(
 		metavar="SITE_SLUG"
 )
 ARGUMENT_PARSER.add_argument(
+		'-a',
+		'--authority',
+		default='jasonyundt.website',
+		help=\
+				"In the URL, “https://example.com/”, "
+				+ "“example.com” is the URL’s authority. By "
+				+ "default, the build_tool assumes that the "
+				+ "site’s authority is “jasonyundt.website”. "
+				+ "You can use this option to test out the site"
+				+ " with a different authority like "
+				+ "“test.jasonyundt.website” or "
+				+ "“localhost:49152”. Default: "
+				+ "“jasonyundt.website”."
+)
+ARGUMENT_PARSER.add_argument(
 		'-d',
 		'--double-validate',
 		action='store_true',
@@ -73,7 +88,7 @@ except FileNotFoundError:
 	pass
 
 
-def build_site(site_slug: str,) -> None:
+def build_site(site_slug: str, authority: str) -> None:
 	print(f"======================== {site_slug} ========================")
 
 	static_dir = Path(BASE_SOURCE_DIR, site_slug, "static")
@@ -92,6 +107,7 @@ def build_site(site_slug: str,) -> None:
 		with Path(static_dir, relative_to_static_dir).open() as file:
 			return escape(file.read())
 	env.globals = {
+			'authority':authority,
 			'include_static':include_static,
 			'Path':Path,
 			'reversed':reversed
@@ -127,4 +143,4 @@ def build_site(site_slug: str,) -> None:
 			)
 
 for site_slug in ARGS.site_slugs:
-	build_site(site_slug)
+	build_site(site_slug, ARGS.authority)

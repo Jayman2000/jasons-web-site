@@ -83,7 +83,7 @@ SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022)
 						• I don’t specify the type attibute here. Normally, I specify the type for all links to pages on my site. Gitweb is special becasue its Content-Type header depends on what browser you’re using (see <https://git.kernel.org/pub/scm/git/git.git/tree/gitweb/gitweb.perl?t=a4a2aa60ab45e767b52a26fc80a0a576aef2a010#n4052>).
 						• From what I can tell, Gitweb doesn’t support translations, so there’s no chance that the hreflang will change (at least, there’s no chance at the moment).
 					#}
-					><li><a href="https://jasonyundt.website/gitweb" hreflang="en-US"><span><cite>Git</cite> repos</span></a></li
+					><li><a href="https://{{ authority }}/gitweb" hreflang="en-US"><span><cite>Git</cite> repos</span></a></li
 				></ul>
 			</nav>
 		{% endif %}
