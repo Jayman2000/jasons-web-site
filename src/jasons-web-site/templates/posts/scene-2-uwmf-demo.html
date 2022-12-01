@@ -1,0 +1,19 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022)
+#}
+{% extends "_post.html" %}
+
+{% block title %}A New <cite>Wolfenstein 3D</cite> Map Set and Map Creation Tool{% endblock %}
+{% block completion_time %}2022-11-30T19:59:07-05:00{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "main-plus-blockquotes-plus-img.css") }}{% endblock %}
+{% block additional_csp %}img-src {{ csp_self_source }};{% endblock %}
+
+{% block post_content %}
+<p>I’ve been working on a level creation tool for <a href="https://www.mobygames.com/game/wolfenstein-3d" target="_blank" rel="external"><cite>Wolfenstein 3D</cite></a> named Scene 2 UWMF. Scene 2 UWMF allows you to create levels using <a href="https://godotengine.org/" target="_blank" rel="external"><cite>Godot</cite>’s editor</a>.</p>
+{#
+I’m setting alt to an empty string in accordance with <https://html.spec.whatwg.org/dev/images.html#ancillary-images>.
+#}
+<img alt="" src="{{ generate_relative_url(relative_to_base, "posts/scene-2-uwmf-screenshot.webp") }}">
+<p><a href="{{ generate_relative_url(relative_to_base, "posts/Scene%202%20UWMF%20Demo.zip") }}" download hreflang="en-US" type="application/zip"><strong>Click here to download a map set made with Scene 2 UWMF.</strong></a> That map set also contains some information for how you can get started with Scene 2 UWMF.</p>
+{% endblock %}
