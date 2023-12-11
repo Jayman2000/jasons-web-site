@@ -1,0 +1,133 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2022–2023)
+#}
+{% extends "_post.html" %}
+
+{% block title %}The 🅭🄍 Loophole That’s Been Annoying Me for 2 Years{% endblock %}
+{% block completion_time %}2023-12-11T16:32:15-05:00{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "cc0-loophole-annoying-for-2-years.css") }}{% endblock %}
+
+{% block post_content %}
+<p>Two years ago, I identified a loophole that involved <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external">the CC0 1.0 Universal Public Domain Dedication</a>. <a href="{{ generate_relative_url(relative_to_base, "posts/why-do-i-use-cc0.html") }}" hreflang="en-US" type="text/html;charset=utf-8">I use 🅭🄍 for a lot of my work</a>, and working around this loophole has been quite annoying. Luckily, the loophole has been fixed!</p>
+
+<section>
+	<h2>What was the loophole?</h2>
+	<p><a href="https://copyright.gov/what-is-copyright/" target="_blank" rel="external" hreflang="en-US">In the U.S., written works are automatically copyrighted the moment they’re written.</a> This can have some unintuitive consequences. For example, if I send you an email, you aren’t allowed to forward that email to someone else unless I give you permission (or you use an exception to copyright law). One way for me to give you permission is to write a document that says that you have permission. But wait. What if you wanted to forward that permission document to someone else? Well, the permission document automatically became copyrighted, so you need to get my permission in order to forward it. I could give you a second permission document for the first permission document! But wait. What if you wanted to forward the second permission document to someone else? Well, the second permission document automatically became copyrighted, so so you need to get my permission in order to forward it. I could give you a third permission document for the second permission document! But wait. What if you wanted to forward the third permission document to someone else? Well, the third permission document automatically became copyrighted, so…</p>
+	<p>This recursive logic loop is especially a problem for <abbr title="Free and open-source software">FOSS</abbr> repos. In order for a piece of software to be free or open-source, there needs to be <a href="https://www.gnu.org/licenses/license-list.html#NoLicense" target="_blank" rel="external">some sort of document</a> <a href="https://github.com/readme/guides/open-source-licensing" target="_blank" rel="external">that gives certain permissions</a>. <a href="https://innovationgraph.github.com/global-metrics/licenses" target="_blank" rel="external">Projects don’t typically write their own permission documents. Instead, they usually use a license that was written by someone else.</a> Additionally, <a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#determining-the-location-of-your-license" target="_blank" rel="external" hreflang="en">projects often include a copy of their license in their repo</a>. Because license documents are automatically copyrighted, <abbr title="Free and open-source software">FOSS</abbr> projects need to get permission in order to include them in their repos.</p>
+	<section>
+		<h3>How common <abbr title="Free and open-source software">FOSS</abbr> licenses deal with this problem</h3>
+		<p>Many licenses nip the problem in the bud. Some licenses <b>explicitly</b> give you permission to redistribute them:</p>
+		<figure>
+			<blockquote>
+				<p>Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed.</p>
+			</blockquote>
+			<figcaption>— <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" rel="external" hreflang="en-US">The <cite>GNU General Public License</cite>, version 3</a></figcaption>
+		</figure>
+		<p>Other licenses <b>implicitly</b> give you permission to redistribute them:</p>
+		<figure>
+			<blockquote>
+				<h4>How to apply the Apache License to your work</h4>
+				<p>Include a copy of the Apache License, typically in a file called LICENSE, in your work, and consider also including a NOTICE file that references the License.</p>
+			</blockquote>
+			<figcaption>— <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="external">The <cite>Apache License</cite>, version 2.0</a></figcaption>
+		</figure>
+	</section>
+	<section>
+		<h3>How 🅭🄍 <i>tried</i> to deal with this problem</h3>
+		<p><a href="https://web.archive.org/web/20190314152125/https://creativecommons.org/publicdomain/zero/1.0/legalcode" target="_blank" rel="external" hreflang="en-US">When I first discovered the loophole back in 2021, 🅭🄍 didn’t contain anything that would give the reader permission to redistribute 🅭🄍.</a> Instead, there was a separate Web page that said:</p>
+		<figure>
+			<blockquote>
+				<p>Creative Commons makes the legal code of its licenses and the CC0 Public Domain Dedication available under the CC0 Public Domain Dedication.</p>
+			</blockquote>
+			<figcaption>— <a href="https://web.archive.org/web/20190315031933/https://creativecommons.org/policies/" target="_blank" rel="external" hreflang="en-US">The 2021 version of CC’s Licensing Statement for Content and Software Code</a> by <a href="https://creativecommons.org" target="_blank" rel="external">Creative Commons</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="external">🅭🅯4.0</a></figcaption>
+		</figure>
+		<details>
+			<summary>Tangent about the interpretation of that quote</summary>
+			<p>Now, there are two possible ways to interpret that quote. I interpret that quote like this:</p>
+			<ul>
+				<li>Creative Commons makes the legal code of its licenses available under the CC0 Public Domain Dedication.</li>
+				<li>Creative Commons makes the legal code of the CC0 Public Domain Dedication available under the CC0 Public Domain Dedication.</li>
+			</ul>
+			<p>I know of at least one other person who interprets that quote like this:</p>
+			<ul>
+				<li>Creative Commons makes the legal code of its licenses available under the CC0 Public Domain Dedication.</li>
+				<li>Creative Commons makes the CC0 Public Domain Dedication available under the CC0 Public Domain Dedication.</li>
+
+			</ul>
+			<p>Personally, I think that my interpretation is more consistent with the rest of the text and is how the author interprets the text. That being said, I can’t prove that my interpretation is the correct one, so it’s possible that there was never any loophole at all.</p>
+		</details>
+		<p>The problem here is that quote only talks about the legal code of 🅭🄍. <a href="https://web.archive.org/web/20200508010123/https://creativecommons.org/legal-code-defined/" target="_blank" rel="external" hreflang="en-US">At the time, Creative Commons’s Web site had a definition for “legal code”</a>, and <a href="https://github.com/creativecommons/creativecommons.org/issues/1212" target="_blank" rel="external" hreflang="en-US">that definition excluded parts of 🅭🄍</a>. That’s what the loophole was. Creative Common’s was probably trying to put all of 🅭🄍’s text into the public domain, but <strong>they ended up only putting part of it into the public domain</strong>.</p>
+	</section>
+</section>
+<section>
+	<h2>The annoying workaround</h2>
+	<p>When I first discovered the loophole, the bottom of each page on Creative Commons’s Web site said:
+	<figure>
+		<blockquote>
+			<p>Except where otherwise <a href="https://web.archive.org/web/20190315031933/https://creativecommons.org/policies#license" target="_blank" rel="external">noted</a>, content on this site is licensed under a <a href="https://web.archive.org/web/20190315031933/https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="external">Creative Commons Attribution 4.0 International license</a>.</p>
+		</blockquote>
+		<figcaption>— <a href="https://web.archive.org/web/20190315031933/https://creativecommons.org/" target="_blank" rel="external" hreflang="en-US">The 2021 version of Creative Commons’s Web site</a> by <a href="https://creativecommons.org" target="_blank" rel="external">Creative Commons</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="external">🅭🅯4.0</a></figcaption>
+	</figure>
+	<p>Based on that statement, I assumed that part of 🅭🄍 was in the public domain and that the rest of 🅭🄍 was available under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="external">🅭🅯4.0</a>. As a result, I was being diligent and including proper attribution, links to the author et cetera for the parts of 🅭🄍 that were copyrighted. It was really annoying because it meant either not including a copy of 🅭🄍 in repositories that use it or including a bunch of extra text alongside it.</p>
+</section>
+<section>
+	<h2>The convoluted series of events that inadvertently closed the loophole</h2>
+	<section>
+		<h3>The attempted direct solution</h3>
+		<p>Now that I’ve found a workaround, it’s time to get the issue fixed upstream. <a href="https://opensource.creativecommons.org/contributing-code/" target="_blank" rel="external">Creative Commons has an official process for contributing to their projects.</a> Here’s the gist of it:</p>
+		<ol>
+			<li>Someone opens an issue on one of <a href="https://opensource.creativecommons.org/contributing-code/" target="_blank" rel="external">their GitHub repos</a>.</li>
+			<li>A Creative Commons staffer triages the issue. Once they decide that the issue looks good enough, they add the label “🏁 status: ready for work”.</li>
+			<li>A Creative Commons staffer assigns someone to work on the issue. Anyone can ask to be assigned to an issue, but for some issues, they’ll only assign Creative Commons staffers.</li>
+			<li>The person assigned to the issue submits a pull request.</li>
+			<li>A Creative Commons staffer reviews the pull request. Once they decide that it looks good, they merge it.</li>
+		</ol>
+		<p>I opened <a href="https://github.com/creativecommons/creativecommons.org/issues/1212" target="_blank" rel="external">two</a> <a href="https://github.com/creativecommons/cc-legal-tools-app/issues/381" target="_blank" rel="external">issues</a>. And I waited, and waited, and waited. <a href="https://github.com/creativecommons/creativecommons.org/issues/1212#event-5047097627" target="_blank" rel="external">The first issue was assigned to someone pretty quickly.</a> <a href="https://github.com/creativecommons/creativecommons.org/issues/1212#event-7242891077" target="_blank" rel="external">A year later, that issue was reassigned to two other people.</a> Today, the issue is still open, and there’s no public signs that any work has been done on it. Additionally, <a href="https://github.com/creativecommons/creativecommons.org/issues/1212#event-8628662459" target="_blank" rel="external">that issue has been reserved for Creative Commons staff only</a>.</p>
+		<p>The second and more important issue still hasn’t even been triaged.</p>
+		<p>While I was quietly waiting for these issues to be fixed, <a href="https://lwn.net/Articles/902506/" target="_blank" rel="external" hreflang="en">I found out about Jason Self’s <abbr title="Worldwide Public Domain Dedication">WPDD</abbr></a>. <a href="https://wpdd.info/about.html" target="_blank" rel="external" hreflang="en">The <abbr title="Worldwide Public Domain Dedication">WPDD</abbr> is a fork of 🅭🄍</a>, so it would also be affected by this loophole. I emailed Jason Self and tried to explain the loophole and how it could be worked around. Unfortunately, the conversation quickly devolved into an unproductive argument. I definitely failed to communicate effectively, and I never got permission to change Jason’s mind which was a huge mistake on my part. If you don’t get permission to change someone’s mind, then you’ll never be successful.</p>
+		<p>There was one upside to that argument, though. That argument allowed me to reflect on how I was interpreting Creative Commons’s legal policies. I got a better understanding of what I think those legal policies mean and why I interpret them the way that I do. While I was having the argument, I realized that I might be misinterpreting those policies. In other words, I realized that my workaround might not work at all. <a href="https://github.com/creativecommons/cc-legal-tools-app/issues/381#issuecomment-1775440712" target="_blank" rel="external">I commented on one of the GitHub issues</a>, and to my surprise, <a href="https://github.com/creativecommons/cc-legal-tools-app/issues/381#issuecomment-1775440718" target="_blank" rel="external">I actually got a response</a>. The problem had <i>almost</i> been solved! Creative Commons had updated that policy to say:</p>
+		<figure>
+			<blockquote>
+				<p>Creative Commons makes the legal code of its licenses and the CC0 Public Domain Dedication available under the CC0 Public Domain Dedication, as well as the text of all of the notices and accompanying text on the license pages.</p>
+			</blockquote>
+			<figcaption>— <a href="https://web.archive.org/web/20231209191810/https://creativecommons.org/policies/" target="_blank" rel="external" hreflang="en-US">The current version of CC’s Licensing Statement for Content and Software Code</a> by <a href="https://creativecommons.org" target="_blank" rel="external">Creative Commons</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="external">🅭🅯4.0</a></figcaption>
+		</figure>
+		<p>The only problem with this new statement is that it says “<strong>license</strong> pages”. <a href="https://creativecommons.org/faq/#how-do-cc-licenses-operate" target="_blank" rel="external">🅭🄍 is not a license.</a> All they have to do is change that quote to say “<strong>legal tools</strong> pages”, and the loophole would be completely closed for good! Unfortunately, they haven’t gotten around to doing that yet, so we need another solution.</p>
+	</section>
+	<section>
+		<h3>The successful indirect solution</h3>
+		<p>One possible indirect solution would be to rely on <a href="https://github.com/creativecommons/cc-legal-tools-app/issues/381#issuecomment-1775440718" target="_blank" rel="external">the response that I had mentioned earlier</a>. Part of that response says:
+		<blockquote>
+			<p>All of the text that appears on the pages containing CC licenses and legal tools should be released to the public domain under CC0. (The licensing statement was written prior to clarifying which elements on those pages are and are not legal code!)</p>
+		</blockquote>
+		<p>I have two concerns with doing that:</p>
+		<ol>
+			<li>Just because something “should be” in the public domain doesn’t mean that it actually is.</li>
+			<li>I would rather have a more “official” statement. I’m confident that <a href="https://creativecommons.org" target="_blank" rel="external">creativecommons.org</a> is reliable. I’m confident that <a href="https://github.com/creativecommons" target="_blank" rel="external">Creative Commons’s GitHub repos</a> are reliable. I’m not so confident that a random comment on GitHub is reliable.</li>
+		</ol>
+		<p>Another possible solution would be to find another place where Creative Commons talks about the legal status of 🅭🄍. If I can find somewhere else where Creative Commons clearly says that 🅭🄍 is in the public domain, then I wouldn’t need to wait for either of those issues to be fixed. I wasn’t able to find a direct reference to 🅭🄍 being in the public domain, but I was able to find this:</p>
+		<figure>
+			<blockquote>
+				<p><a href="https://github.com/creativecommons/cc-legal-tools-data/blob/8f42798f41f59bdea573155f128cd01d40ecc6ba/LICENSE" target="_blank" rel="external"><code>LICENSE</code></a>: The text of the Creative Commons public licenses is dedicated to the public domain under the <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external nofollow">CC0 1.0 Universal (CC0 1.0) Public Domain Dedication</a>.</p>
+			</blockquote>
+			<figcaption>— <a href="https://github.com/creativecommons/cc-legal-tools-data/tree/8f42798f41f59bdea573155f128cd01d40ecc6ba#license" target="_blank" rel="external">An old version of the <code>cc-legal-tools-data</code> repo</a></figcaption>
+		</figure>
+		<p>That statement had <a href="https://github.com/creativecommons/cc-legal-tools-data/issues/44" target="_blank" rel="external">two</a> <a href="https://github.com/creativecommons/cc-legal-tools-data/issues/45" target="_blank" rel="external">problems</a> that were easy to fix. It also had two problems that were difficult to fix. For one thing, this statement has the same problem that the legal policy had. It talks about Creative Commons’s licenses, but it never says anything about 🅭🄍. I had first discovered this statement long before I had heard anything from Creative Commons about potentially changing their legal policy. I ended up waiting until after I got <a href="https://github.com/creativecommons/cc-legal-tools-app/issues/381#issuecomment-1775440718" target="_blank" rel="external">that response that I had mentioned earlier</a>. Even once I had the response, there was still another problem that had to be fixed. At the time, that repo also said:</p>
+		<figure>
+			<blockquote>
+				<p>⚠️ <strong>This data is in progress and in flux. Please, DO NOT REFERENCE IT until it is stable (and this warning is removed).</strong></p>
+			</blockquote>
+			<figcaption>— <a href="https://github.com/creativecommons/cc-legal-tools-data/tree/8f42798f41f59bdea573155f128cd01d40ecc6ba#cc-licenses-data" target="_blank" rel="external">An old version of the <code>cc-legal-tools-data</code> repo</a></figcaption>
+		</figure>
+	</section>
+	<p>So, I waited for longer. I forgot about it for a while, but recently, <a href="https://github.com/creativecommons/cc-legal-tools-data/commit/2c7a4276feebeb803dc76f6167bc0f76494edafc" target="_blank" rel="external">that warning was removed</a>. <a href="https://github.com/creativecommons/cc-legal-tools-data/issues/159" target="_blank" rel="external">I opened another issue</a>, and to my surprise, it was fixed in a matter of weeks. As a result, there is now, finally after all of this time, an official statement from Creative Commons the clearly indicates that 🅭🄍 can be redistributed:</p>
+	<figure>
+		<blockquote>
+			<p><a href="https://github.com/creativecommons/cc-legal-tools-data/blob/main/COPYING" target="_blank" rel="external"><code>COPYING</code></a>: The text of the Creative Commons legal tools is dedicated to the public domain under the <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="external nofollow">CC0 1.0 Universal (CC0 1.0) Public Domain Dedication</a>.</p>
+		</blockquote>
+		<figcaption>— <a href="https://github.com/creativecommons/cc-legal-tools-data/tree/7fe72a9f6c241f6ae8059751793e3471dd4fcebe#copying" target="_blank" rel="external">The current version of the <code>cc-legal-tools-data</code> repo</a></figcaption>
+	</figure>
+</section>
+<p>Finally, after all this time, I can remove all of the pointless attributions and explanations from my repos!</p>
+{% endblock %}
