@@ -1,0 +1,50 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2024)
+#}
+{% extends "_post.html" %}
+
+{% block title %}How Often Should I Release My Software?{% endblock %}
+{% block completion_time %}2024-01-15T10:47:01-05:00{% endblock %}
+
+{% block post_content %}
+<p>A lot of my software doesn’t need to be released. Most of my software already lives in public <a href="https://git-scm.com" target="_blank" rel="external"><cite>Git</cite></a> repos. If someone wants to use one of those pieces of software, then they can just <a href="https://git-scm.com/docs/git-clone" target="_blank" rel="external">clone</a> the repo. Take this Web site for example. I don’t really see a reason why I should give this site a version number or <a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag" target="_blank" rel="external">tag</a> specific <a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefcommitacommit" target="_blank" rel="external">commits</a> as releases. Whenever I <a href="https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpushapush" target="_blank" rel="external">push</a> a change to <a href="https://github.com/Jayman2000/jasons-web-site/tree/main" target="_blank" rel="external">this site’s main branch</a>, I also build the site and update the copy that’s at <a href="https://jasonyundt.website" hreflang="en-US" type="text/html;charset=utf-8"><code>jasonyundt.website</code></a>.</p>
+<p>That being said, there is <a href="https://github.com/Jayman2000/jasons-pre-commit-hooks" target="_blank" rel="external">one piece of software</a> that I do want to start releasing. Here’s the question: how often should I release that piece of software? Before I was able to answer that question, I had to think about these two questions:</p>
+<ol>
+	<li>What does releasing too quickly look like?</li>
+	<li>What does releasing too slowly look like?</li>
+</ol>
+<section>
+	<h2>What does releasing too quickly look like?</h2>
+	<p>When software is released, it creates more work for people who use that software. Package maintainers have to update their packages, and end users have to install updates. Updates take time and energy, so updates need to benefit users or else they won’t be worth doing. Imagine if I released a new version every time I pushed a commit to the main <a href="https://git-scm.com/docs/gitglossary#def_branch" target="_blank" rel="external">branch</a>. You would end up with updates that literally don’t change anything from the end user’s perspective. For example, consider these commits:</p>
+	<ul>
+		<li><a href="https://github.com/Jayman2000/jasons-pre-commit-hooks/commit/e082ec6c6a3648302a7f301761fec12773ac4365" target="_blank" rel="external"><code>e082ec6</code> (Create EditorConfig, <time>2023-12-26</time>)</a></li>
+		<li><a href="https://github.com/Jayman2000/jasons-nixos-config/commit/e1ad5f6444806c1845341032c58436f2c1218a6d" target="_blank" rel="external"><code>e1ad5f6</code> (Update pre-commit hooks, <time>2024-01-04</time>)</a></li>
+		<li><a href="https://git.kernel.org/pub/scm/git/git.git/commit/?id=943fd02769d4d3fc8daab64cfcd7cc2c967f75ef" target="_blank" rel="external"><code>943fd02769</code> (comment: fix typo, <time>2022-03-08</time>)</a></li>
+	</ul>
+	<p>If a new version had been released for each of those commits, there would literally be no benefit to updating. It would just be a waste of time.</p>
+</section>
+<section>
+	<h2>What does releasing too slowly look like?</h2>
+	<p>When a piece of software isn’t working for me or lacks a feature that I want, I often try to contribute to that software. I like that strategy because it’s a really direct way of solving the problem, and it gives back to the community. Unfortunately, that strategy doesn’t always work.</p>
+	<p>For example, <a href="https://github.com/Jayman2000/jasons-nixos-config/commit/a132b99439c44bd563e868a055d9fcee191b19a5" target="_blank" rel="external">in February of <time>2023</time>, I was trying to write a <cite>pre-commit</cite> hook that required Python 3.11 or later</a>. For whatever reason, building <a href="https://github.com/NixOS/nixpkgs/blob/4dd9842df7b98e96a628bf96d5fa283a922a10d4/pkgs/tools/misc/pre-commit/default.nix" target="_blank" rel="external">Nixpkgs’s <code>pre-commit</code> package</a> with <a href="https://python.org" target="_blank" rel="external">Python</a> 3.11 required building <a href="https://cffi.readthedocs.io/en/stable/" target="_blank" rel="external"><cite><abbr title="C Foreign Function Interface for Python">CFFI</abbr></cite></a> with Python 3.11. <a href="https://foss.heptapod.net/pypy/cffi/-/issues/551" target="_blank" rel="external">At the time, one of <cite><abbr title="C Foreign Function Interface for Python">CFFI</abbr></cite>’s tests was broken on Python 3.11.</a> OK, so if I fix that test, then it will allow me to use <a href="https://pre-commit.com" target="_blank" rel="external"><cite>pre-commit</cite></a> with Python 3.11, right? Not so fast! <a href="https://foss.heptapod.net/pypy/cffi/-/issues/551#note_190654" target="_blank" rel="external"><cite><abbr title="C Foreign Function Interface for Python">CFFI</abbr></cite> had already been fixed.</a> The fix was in the main branch, but the most recent release didn’t contain the fix because it was too old. I wanted to make a <cite><abbr title="C Foreign Function Interface for Python">CFFI</abbr></cite> release come out sooner, but I didn’t have any power to make that happen. <a href="https://github.com/NixOS/nixpkgs/pull/198077" target="_blank" rel="external">Additionally, the fix was already in Nixpkgs Unstable</a>, but the most recent <a href="https://nixos.org" target="_blank" rel="external"><cite>NixOS</cite></a> release didn’t contain the fix because it was too old.</p>
+	<p>That’s not the only time something like that has happened to me. Here are some examples:</p>
+	<ul>
+		<li><a href="https://github.com/Jayman2000/jasons-nixos-config/blob/dccd9de296ce6f3c16b15c9a8ce88920382d3420/deployment/applications/ensure-enough-vm-to-shutdown.nix#L46" target="_blank" rel="external">I wanted to use <cite>jq</cite>’s <code>--raw-output0</code> option</a>, but <a href="https://github.com/jqlang/jq/compare/jq-1.6...jq-1.7" target="_blank" rel="external">it took four years for that option to actually end up in a release</a>.</li>
+		<li><a href="https://maniacsvault.net/ecwolf/w/index.php?title=Universal_Wolfenstein_Map_Format&diff=735&oldid=722" target="_blank" rel="external">In <time>2016</time>, the <abbr title="Universal Wolfenstein Map Format">UWMF</abbr> spec was changed to use strings instead of integers for thing types.</a> <a href="https://maniacsvault.net/entry91" target="_blank" rel="external">A version of <cite>ECWolf</cite> that actually supported using strings instead of integers wasn’t released until <time>2023</time>.</a></li>
+		<li><a href="https://github.com/validator/validator/releases/tag/20.6.30" target="_blank" rel="external">The most recent release of <cite>The Nu Html Checker</cite></a> fails if you use “<code>mark :is(a, a:is(:visited, :hover, :visited:hover))</code>” as <a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors" target="_blank" rel="external">a <abbr title="Cascading Style Sheets">CSS</abbr> selector</a>. The latest unstable version of <cite>The Nu Html Checker</cite> validates that selector correctly.</li>
+	</ul>
+</section>
+<section>
+	<h2>How I plan to prevent those situations from happening</h2>
+	<p>Here’s how I’m going to decide when to do releases:</p>
+	<ol>
+		<li>Keep track of the number of unreleased commits. An unreleased commit is a commit that’s in the main branch’s commit log, but isn’t in any of the releases’s commit logs.</li>
+		<li>If there’s thirty or more unreleased commits, then do a release.</li>
+		<li>If there’s an unreleased commit that’s over three months old, then do a release.</li>
+	</ol>
+	<p>The goal of that plan is to make those previously mentioned scenarios very uncommon without requiring much effort on my part. First, that plan makes releases with no user-facing changes unlikely. My assumption is that most of the time releases will contain thirty new commits. I haven’t run the numbers, but my hunch is that I add at least one new feature or one new bug fix every thirty commits without even trying. If somehow I do merge thirty commits without creating a single user-facing change, then that’s OK. If I somehow only change a single comment over the course of three months, then that’s OK. I can do a subpar release every so often.</p>
+	<p>Second, that plan empowers contributors to make releases come out sooner. If a feature gets merged, and you want that feature to get released ASAP, then start submitting patches. The more good patches that a contributor submits, the sooner the release is likely to come out. Additionally, if changes don’t make it into the main branch fast enough, a release will still happen eventually. It might take me a while to realize that we’ve hit the three month mark, but it will happen eventually. If for some reason I don’t do that release, then feel free to bug me. If I don’t respond to being bugged, then I’m probably not doing a good job at maintaining that project. Fork it, and do a release yourself.</p>
+	<p>Another advantage of that plan is that it doesn’t require any thinking. I’ll be able to write a tool that will automatically tell me when I need to do a release. In theory, I could have come up with a more complicated plan that completely prevents pointless updates, but that would require more thinking on my part. The more thinking I have to do, the more likely I am to make a mistake. Thinking about whether or not I should do a release would also take time away from other more important tasks.</p>
+</section>
+{% endblock %}
