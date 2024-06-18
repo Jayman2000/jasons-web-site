@@ -1,0 +1,18 @@
+@charset "utf-8";
+/*
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2024)
+*/
+@import url('main.css');
+
+ol
+{
+	list-style: disc;
+}
+
+blockquote
+{
+	border-left: .25em solid;
+	padding: 0 1em;
+	margin: 0;
+}
