@@ -9,7 +9,7 @@ pkgs.mkShell {
 		coreutils
 		go
 		nodejs
-		python38
+		python3
 		pipenv
 		rustc
 	];
