@@ -3,11 +3,11 @@
 { pkgs ? import <nixpkgs> {} }:
 pkgs.mkShell {
 	nativeBuildInputs = with pkgs; [
-		adoptopenjdk-hotspot-bin-8
 		bash
 		cargo
 		coreutils
 		go
+		jdk
 		nodejs
 		python3
 		pipenv
