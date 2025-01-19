@@ -59,6 +59,7 @@ def write_out_text_file(text: str, file_path: Path) -> None:
 
 
 INVALID_LESS_THAN: Final[Pattern] = compile_re("&LT(?!;)")
+INVALID_LESS_THAN_2: Final[Pattern] = compile_re('<"')
 MINIFIED_SUFFIXES: Final = (".html", ".css")
 def minify(paths: Iterable[Path]) -> None:
 	print("Minifying…")
@@ -89,6 +90,9 @@ def minify(paths: Iterable[Path]) -> None:
 				# [1]: <https://html.spec.whatwg.org/multipage/syntax.html#character-references>
 				# [2]: <https://github.com/wilsonzlin/minify-html/issues/1#issuecomment-618362516>
 				code = INVALID_LESS_THAN.sub("&lt;", code)
+				# Similarly, minify-html replaces ‘&lt;"’ with
+				# ‘<"’ which is also wrong.
+				code = INVALID_LESS_THAN_2.sub('&lt;"', code)
 			elif path.suffix == ".css":
 				# While minify_css() takes all of the same
 				# options as minify(), I don’t think that any of

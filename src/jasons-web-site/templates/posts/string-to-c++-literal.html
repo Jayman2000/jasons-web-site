@@ -1,0 +1,351 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2025)
+#}
+{% extends "_post.html" %}
+
+{% block title %}An Algorithm for Converting Strings to C++17 String Literals{% endblock %}
+{% block completion_time %}2025-01-28T16:31:27-05:00{% endblock %}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "string-to-c++-literal.css") }}{% endblock %}
+
+{% block post_content %}
+<p>I’m currently working on <a href="https://github.com/DescentDevelopers/Descent3/pull/659" target="_blank" rel="external" hreflang="en-US">a pull request for <cite>Descent 3</cite></a>. <a href="https://github.com/DescentDevelopers/Descent3/pull/659#discussion_r1899204882" target="_blank" rel="external" hreflang="en-US">One of <cite>Descent 3</cite>’s maintainers has asked me to change part of that pull request.</a> As part of implementing their requested change, I need to write code that takes a string and converts it into a properly escaped <a href="https://isocpp.org" target="_blank" rel="external">C++</a> string literal.</p>
+<p>Doing so is surprisingly challenging.</p>
+<section>
+	<h2>What Characters Can Be in the Input String?</h2>
+	<p>Our code has to start with a variable that contains some text that is going to get converted. I’m going to call that variable the input string. What characters can the input string possibly contain? Well, in my specific situation, the input string is going to be a path. The first thing we need to do is figure out what characters could possibly be in a valid path.</p>
+	<section>
+		<h3>What Is and Is Not Allowed in Paths?</h3>
+		<section>
+			<h4>Restrictions That <cite>Linux</cite>® Places on Paths</h4>
+			<p><a href="https://kernel.org/linux.html" target="_blank" rel="external"><cite>Linux</cite></a> places basically no restrictions on the format of paths. <a href="https://lore.kernel.org/linux-man/20250113213301.410280-1-jason@jasonyundt.email" target="_blank" rel="external" hreflang="en-US">Paths on <cite>Linux</cite> must end with a null terminator and must not contain any other null bytes.</a> Other than those two rules, paths on <cite>Linux</cite> can contain pretty much any combination of bytes. Paths on Linux can use any character encoding or no character encoding at all.</p>
+		</section>
+		<section>
+			<h4>Restrictions That Windows Places on Paths</h4>
+			<p><a href="https://windows.com" target="_blank" rel="external">Windows</a> places more restrictions on paths. As far as the Windows NT kernel is concerned, <a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcreatefile" target="_blank" rel="external">files</a> and <a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatedirectoryobject" target="_blank" rel="external">directories</a> are just some of the different <a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/windows-kernel-mode-object-manager?redirectedfrom=MSDN" target="_blank" rel="external">types of objects that are handled by the Object Manager.</a> <a href="https://chrisdenton.github.io/omnipath/NT.html" target="_blank" rel="external">If an object has a name, then it has a path.</a> Paths to objects are called <dfn>NT paths</dfn>. Here are some examples of NT paths:</p>
+			<ul>
+				<li><code>\Device\HarddiskVolume4\Program Files\Git\git-cmd.exe</code></li>
+				<li><code>\Device\HarddiskVolume6\Games</code></li>
+				<li><code>\REGISTRY</code></li>
+				<li><code>\Driver\HTTP</code></li>
+				<li><code>\ObjectTypes\Job</code></li>
+			</ul>
+			<p>The Windows NT kernel stores NT paths using <a href="https://learn.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_unicode_string" target="_blank" rel="external">the <code>UNICODE_STRING</code> data type</a>. <a href="https://giodicanio.com/tag/unicode_string" target="_blank" rel="external">Every <code>UNICODE_STRING</code> is supposed to be encoded using UTF-16</a>, but as far as I know, the Windows NT kernel does not enforce this rule. This means that it’s technically possible to create a file object that has invalid <a href="https://www.unicode.org/faq/utf_bom.html#utf16-1" target="_blank" rel="external">UTF-16</a> in its NT path. For the purposes of this blog post, I’m going to say that an NT path is invalid if it doesn’t contain valid UTF-16. This means that a valid NT path can contain any Unicode® character.</p>
+			<p>If you’re used to C and C++, you might be surprised to hear that NT paths can contain <em>any</em> Unicode character. Most of the time, strings in C or C++ are null terminated. Null-terminated UTF-16 strings can’t contain the U+0000 <i>null</i> character. NT paths can contain U+0000 <i>null</i> because <code>UNICODE_STRING</code>s are not necessarily null-terminated.</p>
+			<p>NT paths are not the only type of paths that exist on Windows. <dfn>Win32 paths</dfn> are an alternative to NT paths that allow developers and end users to write paths in a more familiar and more backwards compatible manner. Here are some examples of Win32 paths:</p>
+			<ul>
+				<li><code>C:\Program Files\Git\git-cmd.exe</code></li>
+				<li><code>D:\Games\</code></li>
+				<li><code>Example\relative\path\</code></li>
+			</ul>
+			<p>Valid NT paths can contain any Unicode character, but what about valid Win32 paths? What characters can they contain?</p>
+			<p><a href="https://chrisdenton.github.io/omnipath/Win32.html" target="_blank" rel="external">Win32 paths must be converted to NT paths before the kernel can actually use them.</a> Most applications (including <cite>Descent 3</cite>) only ever deal with Win32 paths and allow Windows APIs to automatically do the conversion for them. <a href="https://googleprojectzero.blogspot.com/2016/02/the-definitive-guide-on-win32-to-nt.html" target="_blank" rel="external">The rules for converting a Win32 path to a NT path are kind of complicated</a>, but if you begin a Win32 path with <code>\\?\</code>, then most of those rules are disabled. If you begin a Win32 path with <code>\\?\</code>, then the only rule is that the first 4 characters of the Win32 path are replaced with <code>\??\</code>. Any other characters in the path are left alone. This means that Win32 paths can contain all the same characters that NT paths can contain. Win32 paths can contain any Unicode character. That being said, it’s unlikely that you would actually be able to open a file that has U+0000 <i>null</i> characters in its name using a Win32 path. Most of the time, Win32 paths are stored as null-terminated strings, and null-terminated strings can’t typically contain U+0000 <i>null</i> characters.</p>
+			<p>
+		</section>
+		<section>
+			<h4>Restrictions That <cite>Descent 3</cite> Places on Paths</h4>
+			<p>If <cite>Descent 3</cite> was as perfect as it could possibly be, then it would support paths that contain any arbitrary sequence of bytes including null bytes (for the sake of weirdly named files on Windows). <cite>Descent 3</cite> is not 100% perfect, though. <cite>Descent 3</cite> often (always?) stores paths as <a href="https://en.cppreference.com/w/cpp/filesystem/path" target="_blank" rel="external"><code>std::filesystem::path</code></a> objects. <cite>Descent 3</cite> also often converts <code>std::filesystem::path</code> objects to <a href="https://www.unicode.org/faq/utf_bom.html#utf8-1" target="_blank" rel="external">UTF-8</a> encoded C strings by doing this:</p>
+			<pre><code>example_path.u8string().c_str()</code></pre>
+			<p>This puts two additional restrictions on paths:</p>
+			<ol>
+				<li>It must be possible to encode the path as valid UTF-8, or else <code>u8string()</code> might fail.</li>
+				<li>It can’t contain a U+0000 <i>null</i> character because <code>c_str()</code> returns a null-terminated string and null-terminated UTF-8 strings can’t contain U+0000 <i>null</i> characters.</li>
+			</ol>
+		</section>
+		<section>
+			<h3>What This Means for Our Input String</h3>
+			<p>Now, back to the original question: What characters can be in the input string? When we take a look at all of the previously mentioned limitations, we can combine them into two simple rules:</p>
+			<ol>
+				<li>We must be able to store the string as valid UTF-8 or UTF-16, so the string must be a sequence of valid Unicode characters.</li>
+				<li>The string can’t contain a U+0000 <i>null</i> character.</li>
+			</ol>
+		</section>
+	</section>
+</section>
+<section>
+	<h2>Dangerous Characters</h2>
+	<p>Now that we know what characters our input string can contain, we have another problem. Some characters need to be escaped. For example, we can’t just write a string literal like this:</p>
+	<pre><code>"So-called "hot" potatoes"</code></pre>
+	<p>We have to escape the quotation marks like this:</p>
+	<pre><code>"So-called \"hot\" potatoes"</code></pre>
+	<p>I call characters like quotation marks <dfn>dangerous characters</dfn> because they might cause problems if they aren’t properly escaped. I tried to find a list of dangerous characters, but I wasn’t able to. I could find lists of characters that <em>could</em> be escaped, but I couldn’t find a list of characters that <em>have</em> to be escaped. This means that we’re going to have to dive into the C++ standard and figure it out ourselves. Specifically, I’m going to take a look at C++17 because <a href="https://github.com/DescentDevelopers/Descent3/blob/11f93221e71201d51a71650a3b190017328cd721/CMakeLists.txt#L46" target="_blank" rel="external"><cite>Descent 3</cite> uses that version of the standard at the moment</a>.</p>
+	<section>
+		<h3>End-of-Line Indicators</h3>
+		<p>The C++ standard describes how C++ programs are compiled. It breaks up the process of compiling C++ programs into 9 “translation phases”. During the first translation phase, this happens:</p>
+		<figure>
+			<blockquote><p>Physical source file characters are mapped, in an implementation-defined manner, to the basic source character set (introducing new-line characters for end-of-line indicators) if necessary. The set of physical source file characters accepted is implementation-defined. Any source file character not in the basic source character set (5.3) is replaced by the <i>universal-character-name</i> that designates that character.</p></blockquote>
+			<figcaption>— ISO/IEC 14882:2017, section 5.2</figcaption>
+		</figure>
+		<section>
+			<h4>Terminology</h4>
+			<p>There are a few terms in that quote that need explaining. The first one is “physical source file characters”. <cite>Descent 3</cite> <a href="https://github.com/DescentDevelopers/Descent3/blob/11f93221e71201d51a71650a3b190017328cd721/.editorconfig#L8" target="_blank" rel="external">uses UTF-8</a> <a href="https://github.com/DescentDevelopers/Descent3/blob/11f93221e71201d51a71650a3b190017328cd721/CMakeLists.txt#L54-L57" target="_blank" rel="external">for its source files</a>, so “physical source file characters” means “Unicode characters” in this situation. The second one is “basic source character set”. Section 5.3 explains that the basic source character set is just a group of 96 Unicode characters. &amp; is an example of a character that’s in the basic source character set. 🍕 is an example of a character that is not in the basic source character set. Characters like 🍕 get replaced with a <i>universal-character-name</i>. The <i>universal-character-name</i> for 🍕 is <code>\U0001F355</code>.</p>
+			<p>The next term that we need to look at is “new-line character”. On its face, that term sounds vague because <a href="https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-5/#G10213" target="_blank" rel="external">there are multiple different Unicode characters that can create new lines</a>. The standard often talks about “<em>the</em> new-line character” which suggests that (as far as C++ is concerned) there is exactly one new-line character, but the standard never directly says which character is the new-line character. The C++17 standard does mention that some terms are defined in other standards:</p>
+			<figure>
+				<blockquote><p>For the purposes of this document, the terms and definitions given in ISO/IEC 2382-1:1993, the terms, definitions, and symbols given in ISO 80000-2:2009, and the following apply.</p></blockquote>
+				<figcaption>— ISO/IEC 14882:2017, section 3</figcaption>
+			</figure>
+
+			<p>I checked both <a href="https://www.iso.org/obp/ui/#iso:std:iso-iec:2382:-1:ed-3:v1:en" target="_blank" rel="external">ISO/IEC 2382-1:1993</a> and ISO 80000-2:2009. Neither of them have a definition for “the new-line character”. That being said, part of the C++17 standard does hint at what the new-line character actually is:</p>
+			<figure>
+				<blockquote>
+					<table>
+						<caption>Table 8 — Escape sequences</caption>
+						<tr>
+							<td>new-line</td>
+							<td>NL(LF)</td>
+							<td><code>\n</code></td>
+						</tr>
+						<tr>
+							<td>horizontal tab</td>
+							<td>HT</td>
+							<td><code>\t</code></td>
+						</tr>
+						<tr>
+							<td>vertical tab</td>
+							<td>VT</td>
+							<td><code>\v</code></td>
+						</tr>
+						<tr>
+							<td colspan="3">…</td>
+						</tr>
+					</table>
+				</blockquote>
+				<figcaption>— ISO/IEC 14882:2017, section 5.13.3</figcaption>
+			</figure>
+			<p>Based on the “(LF)” in that table, I think that it’s safe to say that “the new-line character” is U+000A <i>line feed</i>. I suppose it’s possible that the new-line character is something else in certain implementations, but as far as I can tell, it will always be exactly one character.</p>
+			<p>The last term from section 5.2 of the C++17 standard that we need to understand is “end-of-line indicator”. Unfortunately, there isn’t a definition for “end-of-line indicator” in the C++17 standard, ISO/IEC 2382-1:1993 or ISO 80000-2:2009. I also wasn’t able to find a definition in any of those standards for the related terms “end-of-line” and “line”. This means that each implementation can have a different definition for “end-of-line indicator”.</p>
+			<p>There is a little bit of hope here because <cite>Descent 3</cite> uses UTF-8 for its source code. <a href="https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-5/#G10213" target="_blank" rel="external">The Unicode Core Specification has a whole section called “Newline Guidelines”.</a> Here’s a relevant quote from that section:</p>
+			<figure>
+				<blockquote>
+					<h5 class="unicode_quote_emphasized">Converting to Other Character Code Sets.</h5>
+					<p class="unicode_quote_emphasized">R3 If the intended target is known, map NLF, LS, and PS depending on the target conventions.</p>
+					<p>For example, when mapping to Microsoft Word’s internal conventions for documents, LS would be mapped to VT, and PS and any <i>NLF</i> would be mapped to CRLF.</p>
+				</blockquote>
+				<figcaption>— <a href="https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-5/#G21155" target="_blank" rel="external">The Unicode Standard Version 16.0 – Core Specification, section 5.8.3</a></figcaption>
+			</figure>
+			<p>In our situation, UTF-8 text is being converted to text in C++17’s <i>basic source character set</i>. The convention for C++17’s <i>basic source character set</i> is to always use “the new-line character”. This means that implementations should replace LS characters and NLFs with the new-line character (I’m not sure how PS characters should be handled). This raises a question, though. What about other characters? Is there a chance that something other than the LS character, the PS character or NLFs would get converted into “the new-line character”? Unfortunately, the answer is yes. <a href="https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-4/#G124142" target="_blank" rel="external">Every Unicode character has a “General Category”. One of the General Categories is called Line_Separator or Zl for short.</a> It would be reasonable for an implementation to treat all Line_Separator characters as end-of-line indicators. Unfortunately, the list of Line_Separator characters is not fixed. Future versions of the Unicode Standard could add additional Line_Separator characters. Even if there’s never a new version of the Unicode Standard, the list of Line_Separator characters can still change overtime. This is because of how private-use characters work. The Unicode Core Specification has this to say about private-use characters:</p>
+			<figure>
+				<blockquote>
+					<p><span class="unicode_quote_emphasized">Properties.</span> No private agreement can change which character codes are reserved for private use. However, many Unicode algorithms use the General_Category property or properties which are derived by reference to the General_Category property. Private agreements may override the General_Category or derivations based on it, except where overriding is expressly disallowed in the conformance statement for a specific algorithm. In other words, private agreements may define which private-use characters should be treated like spaces, digits, letters, punctuation, and so on, by all parties to those private agreements. In particular, when a private agreement overrides the General_Category of a private-use character from the default value of gc = Co to some other value such as gc = Lu or gc = Nd, such a change does not change its inherent identity as a private-use character, but merely specifies its intended behavior according to the private agreement.</p>
+				</blockquote>
+				<figcaption>— <a href="https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-23/#G19545" target="_blank" rel="external">The Unicode Standard Version 16.0 – Core Specification, section 23.5</a></figcaption>
+			</figure>
+			<p>This means that a C++17 compiler could decide that a certain set of private-use characters are Line_Separators. The compiler could then decide to interpret all Line_Separators as end-of-line indicators. In other words, the list of end-of-line indicators is implementation defined, even if you use UTF-8.</p>
+		</section>
+		<section>
+			<h4>Working Around the Fact That End-of-Line Indicators Are Dangerous</h4>
+			<p>Now that we understand the terminology, let’s take a look at that section 5.2 quote again:</p>
+			<figure>
+				<blockquote><p>Physical source file characters are mapped, in an implementation-defined manner, to the basic source character set (introducing new-line characters for end-of-line indicators) if necessary. The set of physical source file characters accepted is implementation-defined. Any source file character not in the basic source character set (5.3) is replaced by the <i>universal-character-name</i> that designates that character.</p></blockquote>
+				<figcaption>— ISO/IEC 14882:2017, section 5.2</figcaption>
+			</figure>
+			<p>That quote means that end-of-line indicators are dangerous. Consider this sequence of Unicode characters:</p>
+			<ol class="blank_list">
+				<li>A</li>
+				<li>U+000D <i>carriage return</i></li>
+				<li>B</li>
+				<li>U+000A <i>line feed</i></li>
+				<li>C</li>
+				<li>U+000D <i>carriage return</i></li>
+				<li>U+000A <i>line feed</i></li>
+				<li>D</li>
+				<li>U+0085 <i>next line</i></li>
+				<li>E</li>
+				<li>U+2028 LINE SEPARATOR</li>
+				<li>F</li>
+			</ol>
+			<p>It would be reasonable for a C++17 implementation to turn that sequence of Unicode characters into this sequence of basic source characters:</p>
+			<ol class="blank_list">
+				<li>A</li>
+				<li>The new-line character (whatever it actually is)</li>
+				<li>B</li>
+				<li>The new-line character</li>
+				<li>C</li>
+				<li>The new-line character</li>
+				<li>D</li>
+				<li>The new-line character</li>
+				<li>E</li>
+				<li>The new-line character</li>
+				<li>F</li>
+			</ol>
+			<p>This transformation causes us to lose information. I want to say that all end-of-line indicators are dangerous because of this one-way transformation, but there’s no way of knowing which characters or sequences of characters are end-of-line indicators. What can we do in this situation?</p>
+			<p>Luckily, the section 5.2 quote gives us an escape hatch. It says that characters are mapped <b><q>if necessary</q></b>. If we only ever use characters in the basic source character set, then no mapping will be necessary. If no mapping is necessary, then no mapping will happen, and we’ll avoid this one-way transformation. This means that all characters that aren’t in the basic source character set are dangerous and should be escaped.</p>
+		</section>
+	</section>
+	<section>
+		<h3>Characters That Can’t Be in S-Char-Sequences</h3>
+		<p>Section 5.13.5 of the C++17 standard describes string literals. Here’s the relevant syntax notation:</p>
+		<figure>
+			<blockquote>
+				<h4>5.13.5 String literals</h4>
+				<ul class="blank_list">
+					<li>
+						<p><i>string-literal</i>:</p>
+						<ul class="blank_list">
+							<li><i>encoding-prefix<sub>opt</sub></i> <span class="cpp_syntax_literal">"</span> <i>s-char-sequence<sub>opt</sub></i> <span class="cpp_syntax_literal">"</span></li>
+							<li><i>encoding-prefix<sub>opt</sub></i> <span class="cpp_syntax_literal">R</span> <i>raw-string</i></li>
+						</ul>
+					</li>
+					<li>
+						<p><i>s-char-sequence</i>:</p>
+						<ul class="blank_list">
+							<li><i>s-char</i></li>
+							<li><i>s-char-sequence</i> <i>s-char</i></li>
+						</ul>
+					</li>
+					<li>
+						<p><i>s-char</i>:</p>
+						<ul class="blank_list">
+							<li>any member of the source character set except<div>the double-quote <span class="cpp_syntax_literal">"</span>, backslash <span class="cpp_syntax_literal">\</span>, or new-line character</div></li>
+							<li><i>escape-sequence</i></li>
+							<li><i>universal-character-name</i></li>
+						</ul>
+					</li>
+					<li><p>…</p></li>
+				</ul>
+			</blockquote>
+			<figcaption>— ISO/IEC 14882:2017, section 5.13.5</figcaption>
+		</figure>
+		<p>This means that the double-quote, backslash and new-line characters are all dangerous. They should all be escaped.</p>
+	</section>
+	<section>
+		<h3>Trigraphs</h3>
+		<p>Question marks can be used to create trigraph sequences. For example, <a href="https://en.cppreference.com/w/cpp/language/operator_alternative#Trigraphs_.28removed_in_C.2B.2B17.29" target="_blank" rel="external">if a C++ compiler encounters <code>??'</code>, then it might replace those three characters with <code>^</code></a>. Trigraphs were partially removed in C++17:</p>
+		<figure>
+			<blockquote>
+				<p><b>Change:</b> Removal of trigraph support as a required feature.</p>
+				<p><b>Rationale:</b> Prevents accidental uses of trigraphs in non-raw string literals and comments.</p>
+				<p><b>Effect on original feature:</b> Valid C ++ 2014 code that uses trigraphs may not be valid or may have different semantics in this International Standard. Implementations may choose to translate trigraphs as specified in C ++ 2014 if they appear outside of a raw string literal, as part of the implementation-defined mapping from physical source file characters to the basic source character set.</p>
+			</blockquote>
+			<figcaption>— ISO/IEC 14882:2017, section C.4.1</figcaption>
+		</figure>
+		<p>This means that question marks are potentially dangerous. They should be escaped just in case code is compiled with trigraphs enabled.</p>
+	</section>
+	<section>
+		<h3>The Final List</h3>
+		<p>Here’s the final list of dangerous characters that should be escaped:</p>
+		<ul>
+			<li>any character that’s not in the basic source character set,</li>
+			<li>the double-quote character ("),</li>
+			<li>the backslash character (\),</li>
+			<li>the new-line character and</li>
+			<li>the question mark character (?).</li>
+		</ul>
+	</section>
+</section>
+<section>
+	<h2>Potential Algorithms</h2>
+	<p> Now that we know all of the relevant constraints, we can actually start writing some code! I’m going to start by implementing these algorithms in <a href="https://www.python.org" target="_blank" rel="external">the <i>Python</i>® programming language</a> because it’s the language that I’m most familiar with. After that, I’ll see if it’s possible to port the code to <a href="https://cmake.org/cmake/help/latest/manual/cmake-language.7.html" target="_blank" rel="external">the CMake Language</a>. I need to find an algorithm that will work in the CMake Language because <a href="https://github.com/DescentDevelopers/Descent3/blob/11f93221e71201d51a71650a3b190017328cd721/BUILD.md" target="_blank" rel="external"><cite>Descent 3</cite> uses CMake as its build system</a>.</p>
+	<section>
+		<h3>Algorithm 1: Use <i>Universal-Character-Names</i> for Dangerous Characters</h3>
+		<p>We can replace any dangerous character with a <i>universal-character-name</i> to prevent the dangerous character from causing problems. Here’s how we would do that in the <i>Python</i> programming language:</p>
+
+<pre><code>basic_source_character_set = {
+    " ", "\t", "\v", "\f", "\n",
+
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+    "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+
+    "_", "{", "}", "[", "]", "#", "(", ")", "&lt;", "&gt;", "%", ":", ";", ".", "?", "*",
+    "+", "-", "/", "^", "&amp;", "|", "~", "!", "=", ",", "\\", "\"", "'"
+}
+dangerous_characters_in_the_bscs = { "\"", "\\", "\n", "?" }
+safe_character_set = basic_source_character_set - dangerous_characters_in_the_bscs
+
+input_string = "/home/user/ディセント3"
+# Input strings can contain Unicode characters, but the execution character set
+# (and the execution wide-character set) may not support all Unicode
+# characters. Using a prefix like u8 is wise here because it guarantees that
+# our string will be capable of holding any Unicode character (other than
+# U+0000 null, I guess).
+output_string = "u8\""
+for character in input_string:
+    if character in safe_character_set:
+        output_string += character
+    else:
+        output_string += f"\\U{ord(character):08X}"
+output_string += "\""
+print(output_string)
+</code></pre>
+
+	<p>I really like this solution, but… it has an annoying problem. Unfortunately, I don’t think that it’s possible to port this algorithm to the CMake Language. In the <i>Python</i> programming language, you can use the <a href="https://docs.python.org/3/library/functions.html#ord" target="_blank" rel="external">the <code>ord()</code> function</a> to get the Unicode code point for a particular character. As far as I can tell, there’s no way to do that in the CMake Language. I haven’t been able to find a CMake equivalent of the <code>ord()</code> function.</p>
+	</section>
+	<section>
+		<h3>Algorithm 2: Use <code>\xhh</code> for Each Byte in the String</h3>
+		<p>In C++, narrow string literals are always supposed to be encoded using the execution character set. Compilers like <a href="https://gcc.gnu.org" target="_blank" rel="external"><abbr title="GNU Compiler Collection">GCC</abbr></a> allow you to choose which execution character set to use when compiling your C++ program. <a href="https://github.com/DescentDevelopers/Descent3/blob/11f93221e71201d51a71650a3b190017328cd721/CMakeLists.txt#L54-L67" target="_blank" rel="external"><cite>Descent 3</cite> is supposed to always use UTF-8 as its execution character set.</a> We can take advantage of that fact:</p>
+
+<pre><code>input_string = "/home/user/ディセント3"
+input_string_as_bytes = input_string.encode(encoding="utf_8")
+# For C++17, using the u8 prefix here isn’t going to do anything here. In
+# C++17, the u8 prefix affects how characters are turned into bytes, but we’re
+# taking direct control over what the bytes are going to be. That being said,
+# the u8 prefix will be a good thing in future versions of C++. In C++17, the
+# type for both "example" and u8"example" is const char[N]. In C++20 and later,
+# the type for "example" is const char[N] and the type for u8"example" is
+# const char8_t[N].
+# See &lt;https://en.cppreference.com/w/cpp/language/string_literal&gt;.
+output_string = "u8\""
+for byte in input_string.encode(encoding="utf_8"):
+    output_string += f"\\x{byte:02X}"
+output_string += "\""
+print(output_string)
+</code></pre>
+
+	<p>Can this algorithm be ported to the CMake Language? The answer is: <em>probably</em>. In the <i>Python</i> programming language, you use the <a href="https://docs.python.org/3/library/stdtypes.html#str" target="_blank" rel="external"><code>str</code></a> data type when you want to store sequences of characters and you use the <a href="https://docs.python.org/3/library/stdtypes.html#bytes" target="_blank" rel="external"><code>bytes</code></a> data type when you want to store sequences of bytes. We wanted to turn a sequence of characters into a sequence of bytes, so we had to convert a <code>str</code> object into a <code>bytes</code> object. When we do the conversion, we explicitly set <code>encoding</code> to <code>"utf_8"</code>, so we knew for a fact that the bytes would use the correct encoding.</p>
+	<p>Unfortunately, the CMake Language doesn’t make the same distinction. In the CMake Language, you use the <a href="https://cmake.org/cmake/help/latest/command/set.html#set-cache-entry" target="_blank" rel="external"><code>STRING</code></a> data type when you want to store sequences of characters and you use the same <code>STRING</code> data type when you want to store sequences of bytes. You can figure out the hexadecimal value for each of the bytes in a <code>STRING</code> using <a href="https://cmake.org/cmake/help/latest/command/set.html#set-cache-entry" target="_blank" rel="external"><code>string(HEX…)</code></a>. Here’s the problem: if I create a <code>STRING</code> variable using a string literal, then what character encoding will that <code>STRING</code> use? If it always uses UTF-8, then <code>string(HEX…)</code> will always do the right thing here. If it sometimes uses something other than UTF-8, then <code>string(HEX…)</code> will sometimes do the wrong thing here.</p>
+	<p>I wasn’t able to find any documentation about the character encoding of string literals in the CMake Language, so <a href="https://discourse.cmake.org/t/what-character-encoding-do-cache-strings-use/13492?u=jasonyundt" target="_blank" rel="external">I decided to ask about it on the CMake Discourse instance</a>. I haven’t received a response yet. In the meantime, I’ve decided to do an experiment. I created this <code>CMakeLists.txt</code> file:</p>
+<pre><code>cmake_minimum_required(VERSION 3.29.5)
+project(example_project)
+
+set(EXAMPLE_VARIABLE "🅭" CACHE STRING "Example cache variable")
+
+string(HEX "${EXAMPLE_VARIABLE}" EXAMPLE_VARIABLE_HEX)
+message(STATUS "That previous string as hex: ${EXAMPLE_VARIABLE_HEX}")
+</code></pre>
+	<p>If the CMake Language always uses UTF-8 for string literals, then this should be printed every time I use that <code>CMakeLists.txt</code> file:</p>
+<pre><samp>-- That previous string as hex: f09f85ad
+</samp></pre>
+	<p>I tried using that <code>CMakeLists.txt</code> file in these situations:</p>
+	<ul>
+		<li><cite><a href="https://nixos.org" target="_blank" rel="external">NixOS</a> 24.11</cite> with an <code>en_US.UTF-8</code> locale,</li>
+		<li><cite>NixOS 24.11</cite> with <a href="{{ generate_relative_url(relative_to_base, "posts/terminal-in-ascii-on-linux.html") }}" hreflang="en-US" type="text/html;charset=utf-8">an <code>en_US.ANSI_X3.4-1968</code> locale</a>,</li>
+		<li><a href="https://www.microsoft.com/windows/windows-11" target="_blank" rel="external"><cite>Windows 11</cite></a> with an English (United States) locale and <a href="https://learn.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page" target="_blank" rel="external">“Beta: Use Unicode UTF-8 for worldwide language support”</a> turned off,</li>
+		<li><cite>Windows 11</cite> with an English (United States) locale and “Beta: Use Unicode UTF-8 for worldwide language support” turned on,</li>
+		<li><cite>Windows 11</cite> with an Japanese (Japan) locale and “Beta: Use Unicode UTF-8 for worldwide language support” turned off and finally</li>
+		<li><cite>Windows 11</cite> with an Japanese (Japan) locale and “Beta: Use Unicode UTF-8 for worldwide language support” turned on.</li>
+	</ul>
+	<p>In all of those situations, the expected message was printed which seems to suggest that CMake <code>STRING</code> literals always use UTF-8. I wish that there was some sort of guarantee that that would be true, but I haven’t found one yet.</p>
+	<p>This means that algorithm 2 can be ported to the CMake Language, but we can’t 100% guarantee that it will work properly:</p>
+<pre><code>cmake_minimum_required(VERSION 3.29.5)
+project(example_project)
+
+set(INPUT_STRING "/home/user/ディセント3" CACHE STRING "The STRING that will be converted into a C++ string literal")
+set(OUTPUT_STRING "u8\"")
+
+string(LENGTH "${INPUT_STRING}" INPUT_STRING_LENGTH)
+math(EXPR LAST_INDEX "${INPUT_STRING_LENGTH} - 1")
+foreach(I RANGE "${LAST_INDEX}")
+	string(SUBSTRING "${INPUT_STRING}" "${I}" 1 CURRENT_BYTE)
+	string(HEX "${CURRENT_BYTE}" CURRENT_BYTE_HEX)
+	string(APPEND OUTPUT_STRING "\\x${CURRENT_BYTE_HEX}")
+endforeach()
+string(APPEND OUTPUT_STRING "\"")
+message(STATUS "${OUTPUT_STRING}")
+</code></pre>
+	</section>
+</section>
+<section>
+	<h2>Conclusion</h2>
+	<p>This whole situation sucks. I often try to make sure that my code does the right thing in all possible situations. The more I try to do that, the more I feel alienated. It seems like everyone else just settles for good enough. I don’t want things to be good enough. I want them the be the best that they can possibly be, but the way that C++17 and the CMake Language were designed keep consistently making that difficult.</p>
+</section>
+<footer>
+	<p><cite>Linux</cite>® is the registered trademark of Linus Torvalds in the U.S. and other countries. For more information, see <a href="https://www.linuxfoundation.org/legal/the-linux-mark" target="_blank" rel="external">this Linux Mark Institute policy page</a>.
+	<p>“<i>Python</i>” and the <i>Python</i> logos are trademarks or registered trademarks of the <i>Python</i> Software Foundation, used by Jason Yundt with permission from the Foundation. For more information, see <a href="https://www.python.org/psf/trademarks" target="_blank" rel="external">the PSF Trademark Usage Policy</a>.</p>
+	<p>Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the United States and other countries. For more information, see <a href="https://www.unicode.org/policies/logo_policy.html" target="_blank" rel="external">The Unicode® Consortium Name and Trademark Usage Policy</a>.</p>
+</footer>
+{% endblock %}
