@@ -1,6 +1,6 @@
 # yamllint disable rule:line-length
 # SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
-# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022)
+# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022, 2025)
 # yamllint enable
 
 
@@ -9,12 +9,12 @@
 repos:
     -
         repo: https://github.com/adrienverge/yamllint
-        rev: v1.26.3
+        rev: v1.35.1
         hooks:
             - id: yamllint
     -
         repo: https://github.com/pre-commit/pre-commit-hooks
-        rev: v4.1.0
+        rev: v5.0.0
         hooks:
             - id: check-ast
             - id: check-case-conflict
@@ -30,7 +30,7 @@ repos:
             - id: trailing-whitespace
     -
         repo: https://github.com/jumanjihouse/pre-commit-hooks
-        rev: 2.1.5
+        rev: 3.0.0
         hooks:
             -
                 id: forbid-space-in-indent
@@ -42,7 +42,7 @@ repos:
                 types: ['text']
     -
         repo: https://github.com/igorshubovych/markdownlint-cli
-        rev: v0.30.0
+        rev: v0.44.0
         hooks:
             - id: markdownlint
     -
@@ -54,7 +54,7 @@ repos:
                 args: ['--tab', '--force-function-style', 'fnonly']
     -
         repo: https://github.com/PyCQA/autoflake
-        rev: v1.4
+        rev: v2.3.1
         hooks:
             - id: autoflake
     -
@@ -112,7 +112,7 @@ repos:
                     - >
                         SPDX-FileContributor:
                         .+( <.+>)?
-                        \(([0-9]{4}[-–])?[0-9]{4}\)
+                        \([0-9]{4}((–|-|, )[0-9]{4})*\)
             -
                 # yamllint disable rule:line-length
                 #
