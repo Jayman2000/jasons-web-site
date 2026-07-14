@@ -1,0 +1,81 @@
+@charset "utf-8";
+/*
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <jason@jasonyundt.email> (2026)
+*/
+@import url('main-plus-blockquotes-with-marks.css');
+
+section {
+	margin-left: 8rem;
+}
+
+section > :first-child {
+	margin-left: -8rem;
+}
+
+.quote-that-uses-single-quotes
+{
+	quotes: "‘" "’";
+}
+
+.quote-that-uses-single-quotes > em
+{
+	font-weight: bold;
+}
+
+#em-dash-list {
+	list-style-type: "—";
+}
+
+#em-dash-list > li > p {
+	margin-left: 1em;
+}
+
+#side-by-side-dl > *
+{
+	display: inline;
+	margin: 0;
+}
+
+.GNU-C-example
+{
+	margin-left: 3.2em;
+}
+
+:not(pre):not(code) > b {
+	font-weight: 900;
+	/* I’m increasing the font-size here in order to make it easier to tell that a single equals sign is written in bold. */
+	font-size: larger;
+}
+
+.anchor-link {
+	visibility: hidden;
+}
+
+:has(> .anchor-link):hover > .anchor-link,
+:has(> span > .anchor-link):hover > .anchor-link {
+	visibility: visible;
+}
+
+/*
+This next part is based of off this part of the HTML Standard [1]. This next part does three things. First, it defines styling for seventh level headings. Second, it makes all headings larger so that seventh level headings are easier to read. Third, it makes it so that the headings that I’m quoting from other sources aren’t huge.
+
+[1]: <https://html.spec.whatwg.org/multipage/rendering.html#sections-and-headings>
+*/
+
+h1 { font-size: 4.00em; }
+h2 { font-size: 3.00em; }
+h3 { font-size: 2.00em; }
+h4 { font-size: 1.50em; }
+h5 { font-size: 1.17em; }
+h6 { font-size: 1.00em; }
+div[role="heading"][aria-level="7"] { font-size: 0.83em; }
+div[role="heading"][aria-level="8"] { font-size: 0.67em; }
+
+div[role="heading"] {
+	font-weight: bold;
+	margin-top: 2.33em;
+	margin-bottom: 2.33em;
+}
+
+blockquote > h2 { font-size: 1.17em; }

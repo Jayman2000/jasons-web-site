@@ -1,0 +1,1170 @@
+{#
+SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022, 2026)
+#}
+{% extends "_post.html" %}
+
+{% block title %}What Can Be in Environment Variable Names and Values on Linux?{% endblock %}
+{# TODO: Fix hyphenation for C23 syntax elements. #}
+{# TODO: Make every quoted header accurate to its original HTML. #}
+{# TODO: Check to see if any of the <pre> elements in my block quotes should have ended with a newline but didn’t. #}
+{# TODO: Include a copy of every license. #}
+{# TODO: Verify that all quotes match exactly. #}
+{# TODO: Use a trademark symbol for Linux. Make sure that the trademark policy for Linux is being followed. #}
+{# TODO: Is Firefox trademarked? It turns out that it is indeed. Check its trademark policy. #}
+{# TODO: Is GNU trademarked? #}
+{# TODO: Shout out the comment from glibc/locale/programs/charmap.c #}
+{# TODO: Doesn’t K&R C say that ASCII is used on UNIX systems? Perhaps it could be argued that it would be correct to say that K&R C says that character string literals use ASCII on Linux because Linux is a UNIX-like system. Additionally, perhaps K&R C is worded in such a way that ASCII is the default, and EBCDIC is only used on systems that explicitly say “hey, this is EBCDIC!” Also, <https://www.kernel.org/linux.html> says “Linux is a clone of the operating system Unix, written from scratch by Linus Torvalds with assistance from a loosely-knit team of hackers across the Net.” Since it is a clone of UNIX, it would make sense if the rules about UNIX from K&R C applied. #}
+{# TODO: <https://www.kernel.org/linux.html> says “[Linux] has all the features you would expect in a modern fully-fledged Unix, including true multitasking, virtual memory, shared libraries, demand loading, shared copy-on-write executables, proper memory management, and multistack networking including IPv4 and IPv6.” I could make the argument that we would expect that ASCII (or an ASCII-compatible encoding) would be ued on a modern folly-fledged UNIX. If that wasn’t the case, then Linux certainly would not have all of the features that one would expect. Specifically, it would not have this expected feature: firt-class UFT-8 support. #}
+{# TODO: Very useful quote from Section 12.8 of the GNU C Language Intro and Reference Manual: “Concatenating an ordinary string with a UTF-8 string conceptually produces another UTF-8 string. However, if the ordinary string contains character codes 128 and up, the results cannot be relied on.” #}
+{# TODO: Verify that quotes from any ISO standards are correct. #}
+{# TODO: Completion time
+{% block completion_time %}2022-02-20T08:51:18-05:00{% endblock %}
+#}
+{% block css_url %}{{ generate_relative_url(relative_to_base, "what-can-be-in-env-var-names-and-values.css") }}{% endblock %}
+
+{% block post_content %}
+<p>On <a href="https://kernel.org/linux.html" target="_blank" rel="external">Linux</a>, there are several rules that apply to environment variables:</p>
+<ol>
+	<li>Every environment variable has a name and a value.</li>
+	<li>The name is a sequence of bytes. It may contain any byte except for <code>0x00</code> and <code>0x3D</code>. (In <a href="https://www.iana.org/assignments/character-sets/character-sets.xhtml" target="_blank" rel="external"><code>US-ASCII</code></a>, <code>0x00</code> bytes represent NULL characters and <code>0x3D</code> bytes represent EQUALS SIGN characters).</li>
+	<li>The name technically can be zero bytes long, but it’s not a good idea to make it zero bytes long. The <code>setenv()</code> and <code>unsetenv()</code> functions will not work if you create an environment variable who’s name is zero bytes long.</li>
+	<li>The value is a sequence of bytes. It may contain any byte except for <code>0x00</code>.</li>
+	<li>The value can be zero bytes long. Unlike zero byte long environment variable names, zero byte long environment variable values won’t break stuff like <code>setenv()</code> and <code>unsetenv()</code>.</li>
+</ol>
+<p>I would like to start by saying that those rules stink. The average user who knows about environment variables thinks that the names and values of environment variables are text. I mean, just look at what happens when you run <a href="https://www.gnu.org/software/coreutils/manual/html_node/printenv-invocation.html" target="_blank" rel="external"><code>printenv</code></a>:</p>
+<pre><samp>~&gt; <kbd>printenv | head</kbd>
+CMD_DURATION_MS=3
+COLORFGBG=15;0
+COLORTERM=truecolor
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+DESKTOP_SESSION=plasma
+DISPLAY=:0
+DOCKER_HOST=unix:///run/user/1000/docker.sock
+EDITOR=nvim
+FLATPAK_TTY_PROGRESS=1
+GDK_PIXBUF_MODULE_FILE=/nix/store/pchjc11r13yhlrxi2zjybx4f691xyzg2-gdk-pixbuf-loaders.cache
+~&gt; </samp></pre>
+<p>That all looks like text to me. When users see stuff like that over and over again, it’s only natural for them to assume that environment variable names and values are text. But they aren’t text! They’re sequences of bytes that may or may not be text. Most of the time, the names and values of environment variables are supposed to be interpreted as text, but in order to interpret a sequence of bytes as text, you need to know its character encoding. But there’s no rule that says that you have to use any particular character encoding! One program could use one character encoding for environment variable names and values, and a different program running on the same system could use a different character encoding for environment variable names and values. And both of those programs would be right to do so! This whole situation is recipe for mojibake.</p>
+<p>I don’t like the rules that I listed above, but they are the rules that we’re supposed to play by when dealing with environment variables on Linux. Don’t take by word for it, though. I’m just some random guy on the Internet. I’m not an authoritative source when it comes to environment variables on Linux. That being said, I believe that I can use authoritative sources to prove that the above list rules are accurate.</p>
+<section id="ground-rules">
+	<h2>Ground rules for the proof</h2>
+	<p>Before I start trying to prove that my list of rules is accurate, I going to set some ground rules for the proof:</p>
+	<ol type="A">
+		<li>I’m only allowed to cite authoritative sources of information. For example, I’m not allowed to cite <a href="https://stackexchange.com" target="_blank" rel="external">Stack Exchange</a> answers during the proof because Stack Exchange answers aren’t authoritative sources of information. This rule helps ensure that the proof really is accurate.</li>
+		<li>I’m only allowed to rely on documented behavior. For example, if the <cite>Linux</cite> kernel provides a system call named <code>example_system_call</code> but there’s no documentation for that system call, then I’m not allowed to use it. This rule helps ensure that the proof is true for all Linux systems and not just a few Linux systems that I happened to test.</li>
+	</ol>
+</section>
+<section>
+	<h2>Proving that the list of rules is accurate</h2>
+	<section>
+		<h3>Finding our first few authoritative sources</h3>
+		<p>In order to prove that the list of rules that I wrote is accurate, the first thing that we need to do is find authoritative sources of information. <a href="https://www.wikidata.org/wiki/Q14579#P856" target="_blank" rel="external">Wikidata says that the official Web site for the <cite>Linux</cite> kernel is</a> <a href="https://kernel.org" target="_blank" rel="external"><code>https://kernel.org</code></a>. The official Web site for <cite>Linux</cite> is definitely an authoritative source of information. Near the bottom of <a href="https://kernel.org" target="_blank" rel="external"><code>https://kernel.org</code></a>, there is a section named <q>Other resources</q> that contains a <q><a href="https://docs.kernel.org/" target="_blank" rel="external">Documentation</a></q> link. When I click on that <q><a href="https://docs.kernel.org/" target="_blank" rel="external">Documentation</a></q> link, it takes me to a page that is titled <q>The Linux Kernel documentation — The Linux Kernel  documentation</q>. That title suggests that that page contains official <cite>Linux</cite> kernel documentation. It presents itself as being an official source of information about the <cite>Linux</cite> kernel, and the <cite>Linux</cite> kernel’s official Web site links directly to it. Based on those two facts, I think that it’s safe to say that the <q><a href="https://docs.kernel.org/" target="_blank" rel="external">Documentation</a></q> page is an authoritative source of information.</p>
+		<p>The <q><a href="https://docs.kernel.org/" target="_blank" rel="external">Documentation</a></q> page says <q>See also: the <a href="https://www.kernel.org/doc/man-pages/" target="_blank" rel="external">Linux man pages</a>, which are kept separately from the kernel’s own documentation.</q> That <q><a href="https://www.kernel.org/doc/man-pages/" target="_blank" rel="external">Linux man pages</a></q> link leads to a page that’s titled <q>The Linux man-pages project</q>. Here’s what that page has to say:</p>
+		<figure>
+			<blockquote><p>The Linux <em>man-pages</em> project documents the <a href="https://en.wikipedia.org/wiki/Linux" target="_blank" rel="external">Linux</a> <a href="https://www.kernel.org/pub/linux/kernel" target="_blank" rel="external">kernel</a> and C library interfaces that are employed by user-space programs. With respect to the C library, the primary focus is the <a href="https://www.gnu.org" target="_blank" rel="external">GNU</a> C library (<a href="https://www.gnu.org/software/libc/" target="_blank" rel="external">glibc</a>), although, where known, documentation of variations in other C libraries available for Linux is also included.</p></blockquote>
+			<figcaption>— <a href="https://www.kernel.org/doc/man-pages/" target="_blank" rel="external">The <cite>Linux <em>man-pages</em></cite> project’s official Web site</a></figcaption>
+		</figure>
+		<p>The <cite>Linux <em>man-pages</em></cite> project presents itself as being an official source of information about the Linux family of operating systems, and an authoritative source of information (the <q><a href="https://docs.kernel.org/" target="_blank" rel="external">Documentation</a></q> page) refers readers to the <cite>Linux <em>man-pages</em></cite> project. Based on those two facts, I think that it’s safe to say that the <cite>Linux <em>man-pages</em></cite> project is an authoritative source of information. At the time of writing, the latest stable release of the <cite>Linux <em>man-pages</em></cite> project is version 6.18. All of the <cite>Linux <em>man-pages</em></cite> project quotes in this blog post were taken from version 6.18.</p>
+	</section>
+	<section>
+		<h3>Proving that rule #1 is true</h3>
+		<section>
+			<h4>An environment variable that has a name must also have a value</h4>
+			<p>The <cite>Linux <em>man-pages</em></cite> project provides a getenv(3) man page which describes a C library interface. We can use some information from getenv(3) to help prove one of the rules that I wrote previously: “Every environment variable has a name and a value.” That man page says a few different things that are relevant to us:</p>
+			<figure>
+				<blockquote>
+					<h2>SYNOPSIS</h2>
+					<pre>
+       <b>#include &lt;stdlib.h&gt;</b>
+
+       <b>char *getenv(const char *</b><i>name</i><b>);</b></pre>
+					<p>[…]</p>
+					<h2>DESCRIPTION</h2>
+					<pre>
+       The <b>getenv</b>() function searches the environment list to find the
+       environment variable <i>name</i>, and returns a pointer to the
+       corresponding <i>value</i> string.</pre>
+					<p>[…]</p>
+					<h2>RETURN VALUE</h2>
+					<pre>
+       The <b>getenv</b>() function returns a pointer to the value in the
+       environment, or NULL if there is no match.</pre>
+				</blockquote>
+				<figcaption>— <a href="https://man7.org/linux/man-pages/man3/getenv.3.html#SYNOPSIS" target="_blank" rel="external">The getenv(3) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+			</figure>
+			<p>We can use the information from that quote to prove that an environment variable that has a name must also have a value. Proving that the statement “an environment variable that has a name must also have a value” is true is an important step towards proving that the statement “every environment variable has a name and a value” is also true. Here’s the proof:</p>
+			<ol>
+				<li><p>Assume that this statement is true: “an environment variable can have a name without having a value.” (This statement is actually wrong. We’re assuming that it is true so that we can do proof by contradiction.)</p></li>
+				<li><p>Somehow, add an environment variable to the environment that has the name <code>my_var</code> and does not have a value.</p></li>
+				<li>
+					<p>Run <code>getenv("my_var")</code> and inspect its return value.</p>
+					<ul>
+						<li>If the return value is a pointer to a value in the environment, then that would indicate that <code>my_var</code> really does have a value. This contradicts step #2 because we said that <code>my_var</code> had no value in step #2.</li>
+						<li>If the return value is <code>NULL</code>, then that would indicate that there is no environment variable who’s name matches <code>my_var</code>. This contradicts step #2 because we made is so that an environment variable named <code>my_var</code> really did exist in the environment.</li>
+						<li>If the return value is anything other than those two previous options, then that would contradict the RETURN VALUE section of the getenv(3) man page. The <code>getenv()</code> function is only ever supposed to return a pointer to a value in the environment or <code>NULL</code>.</li>
+					</ul>
+				</li>
+				<li><p>This indicates that the following statement from step #1 must not be true: “an environment variable can have a name without having a value.”</p></li>
+				<li><p>Therefore, the following statement must be true: “an environment variable that has a name must also have a value”</p></li>
+			</ol>
+		</section>
+		<section>
+			<h4>An environment variable that has a value must also have a name</h4>
+			<section>
+				<h5>Finding a relevant quote from envioron(7)</h5>
+				<p>Now that we’ve proven that all environment variables that have names also have values, our next step is to prove that the statement “an environment variable that has a value must also have a name” is true. Before we start doing that, I want to point out something about getenv(3)’s DESCRIPTION. Its DESCRIPTION talks about <q>the environment list</q>. What is the environment list? Here’s a different quote from getenv(3) that points us in the correct direction:</p>
+				<figure>
+					<blockquote>
+						<h2>NOTES</h2>
+						<pre>
+       The strings in the environment list are of the form <i>name=value</i>.</pre>
+						<p>[…]</p>
+						<h2>SEE ALSO</h2>
+						<pre>
+       <a href="https://man7.org/linux/man-pages/man3/clearenv.3.html" target="_blank" rel="external">clearenv(3)</a>, <a href="https://man7.org/linux/man-pages/man3/getauxval.3.html" target="_blank" rel="external">getauxval(3)</a>, <a href="https://man7.org/linux/man-pages/man3/putenv.3.html" target="_blank" rel="external">putenv(3)</a>, <a href="https://man7.org/linux/man-pages/man3/setenv.3.html" target="_blank" rel="external">setenv(3)</a>, <a href="https://man7.org/linux/man-pages/man3/unsetenv.3.html" target="_blank" rel="external">unsetenv(3)</a>,
+       <a href="https://man7.org/linux/man-pages/man7/capabilities.7.html" target="_blank" rel="external">capabilities(7)</a>, <a href="https://man7.org/linux/man-pages/man7/environ.7.html" target="_blank" rel="external">environ(7)</a></pre>
+					</blockquote>
+					<figcaption>— <a href="https://man7.org/linux/man-pages/man3/getenv.3.html#NOTES" target="_blank" rel="external">The getenv(3) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+				</figure>
+				<p>The getenv(3) man page doesn’t tell us what the environment list is, but it does give us a hint: <q>The strings in the environment list are of the form <i>name=value</i>.</q> So we should be on the look out for something that contains strings in that form. Luckily, the getenv(3) man page’s SEE ALSO section mentions the environ(7) man page. environ(7) is another man page from the <cite>Linux <em>man-pages</em></cite> project that describes a C library interface. Here’s what the environ(7) man page has to say:</p>
+				<figure>
+					<blockquote>
+						<h2>NAME</h2>
+						<pre>
+       environ - user environment</pre>
+						<h2>SYNOPSIS</h2>
+						<pre>
+       <b>extern char **</b><i>environ</i><b>;</b></pre>
+						<h2>DESCRIPTION</h2>
+						<pre>
+       The variable <i>environ</i> points to an array of pointers to strings
+       called the "environment".  The last pointer in this array has the
+       value NULL.  This array of strings is made available to the
+       process by the <a href="https://man7.org/linux/man-pages/man2/execve.2.html" target="_blank" rel="external">execve(2)</a> call when a new program is started.  When
+       a child process is created via <a href="https://man7.org/linux/man-pages/man2/fork.2.html" target="_blank" rel="external">fork(2)</a>, it inherits a <i>copy</i> of its
+       parent's environment.
+
+       By convention, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".
+       The name is case-sensitive and may not contain the character "<b>=</b>".
+       The value can be anything that can be represented as a string.
+       The name and the value may not contain an embedded null byte
+       ('\0'), since this is assumed to terminate the string.</pre>
+					</blockquote>“extern char **environ;” is a declaration (see Section 6.7.1 of the C23 standard). A declaration can take few different forms. This particular declaration has this form: declaration-specifiers, space, init-declarator-list, semicolon:
+					<figcaption>— <a href="https://man7.org/linux/man-pages/man7/environ.7.html#NAME" target="_blank" rel="external">The environ(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+				</figure>
+				<p>It looks like we found documentation for the “environment list” that getenv(3) was talking about. getenv(3) told us that the environment list has strings on it. The environ(7) man page is telling us that <code>environ</code> is a pointer to an array of pointers to strings. “An array of pointers to strings” is a specific way of doing “a list that has strings on it”. getenv(3) told us that the strings on the list are of the form <i>name=value</i>. The environ(7) man page uses pretty much that exact same language. It looks like the array that <code>environ</code> points to is the environment list.</p>
+			</section>
+			<section>
+				<h5>Figuring out how to interpret the italic and bold text that’s in the environ(7) quote</h5>
+				<section>
+					<h6>Finding <code>&lt;<em>man-pages</em> repo&gt;/CONTRIBUTING.d/style/man</code></h6>
+					<p>The most important part of that envion(7) quote is <q id="environ-quote" class="quote-that-uses-single-quotes">By convention, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".</q> There are three things in that quote that are explicitly italicized: “<i>environ</i>”, “<i>name</i>” and “<i>value</i>”. It’s important to note that the equals sign is not italicized. Instead, it is bold. What does the formatting of that text mean? In order to figure that out, we need to go down a rabbit hole. Let’s take a look at the <cite>Linux <em>man-pages</em></cite> project’s <code>README</code> file. It contains a Files section that lists several different files and directories that are included in the <cite>Linux <em>man-pages</em></cite> project:</p>
+					<figure>
+						<blockquote>
+							<pre>
+Files
+   AUTHORS
+       List of individuals and organizations that have contributed
+       content to the project.
+
+   CONTRIBUTING
+   CONTRIBUTING.d/*
+       Instructions for reporting bugs and contributing.</pre>
+						</blockquote>
+						<figcaption>— <a href="https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/README?h=man-pages-6.18#n18" target="_blank" rel="external">The <cite>Linux <em>man-pages</em></cite> project’s <code>README</code> file</a></figcaption>
+					</figure>
+					<p>That quote mentions a file named <code>CONTRIBUTING</code>. The <code>CONTRIBUTING</code> file contains another Files section that lists more files and directories that are included in the <cite>Linux <em>man-pages</em></cite> project:</p>
+					<figure>
+						<blockquote>
+							<pre>
+Files
+   CONTRIBUTING.d/git
+       Instructions for configuring git(1).
+
+   CONTRIBUTING.d/mail
+       Instructions for sending emails to the project
+
+   CONTRIBUTING.d/patches/
+       Instructions for contributing patches
+
+   CONTRIBUTING.d/bugs
+       Instructions for reporting bugs
+
+   CONTRIBUTING.d/lint
+       Instructions for linting manual pages
+
+   CONTRIBUTING.d/external_pages
+       Pages imported or generated from other projects
+
+   CONTRIBUTING.d/style
+       Preferred layout of manual pages and style guide notes</pre>
+						</blockquote>
+						<figcaption>— <a href="https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/CONTRIBUTING?h=man-pages-6.18#n17" target="_blank" rel="external">The <cite>Linux <em>man-pages</em></cite> project’s <code>CONTRIBUTING</code> file</a></figcaption>
+					</figure>
+					<p id="CONTRIBUTING.d/style">That quote mentions <code>CONTRIBUTING.d/style</code>. <code>CONTRIBUTING.d/style</code> is a directory that contains two files: <code>c</code> and <code>man</code>. The <code>man</code> file is very short. Here is its entire contents:</p>
+					<figure>
+						<blockquote>
+							<pre>
+Name
+       Style - preferred layout of manual pages and style guide notes
+
+Description
+       For a description of the preferred layout of manual pages, as
+       well as some style guide notes, see:
+
+           $ man 7 man-pages
+
+       It will also be interesting to consult groff_man(7) and
+       groff_man_style(7) for understanding and writing good man(7)
+       source code.
+
+See also
+       CONTRIBUTING
+       CONTRIBUTING.d/*
+
+       man-pages(7)
+       groff_man(7)
+       groff_man_style(7)
+       groff_char(7)</pre>
+						</blockquote>
+						<figcaption>— <a href="https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/CONTRIBUTING.d/style/man?h=man-pages-6.18" target="_blank" rel="external">The <cite>Linux <em>man-pages</em></cite> project’s <code>CONTRIBUTING.d/style/man</code> file</a></figcaption>
+					</figure>
+					<p>We now need to go through each of the documents that <code>CONTRIBUTING.d/style/man</code> references and look for information about when text should be written in italics and when text should be written in bold. We’ll be able to use the information that we find in order to help us interpret the use of italics and bold that’s in <a href="#environ-quote">the environ(7) quote that we are concerned about</a>.</p>
+				</section>
+				<section>
+					<h6>Looking through the man-pages(7) man page</h6>
+					<section>
+						{# See <https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA12>. #}
+						<div role="heading" aria-level="7">The first batch of quotes from the man-pages(7) man page</div>
+						<p>I started by taking a look at the man-pages(7) man page. It mentions a few different things about italic text and bold text. Here’s the first time that it talks about italic or bold text:</p>
+						<figure>
+							<blockquote>
+								<h2>DESCRIPTION</h2>
+								<pre>
+       This page describes the conventions that should be employed when
+       writing man pages for the <i>Linux man-pages project</i>, which documents
+       the user-space API provided by the Linux kernel and the GNU C
+       library.</pre>
+							<p>[…]</p>
+							<pre>
+   <b>Sections within a manual page</b>
+       The list below shows conventional or suggested sections.</pre>
+							<p>[…]</p>
+							<pre>
+       The following list elaborates on the contents of each of the above
+       sections.</pre>
+							<p>[…]</p>
+							<pre>
+       SYNOPSIS
+              A brief summary of the command or function's interface.
+
+              For commands, this shows the syntax of the command and its
+              arguments (including options); boldface is used for as-is
+              text and italics are used to indicate replaceable
+              arguments.</pre>
+							</blockquote>
+							<figcaption>— <a href="https://man7.org/linux/man-pages/man7/man-pages.7.html#DESCRIPTION" target="_blank" rel="external">The man-pages(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+						</figure>
+						<p>This quote from the man-pages(7) man page sounds promising. It would make sense to interpret some of the italic text from <a href="#environ-quote">the previous environ(7) quote</a> as being text that needs to be replaced. It would also make sense to interpret the bold equals sign as text that needs to be kept as-is. Unfortunately, this quote from the man-pages(7) man page is not applicable for a few different reasons. For one thing, this quote from the man-pages(7) man page talks about text which appears in SYNOPSIS sections. The italic text and bold text from the environ(7) man page that we’re worried about does not appear in its SYNOPSIS section. Additionally, the quote from the man-pages(7) man page says <q>For commands, this shows the syntax of the command[…]</q> environ(7) is not a man page that describes a command. environ(7) is a man page that describes a C library interface.</p>
+						<p>Here’s the next time that the man-pages(7) man page mentions italic or bold text:<p>
+						<figure>
+							<blockquote>
+								<h2>FORMATTING AND WORDING CONVENTIONS</h2>
+								<pre>
+       The following subsections note some details for preferred
+       formatting and wording conventions in various sections of the
+       pages in the <i>man-pages</i> project.
+
+   <b>SYNOPSIS</b>
+       Wrap the function prototype(s) in a <i>.nf</i>/<i>.fi</i> pair to prevent
+       filling.
+
+       Forward declarations of parameters in functions should not use
+       bold nor italics; this helps distinguish them visually from actual
+       parameters.</pre>
+							</blockquote>
+							<figcaption>— <a href="https://man7.org/linux/man-pages/man7/man-pages.7.html#FORMATTING_AND_WORDING_CONVENTIONS" target="_blank" rel="external">The man-pages(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+						</figure>
+						<p>This quote from the man-pages(7) man page is also not applicable for similar reasons. This quote from the man-pages(7) man page is about text that appears in SYNOPSIS sections. <a href="#environ-quote">The previous environ(7) quote</a> comes from its DESCRIPTION section, not its SYNOPSIS section. This quote from the man-pages(7) man page is about man pages that describe functions. The environ(7) man page describes a variable, not a function.</p>
+						<p>Here’s the next time that the man-pages(7) man page mentions italic or bold text:<p>
+						<figure>
+							<blockquote>
+								<h2>STYLE GUIDE</h2>
+								<pre>
+       The following subsections describe the preferred style for the
+       <i>man-pages</i> project.  For details not covered below, the Chicago
+       Manual of Style is usually a good source; try also grepping for
+       preexisting usage in the project source tree.
+
+       UNIX for Beginners [2nd ed., Brian W. Kernighan]
+       ⟨https://www.ualberta.ca/computing-science/media-
+       library/docs/unix-beginners.pdf⟩ also contains a noteworthy
+       section, “Hints for Preparing Documents”.</pre>
+								<p>[…]</p>
+								<pre>
+   <b>Formatting conventions for manual pages describing commands</b>
+       For manual pages that describe a command (typically in Sections 1
+       and 8), the arguments are always specified using italics, <i>even in</i>
+       <i>the SYNOPSIS section</i>.
+
+       The name of the command, and its options, should always be
+       formatted in bold.
+
+   <b>Formatting conventions for manual pages describing functions</b>
+       For manual pages that describe functions (typically in Sections 2
+       and 3), the arguments are always specified using italics, <i>even in</i>
+       <i>the SYNOPSIS section</i>, where the rest of the function is specified
+       in bold:
+
+           <b>int myfunction(int </b><i>argc</i><b>, char **</b><i>argv</i><b>);</b>
+
+       Variable names should, like argument names, be specified in
+       italics.
+
+       Any reference to the subject of the current manual page should be
+       written with the name in bold followed by a pair of parentheses in
+       Roman (normal) font.</pre>
+							</blockquote>
+							<figcaption>— <a href="https://man7.org/linux/man-pages/man7/man-pages.7.html#STYLE_GUIDE" target="_blank" rel="external">The man-pages(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+						</figure>
+						{# TODO: Do I actually have to go through the Chicago Manual of Style? #}
+						{# TODO: Go through each of those style guides until documentation about bold and italics are found. #}
+						<p>That quote mentions <a href="https://www.ualberta.ca/computing-science/media-library/docs/unix-beginners.pdf" target="_blank" rel="external"><cite>UNIX for Beginners</cite></a>. I took a look at <cite>UNIX for Beginners</cite>, and it doesn’t say anything about italics or bold. That quote also talks about the use of italic and bold text in manual pages that describe commands and functions. Unfortunately, that information isn’t relevant for environ(7) because environ(7) doesn’t describe a command or a function. It describes a variable.</p>
+						<p>Here’s the next time that the man-pages(7) man page mentions italic or bold text:<p>
+						<figure>
+							<blockquote>
+								<h2>STYLE GUIDE</h2>
+								<p>[…]</p>
+								<pre>
+   <b>Lists</b>
+       There are different kinds of lists:
+
+       Tagged paragraphs
+              These are used for a list of tags and their descriptions.
+              When the tags are constants (either macros or numbers) they
+              are in bold.  Use the <b>.TP </b>macro.</pre>
+							</blockquote>
+							<figcaption>— <a href="https://man7.org/linux/man-pages/man7/man-pages.7.html#STYLE_GUIDE" target="_blank" rel="external">The man-pages(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+						</figure>
+						<p><a href="#environ-quote">The previous environ(7) quote that we are concerned about</a> does not use any tagged paragraphs so this part of the man-pages(7) man page is not relevant to us.</p>
+						<p>Here’s the next time that the man-pages(7) man page mentions italic or bold text:<p>
+						<figure id="man-pages-quote">
+							<blockquote>
+								<h2>STYLE GUIDE</h2>
+								<p>[…]</p>
+								<pre>
+   <b>Formatting conventions (general)</b>
+       Paragraphs should be separated by suitable markers (usually either
+       <i>.P</i> or <i>.IP</i>).  Do <i>not</i> separate paragraphs using blank lines, as this
+       results in poor rendering in some output formats (such as
+       PostScript and PDF).
+
+       Filenames (whether pathnames, or references to header files) are
+       always in italics (e.g., <i>&lt;stdio.h&gt;</i>), except in the SYNOPSIS
+       section, where included files are in bold (e.g., <b>#include</b>
+       <b>&lt;stdio.h&gt;</b>).  When referring to a standard header file include,
+       specify the header file surrounded by angle brackets, in the usual
+       C way (e.g., <i>&lt;stdio.h&gt;</i>).
+
+       Special macros, which are usually in uppercase, are in bold (e.g.,
+       <b>MAXINT</b>).  Exception: don't boldface NULL.
+
+       When enumerating a list of error codes, the codes are in bold
+       (this list usually uses the <b>.TP </b>macro).
+
+       Complete commands should, if long, be written as an indented line
+       on their own, with a blank line before and after the command, for
+       example
+
+           man 7 man-pages
+
+       If the command is short, then it can be included inline in the
+       text, in italic format, for example, <i>man 7 man-pages</i>.  In this
+       case, it may be worth using nonbreaking spaces (<b>\~</b>) at suitable
+       places in the command.  Command options should be written in
+       italics (e.g., <i>-l</i>).
+
+       Expressions, if not written on a separate indented line, should be
+       specified in italics.  Again, the use of nonbreaking spaces may be
+       appropriate if the expression is inlined with normal text.
+
+       When showing example shell sessions, user input should be
+       formatted in bold, for example
+
+           $ <b>date</b>;
+           Thu Jul  7 13:01:27 CEST 2016
+
+       Any reference to another man page should be written with the name
+       in bold, <i>always</i> followed by the section number, formatted in Roman
+       (normal) font, without any separating spaces (e.g., <a href="https://man7.org/linux/man-pages/man2/intro.2.html" target="_blank" rel="external">intro(2)</a>).
+       The preferred way to write this in the source file is:
+
+           .BR intro (2)
+
+       (Including the section number in cross references lets tools like
+       <b>man2html</b>(1) create properly hyperlinked pages.)
+
+       Control characters should be written in bold face, with no quotes;
+       for example, <b>^X</b>.</pre>
+							</blockquote>
+							<figcaption>— <a href="https://man7.org/linux/man-pages/man7/man-pages.7.html#STYLE_GUIDE" target="_blank" rel="external">The man-pages(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+						</figure>
+						<p><a href="#environ-quote">The previous environ(7) quote that we are concerned about</a> has these three words written in italics: “<i>environ</i>”, “<i>name</i>” and “<i>value</i>”. It also has a equals sign that is written in bold. The first time that the above man-pages(7) quote talks about italic or bold text, it’s talking about filenames and paths. “<i>environ</i>”, “<i>name</i>”, “<i>value</i>” and the bold equals sign are not filenames or paths, so that part of the man-pages(7) quote is not relevant. The second time that the above man-pages(7) quote talks about italic or bold text, it’s talking about how special macros should be written in bold. That part of the man-pages(7) quote isn’t relevant because the equals sign from the previous environ(7) quote was the only thing written in bold. The equals sign is not a macro. The third time that the above man-pages(7) quote talks about italic or bold text, it’s talking about how error codes in lists of error codes should be written in bold. The equals sign from the previous environ(7) quote is not an error code and it’s not part of a list of error codes. The fourth time that the above man-pages(7) quote talks about italic or bold text, it’s talking about how italics should be used when writing commands. The words “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” from the previous environ(7) quote were not part of any commands. The fifth time that the above environ(7) quote talks about italic or bold text, it’s talking about how expressions should be written in italics as long as they aren’t written on a separate line. The words “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” are written in italics and were not written on separate lines from the rest of the text. Are they expressions? To figure that out, we unfortunately have to go on a tangent.</p>
+						<p>TODO: talk about the rest of the references to italic and bold text that are in that quotation.</p>
+					</section>
+					<section>
+						<div role="heading" aria-level="7">Tangent: are “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” expressions?</div>
+						<section>
+							<div role="heading" aria-level="8">Which version of the C programming language is relevant here?</div>
+							<p><a href="#environ-quote">The quote that we are concerned about</a> is <q class="quote-that-uses-single-quotes">By convention, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".</q> It comes from environ(7). environ(7) is a man page that describes a C library interface. So we need to ask ourselves if “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” are expressions <em>in the C programming language</em>. In order to do that, we need to find authoritative sources of information about the C programming language.</p>
+							<p>environ(7) is in manual section 7. The intro(7) man page contains an introduction to manual section 7:</p>
+							<figure>
+								<blockquote>
+									<h2>NAME</h2>
+									<pre>
+       intro - introduction to overview and miscellany section
+</pre>
+									<h2>DESCRIPTION</h2>
+									<pre>
+       Section 7 of the manual provides overviews on various topics, and
+       describes conventions and protocols, character set standards, the
+       standard filesystem layout, and miscellaneous other things.
+</pre>
+									<h2>NOTES</h2>
+									<pre>
+   <b>Authors and copyright conditions</b>
+       Look at the header of the manual page source for the author(s) and
+       copyright conditions.  Note that these can be different from page
+       to page!
+</pre>
+									<h2>SEE ALSO</h2>
+									<pre>
+       <a href="https://man7.org/linux/man-pages/man7/standards.7.html" target="_blank" rel="external">standards(7)</a></pre>
+								</blockquote>
+								<figcaption>— <a href="https://man7.org/linux/man-pages/man7/intro.7.html" target="_blank" rel="external">The intro(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+							</figure>
+							<p>intro(7)’s SEE ALSO section mentions standards(7). standards(7) contains some information that is useful to us:</p>
+							<figure>
+								<blockquote class="quote-that-uses-single-quotes">
+									<h2>NAME</h2>
+									<pre>
+       standards - C and UNIX Standards
+</pre>
+									<h2>DESCRIPTION</h2>
+									<pre>
+       The STANDARDS section that appears in many manual pages identifies
+       various standards to which the documented interface conforms.  The
+       following list briefly describes these standards.</pre>
+									<p>[…]</p>
+									<pre>
+
+   <b>Standard C</b>
+       <b>K&amp;R    </b>This refers to the C language as specified in <i>“The C</i>
+              <i>Programming Language”</i> [Brian W. Kernighan and Dennis M.
+              Ritchie; Prentice Hall; 1st Ed., 1978].
+
+       <b>C89    </b>This was the first C language standard, ratified by ANSI
+              (American National Standards Institute) in 1989
+              (<i>X3.159-1989</i>).  Sometimes this is known as <i>ANSI C</i>, but
+              since C99 is also an ANSI standard, this term is ambiguous.
+              It is available online
+              ⟨<a href="https://nvlpubs.nist.gov/nistpubs/Legacy/FIPS/fipspub160.pdf">https://nvlpubs.nist.gov/nistpubs/Legacy/FIPS/fipspub160.pdf</a>⟩.
+
+              The rationale for the C89 standard is also available online
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/C89Rationale.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/C89Rationale.pdf</a>⟩.
+
+              This standard was also ratified by ISO (International
+              Standards Organization) and IEC (International
+              Electrotechnical Commision) in 1990 (<i>ISO/IEC 9899:1990</i>),
+              and is thus occasionally referred to as <i>ISO C90</i>.
+
+       <b>C94    </b>Technical Corrigendum 1
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/tc1.htm">https://www.open-std.org/jtc1/sc22/wg14/www/docs/tc1.htm</a>⟩
+              of C90 was ratified by ISO/IEC in 1994
+              (<i>ISO/IEC 9899:1990/Cor1:1994</i>).
+
+       <b>C95    </b>This amendment of the C language standard was ratified by
+              ISO/IEC in 1995 (<i>ISO/IEC 9899:1990/Amd1:1995</i>).  A draft is
+              available online
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n412.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/n412.pdf</a>⟩.
+
+       <b>C96    </b>Technical Corrigendum 2
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/tc2.htm">https://www.open-std.org/jtc1/sc22/wg14/www/docs/tc2.htm</a>⟩
+              of C90 was ratified by ISO/IEC in 1996
+              (<i>ISO/IEC 9899:1990/Cor2:1996</i>).  A draft is available online
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n457.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/n457.pdf</a>⟩.
+
+       <b>C99    </b>This revision of the C language standard was ratified by
+              ISO/IEC in 1999 (<i>ISO/IEC 9899:1999</i>).
+
+              Technical Corrigendum 1
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/9899tc1/n32071.PDF">https://www.open-std.org/jtc1/sc22/wg14/www/docs/9899tc1/n32071.PDF</a>⟩
+              of C99 was ratified by ISO/IEC in 2001
+              (<i>ISO/IEC 9899:1999/Cor1:2001</i>).
+
+              Technical Corrigendum 2
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/9899-1999_cor_2-2004.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/9899-1999_cor_2-2004.pdf</a>⟩
+              of C99 was ratified by ISO/IEC in 2004
+              (<i>ISO/IEC 9899:1999/Cor2:2004</i>).
+
+              Technical Corrigendum 3
+              ⟨<a href="https://www.open-std.org/JTC1/SC22/WG14/www/docs/n1235.pdf">https://www.open-std.org/JTC1/SC22/WG14/www/docs/n1235.pdf</a>⟩
+              of C99 was ratified by ISO/IEC in 2007
+              (<i>ISO/IEC 9899:1999/Cor3:2007</i>).  A draft is available online
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf</a>⟩.
+
+              The rationale for the C99 standard is also available online
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/C99RationaleV5.10.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/C99RationaleV5.10.pdf</a>⟩.
+
+       <b>C11    </b>This revision of the C language standard was ratified by
+              ISO/IEC in 2011 (<i>ISO/IEC 9899:2011</i>).  A draft is available
+              online
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf</a>⟩.
+
+              Technical Corrigendum 1
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1606.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1606.pdf</a>⟩
+              of C11 was ratified by ISO/IEC in 2012
+              (<i>ISO/IEC 9899:2011/Cor1:2012</i>).
+
+       <b>C17    </b>This revision of the C language standard was ratified by
+              ISO/IEC in 2018 (<i>ISO/IEC 9899:2018</i>).  A draft is available
+              online
+              ⟨<a href="https://web.archive.org/web/20181230041359if_/http://www.open-std.org/jtc1/sc22/wg14/www/abq/c17_updated_proposed_fdis.pdf">https://web.archive.org/web/20181230041359if_/http://www.open-std.org/jtc1/sc22/wg14/www/abq/c17_updated_proposed_fdis.pdf</a>⟩.
+
+       <b>C23    </b>This revision of the C language standard was ratified by
+              ISO/IEC in 2024 (<i>ISO/IEC 9899:2024</i>).  A draft is available
+              online
+              ⟨<a href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf</a>⟩.</pre>
+								</blockquote>
+								<figcaption>— <a href="https://man7.org/linux/man-pages/man7/standards.7.html" target="_blank" rel="external">The standards(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+							</figure>
+							<p>The above quote solves one of our problems, but it also creates a new one. Our old problem was that we needed to find an authoritative source of information about the C programming language. That quote gives us plenty of authoritative sources of information about the C programming language. Our new problem is that the authoritative sources of information are split up based on the version of the C programming language. We now need to figure out which version of the C programming language we should use when determining whether or not “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” are expressions.</p>
+							<p>An important part of the above quotation is <q>The STANDARDS section that appears in many manual pages[…]</q> Unfortunately, neither the environ(7) man page nor the man-pages(7) man page contains a STANDARDS section. In fact, neither of those man pages contain the text “K&amp;R”, “C89”, “C90”, “C94”, “C95”, “C96”, “C99”, “C11”, “C17” or “C23” at all. Luckily, I was able to find another part of the <cite>Linux <em>man-pages</em></cite> project that clarifies which version of the C programming language is being used here. <a href="#CONTRIBUTING.d/style">Previously, I had found a <code>CONTRIBUTING.d/style</code> directory that contains two files: <code>c</code> and <code>man</code>.</a> Let’s take a look at <code>CONTRIBUTING.d/style/c</code>:</p>
+							<figure id="we-use-latest-gnu-c">
+								<blockquote>
+									<pre>
+Name
+       style/c - C coding style
+
+Description</pre>
+									<p>[…]</p>
+									<pre>
+    Dialect
+	We use the latest GNU C dialect.  Feel free to use new language
+	features, unless they are evil.
+
+See also
+	For anything not explicitly covered above, you can check the
+	following coding styles, roughly in order of appearance:
+
+	&lt;https://include-what-you-use.org/&gt;
+	&lt;https://doc.cat-v.org/bell_labs/pikestyle&gt;
+	&lt;https://www.kernel.org/doc/html/latest/process/coding-style.html&gt;
+	&lt;https://git.kernel.org/pub/scm/git/git.git/tree/Documentation/CodingGuidelines&gt;
+	&lt;https://mbsd.evolvis.org/htman/i386/man9/style.htm&gt;
+	&lt;https://nginx.org/en/docs/dev/development_guide.html#code_style&gt;
+	&lt;https://google.github.io/styleguide/&gt;
+	&lt;https://www.gnu.org/prep/standards/standards.html&gt;
+	&lt;https://www.cis.upenn.edu/~lee/06cse480/data/cstyle.ms.pdf&gt;</pre>
+								</blockquote>
+								<figcaption>— <a href="https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/CONTRIBUTING.d/style/c?h=man-pages-6.18" target="_blank" rel="external">The <cite>Linux <em>man-pages</em></cite> project’s <code>CONTRIBUTING.d/style/c</code> file</a></figcaption>
+							</figure>
+							<!-- Source for the expansion of the GNU acronym: <https://www.gnu.org/gnu/about-gnu.html>. -->
+							<p>We now know that version of C the <cite>Linux <em>man-pages</em></cite> project uses. It uses the latest <abbr title="GNU's Not Unix">GNU</abbr> C dialect.</p>
+						</section>
+						<section>
+							<div role="heading" aria-level="8">Finding authoritative sources of information about the <abbr title="GNU's Not Unix">GNU</abbr> C dialect</div>
+							<p>We now have a new problem: where are we going to find authoritative sources of information about the <abbr title="GNU's Not Unix">GNU</abbr> C dialect? That above quote gives us a list of links. Let’s go through each of those links in order and see if we can find any information about the <abbr title="GNU's Not Unix">GNU</abbr> C dialect.</p>
+							<p>I wasn’t able to find any documentation about the <abbr title="GNU's Not Unix">GNU</abbr> C dialect on <a href="https://include-what-you-use.org/" target="_blank" rel="external"><code>https://include-what-you-use.org/</code></a>. <a href="https://doc.cat-v.org/bell_labs/pikestyle" target="_blank" rel="external"><code>https://doc.cat-v.org/bell_labs/pikestyle</code></a> doesn’t mention the word “<abbr title="GNU's Not Unix">GNU</abbr>” at all. Luckily, <a href="https://www.kernel.org/doc/html/latest/process/coding-style.html" target="_blank" rel="external"><code>https://www.kernel.org/doc/html/latest/process/coding-style.html</code></a> does contain some information that is useful to us:</p>
+							<figure>
+								<blockquote>
+									<h2>Appendix I) References<a href="https://www.kernel.org/doc/html/latest/process/coding-style.html#appendix-i-references" target="_blank" rel="external" class="anchor-link" title="Permalink to this heading">¶</a></h2>
+									<p>The C Programming Language, Second Edition
+									by Brian W. Kernighan and Dennis M. Ritchie.
+									Prentice Hall, Inc., 1988.
+									ISBN 0-13-110362-8 (paperback), 0-13-110370-9 (hardback).</p>
+									<p>The Practice of Programming
+									by Brian W. Kernighan and Rob Pike.
+									Addison-Wesley, Inc., 1999.
+									ISBN 0-201-61586-X.</p>
+									<p>GNU manuals - where in compliance with K&amp;R and this text - for cpp, gcc,
+									gcc internals and indent, all available from <a href="https://www.gnu.org/manual/" target="_blank" rel="external">https://www.gnu.org/manual/</a>
+								</blockquote>
+								<figcaption>— <a href="https://www.kernel.org/doc/html/latest/process/coding-style.html#appendix-i-references" target="_blank" rel="external"><cite>Linux</cite> kernel coding style — The <cite>Linux</cite> Kernel  documentation</a> (version 7.2.0-rc4)</figcaption>
+							</figure>
+							<p>Let’s take a look at what <a href="https://www.gnu.org/manual/" target="_blank" rel="external"><code>https://www.gnu.org/manual/</code></a> has to say:</p>
+							<figure>
+								<blockquote>
+									<h2>GNU Manuals Online</h2>
+									<hr>
+	
+									<p>This table lists <a href="https://www.gnu.org/software/software.html" target="_blank" rel="external">official GNU packages</a> with links to their primary documentation, where available.</p>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/manual/" target="_blank" rel="external">GNU Manuals Online - GNU Project - Free Software Foundation</a></figcaption>
+							</figure>
+							<p>We’re making progress. We now have a authoritative source of information for <abbr title="GNU's Not Unix">GNU</abbr>-related stuff. In order to find authoritative sources of information about the <abbr title="GNU's Not Unix">GNU</abbr> C dialect, we’re going to need to take a look at a few different items that are listed on <a href="https://www.gnu.org/manual/" target="_blank" rel="external"><code>https://www.gnu.org/manual/</code></a>. Here’s the first item that we need to look at:</p>
+							<figure>
+								<blockquote>
+									<dl>
+										<dt id="gcc"><a href="https://gcc.gnu.org/onlinedocs/" target="_blank" rel="external">GCC</a>
+										&nbsp;<span>(<a href="https://gcc.gnu.org/onlinedocs/cpp/" target="_blank" rel="external">cpp</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/cppinternals/" target="_blank" rel="external">cppinternals</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gcc/" target="_blank" rel="external">gcc<!-- again --></a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gccint/" target="_blank" rel="external">gccint</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gfc-internals/" target="_blank" rel="external">gfc-internals</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gfortran/" target="_blank" rel="external">gfortran</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gnat-style/" target="_blank" rel="external">gnat-style</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gnat_rm/" target="_blank" rel="external">gnat_rm</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gnat_ugn/" target="_blank" rel="external">gnat_ugn</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/libgomp/" target="_blank" rel="external">libgomp</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/libiberty/" target="_blank" rel="external">libiberty</a>
+										&nbsp;<a href="https://gcc.gnu.org/onlinedocs/libstdc++/" target="_blank" rel="external">libstdc++</a>)</span>
+										</dt>
+										<dd>GNU Compiler Collection.
+										       <br>Available in print:
+										       <cite><a href="http://shop.fsf.org/product/using-gcc-gnu-compiler-collection-reference-manual/" target="_blank" rel="external">Using GCC: The GNU Compiler Collection Reference Manual</a></cite>.
+										    [<a href="https://www.gnu.org/software/gcc/" target="_blank" rel="external">gcc&nbsp;home</a>]</dd>
+									</dl>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/manual/#gcc" target="_blank" rel="external">GNU Manuals Online - GNU Project - Free Software Foundation</a></figcaption>
+							</figure>
+							<p>If you click on that first <q><a href="https://gcc.gnu.org/onlinedocs/" target="_blank" rel="external">GCC</a></q> link (as opposed to the second <q><a href="https://gcc.gnu.org/onlinedocs/gcc/" target="_blank" rel="external">gcc</a></q> link), then it will take you to a page that lists sets of manuals for several different versions of <cite><abbr title="GNU Compiler Collection">GCC</abbr></cite>. At the moment, the latest stable version of <cite><abbr title="GNU Compiler Collection">GCC</abbr></cite> that’s listed on that page is version 16.1. I’m going to use the set of manuals for that version of <cite><abbr title="GNU Compiler Collection">GCC</abbr></cite>.</p>
+							<p>The first item in the set of manuals for <cite><abbr title="GNU Compiler Collection">GCC</abbr></cite> version 16.1 is listed as <q><a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/" target="_blank" rel="external">GCC 16.1 Manual</a></q>, but it’s actual title is <cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite>. It contains a lot of information that is useful for us:</p>
+							<figure>
+								<blockquote>
+									<p>A fifth version of the C standard, known as <em>C23</em>, was published
+									in 2024 as ISO/IEC 9899:2024.
+									(While in development, drafts of this standard version were referred
+									to as <em>C2X</em>.)  Support for this is
+									enabled with <samp>-std=c23</samp> or <samp>-std=iso9899:2024</samp>.
+									</p>
+									<p>A further version of the C standard, known as <em>C2Y</em>, is under
+									development; experimental and incomplete support for this is enabled
+									with <samp>-std=c2y</samp>.
+									</p>
+									<p>By default, GCC provides some extensions to the C language that, on
+									rare occasions conflict with the C standard.  See <a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/C-Extensions.html" target="_blank" rel="external">Extensions to the C Language Family</a>.  
+									Some features that are part of the C99 standard
+									are accepted as extensions in C90 mode, and some features that are part
+									of the C11 standard are accepted as extensions in C90 and C99 modes.
+									Use of the
+									<samp>-std</samp> options listed above disables these extensions where
+									they conflict with the C standard version selected.  You may also
+									select an extended version of the C language explicitly with
+									<samp>-std=gnu90</samp> (for C90 with GNU extensions), <samp>-std=gnu99</samp>
+									(for C99 with GNU extensions), <samp>-std=gnu11</samp> (for C11 with GNU
+									extensions), <samp>-std=gnu17</samp> (for C17 with GNU extensions) or
+									<samp>-std=gnu23</samp> (for C23 with GNU extensions).
+									</p>
+								</blockquote>
+								<figcaption>— <a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/Standards.html#C-Language" target="_blank" rel="external"><cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite>, Section 2.1 “C Language”</a></figcaption>
+							</figure>
+							<p>The first part of that quote demonstrates that both <cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite> and the <cite>Linux <em>man-pages</em></cite> project mean the same thing when they say C23. Both of them use the term “C23” to refer to ISO/IEC 9899:2024. The rest of that quote introduces an important concept: <abbr title="GNU's Not Unix">GNU</abbr> extensions. The quote talks about how you can use various different versions of the C standard with <abbr title="GNU's Not Unix">GNU</abbr> extensions. The <abbr title="GNU's Not Unix">GNU</abbr> C dialect is actually just standard C with <abbr title="GNU's Not Unix">GNU</abbr> extensions. We can verify this by clicking on that <q><a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/C-Extensions.html" target="_blank" rel="external">Extensions to the C Language Family</a></q> link. That link takes us to a page that says the following:</p>
+							<figure>
+								<blockquote>
+									<h2><span>6 Extensions to the C Language Family<a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/C-Extensions.html#Extensions-to-the-C-Language-Family" target="_blank" rel="external" class="anchor-link"> ¶</a></span></h2>
+									<a id="index-extensions_002c-C-language"></a>
+									<a id="index-C-language-extensions"></a>
+
+									<a id="index-pedantic-2"></a>
+									<p>GNU C provides several language features not found in ISO standard C.
+									(The <samp class="option">-pedantic</samp> option directs GCC to print a warning message if
+									any of these features is used.)  To test for the availability of these
+									features in conditional compilation, check for a predefined macro
+									<code class="code">__GNUC__</code>, which is always defined under GCC.
+									</p>
+									<p>These extensions are available in C and Objective-C.</p>
+								</blockquote>
+								<figcaption>— <a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/C-Extensions.html" target="_blank" rel="external"><cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite>, Section 6 “Extensions to the C Language Family”</a></figcaption>
+							</figure>
+							<p>The above quote uses the word “extensions” to refer to language features that are in <abbr title="GNU's Not Unix">GNU</abbr> C but not in standard C. This indicates that the “standard C with <abbr title="GNU's Not Unix">GNU</abbr> extensions” is the same thing as “<abbr title="GNU's Not Unix">GNU</abbr> C”.</p>
+							<p>It’s important to remember that <a href="#we-use-latest-gnu-c"><code>CONTRIBUTING.d/style/c</code> said <q>We use the <em>latest</em> GNU C dialect.</q></a> Section 2.1 of <cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite> mentioned a few different versions of <abbr title="GNU's Not Unix">GNU</abbr> C: <samp>-std=gnu90</samp>, <samp>-std=gnu99</samp>, <samp>-std=gnu11</samp>, <samp>-std=gnu17</samp> and <samp>-std=gnu23</samp>. Out of all of those options, <samp>-std=gnu23</samp> is the newest. That being said, it’s possible that there’s a version of <abbr title="GNU's Not Unix">GNU</abbr> C that’s even newer than <samp>-std=gnu23</samp>, and that that newer version simply wasn’t mentioned in Section 2.1 of <cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite>. In order to figure out whether or not <samp>-std=gnu23</samp> really is the latest version of <abbr title="GNU's Not Unix">GNU</abbr> C, we need to take a look at <cite><abbr title="GNU Compiler Collection">GCC</abbr></cite>’s documentation for the <code>-std=</code> command-line option:</p>
+							<figure>
+								<blockquote>
+									<dl>
+									<dt><a id="index-std-1"></a><span><code>-std=</code><a class="anchor-link" href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/C-Dialect-Options.html#index-std-1" target="_blank" rel="external"> ¶</a></span></dt>
+									<dd><p>Determine the language standard. See <a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/Standards.html" target="_blank" rel="external">Language Standards
+									Supported by GCC</a>, for details of these standard versions.  This option
+									is currently only supported when compiling C or C++.
+									</p>
+									<p>The compiler can accept several base standards, such as ‘<samp>c90</samp>’ or
+									‘<samp>c++98</samp>’, and GNU dialects of those standards, such as
+									‘<samp>gnu90</samp>’ or ‘<samp>gnu++98</samp>’.  When a base standard is specified, the
+									compiler accepts all programs following that standard plus those
+									using GNU extensions that do not contradict it.  For example,
+									<samp>-std=c90</samp> turns off certain features of GCC that are
+									incompatible with ISO C90, such as the <code>asm</code> and <code>typeof</code>
+									keywords, but not other GNU extensions that do not have a meaning in
+									ISO C90, such as omitting the middle term of a <code>?:</code>
+									expression. On the other hand, when a GNU dialect of a standard is
+									specified, all features supported by the compiler are enabled, even when
+									those features change the meaning of the base standard.  As a result, some
+									strict-conforming programs may be rejected.  The particular standard
+									is used by <samp>-Wpedantic</samp> to identify which features are GNU
+									extensions given that version of the standard. For example
+									<samp>-std=gnu90 -Wpedantic</samp> warns about C++ style ‘<samp>//</samp>’
+									comments, while <samp>-std=gnu99 -Wpedantic</samp> does not.
+									</p>
+									<p>A value for this option must be provided; possible values are
+									</p>
+									<dl>
+									<dt>‘<samp>c90</samp>’</dt>
+									<dt>‘<samp>c89</samp>’</dt>
+									<dt>‘<samp>iso9899:1990</samp>’</dt>
+									<dd><p>Support all ISO C90 programs (certain GNU extensions that conflict
+									with ISO C90 are disabled). Same as <samp>-ansi</samp> for C code.
+									</p>
+									</dd>
+									</dl>
+									<p>[…]</p>
+									<dl>
+									<dt>‘<samp>gnu23</samp>’</dt>
+									<dt>‘<samp>gnu2x</samp>’</dt>
+									<dd><p>GNU dialect of ISO C23.  This is the default for C code.  The name
+									‘<samp>gnu2x</samp>’ is deprecated.
+									</p>
+									</dd>
+									<dt>‘<samp>gnu2y</samp>’</dt>
+									<dd><p>The next version of the ISO C standard, still under development, plus
+									GNU extensions.  The support for this version is experimental and
+									incomplete.
+									</p>
+									</dd>
+									</dl>
+									</dl>
+								</blockquote>
+								<figcaption>— <a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/C-Dialect-Options.html#index-std-1" target="_blank" rel="external"><cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite>, Section 3.4 “Options Controlling C Dialect”</a></figcaption>
+							</figure>
+							<p>Based on the above quotation, there are two possible ways of interpreting the phrase <q>the latest GNU C dialect</q>:</p>
+							<ol>
+								<li>The word “latest” could mean “latest stable version”. In that case, <samp>-std=gnu23</samp> would be the latest GNU C dialect.</li>
+								<li>The word “latest” could mean “latest version regardless of whether or not it’s stable”. In that case, <samp>-std=gnu2y</samp> would be the latest GNU C dialect.</li>
+							</ol>
+							<p>I think that the first option is the correct interpretation. I mean, if someone told me to install the latest version of <a href=" https://www.firefox.com" target="_blank" rel="external"><cite>Firefox</cite></a>, then I would assume that they meant the latest stable version of Firefox, not the latest unstable version.</p>
+							<p>At this point, we know that <q>the latest GNU C dialect</q> is <q>C23 with GNU extensions</q>, and we know that ISO/IEC 9899:2024 is an authoritative source of information about C23. Before we move on, I want to introduce another authoritative source of information about GNU C. Here’s another item that’s listed on <a href="https://www.gnu.org/manual/" target="_blank" rel="external">https://www.gnu.org/manual/</a>:</p>
+							<figure>
+								<blockquote>
+									<dl>
+									<dt id="c-intro-and-ref"><a href="https://www.gnu.org/software/c-intro-and-ref/manual/" target="_blank" rel="external">GNU C Introduction and Reference</a></dt>
+									<dd>Introduction for learning the GNU C language, and reference for it.
+									    [<a href="https://www.gnu.org/software/c-intro-and-ref/" target="_blank" rel="external">c-intro-and-ref&nbsp;home</a>]</dd>
+									</dl>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/manual/#c-intro-and-ref" target="_blank" rel="external">GNU Manuals Online - GNU Project - Free Software Foundation</a></figcaption>
+							</figure>
+							<p>At this point, we have found a few different authoritative sources of information for the latest <abbr title="GNU's Not Unix">GNU</abbr> C dialect:</p>
+							<ul>
+								<li>The C23 standard (ISO/IEC 9899:2024)</li>
+								<li><a href="https://gcc.gnu.org/onlinedocs/gcc-16.1.0/gcc/C-Extensions.html" target="_blank" rel="external"><cite>Using the <abbr title="GNU's Not Unix">GNU</abbr> Compiler Collection</cite>, Section 6 “Extensions to the C Language Family”</a></li>
+								<li><a href="https://www.gnu.org/software/c-intro-and-ref/manual/" target="_blank" rel="external"><cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite></a> (For the rest of this blog post, any quotes from the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite> are going to come from the version of <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite> that says <q>last updated May 15, 2025</q>.)</li>
+							</ul>
+							<p>Now that we have relevant and authoritative sources of information, we can use them in order to determine whether or not “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” are expressions.</p>
+						</section>
+						<section>
+							<div role="heading" aria-level="8">According to the C23 standard, are “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” expressions?</div>
+							<p><a href="#environ-quote">The previous quote that contains “<i>environ</i>”, “<i>name</i>” and “<i>value</i>”</a> comes from the environ(7) man page. Here’s what the SYNOPSIS section of the environ(7) man page says:</p>
+							<figure id="environ-synopsis">
+								<blockquote>
+									<h2>SYNOPSIS</h2>
+									<pre>
+       <b>extern char **</b><i>environ</i><b>;</b></pre>
+								</blockquote>
+								<figcaption>— <a href="https://man7.org/linux/man-pages/man7/environ.7.html#SYNOPSIS" target="_blank" rel="external">The environ(7) man page from the <cite>Linux <em>man-pages</em></cite> project</a></figcaption>
+							</figure>
+							<p>In order to figure out whether or not “<i>environ</i>” is an expression, we first need to interpret the line of code that’s in the SYNOPSIS section:</p>
+							<ol type="1">
+								<li>
+									<p>“<code><b>extern char **</b><i>environ</i><b>;</b></code>” is a declaration (see Section 6.7.1 of the C23 standard). A declaration can take few different forms. This particular declaration has this form: declaration-specifiers, space, init-declarator-list, semicolon:</p>
+									<ol type="A">
+										<li>
+											<p>“<code><b>extern char</b></code>” is the declaration-specifiers (see Section 6.7.1 of the C23 standard). declaration-specifiers can take a few different forms. This particular declaration-specifiers has this form: declaration-specifier, space, declaration-specifiers:</p>
+											<ol type="I">
+												<li>
+													<p>“<code><b>extern</b></code>” is the declaration-specifier (see Section 6.7.1 of the C23 standard). A declaration-specifier can take a few different forms. This particular declaration-specifier has this form: storage-class-specifier:</p>
+													<ol type="a">
+														<li>
+															<p>“<code><b>extern</b></code>” is the storage-class-specifier (see Section 6.7.2 of the C23 standard). A storage-class-specifier can take a few different forms. This particular storage-class-specifier has this form: the characters “<code><b>extern</b></code>”.</p>
+														</li>
+													</ol>
+												</li>
+												<li>
+													<p>“<code><b> </b></code>” is the space.</p>
+												</li>
+												<li>
+													<p>“<code><b>char</b></code>” is the declaration-specifiers. declaration-specifiers can take a few different forms. This particular declaration-specifiers has this form: a single declaration-specifier:</p>
+													<ol type="a">
+														<li>
+															<p>“<code><b>char</b></code>” is the single declaration-specifier. A declaration-specifier can take a few different forms. This particular declaration-specifier has this form: a single type-specifier-qualifier:</p>
+															<ol type="i">
+																<li>
+																	<p>“<code><b>char</b></code>” is the single type-specifier-qualifier (see Section 6.7.3.2 of the C23 standard). A type-specifier-qualifier can take a few different forms. This particular type-specifier-qualifier has this form: a single type-specifier:</p>
+																	<ol type="1">
+																		<li>
+																			<p>“<code><b>char</b></code>” is the single type-specifier (see Section 6.7.3.1 of the C23 standard). A type-specifier can take a few different forms. This particular type-specifier has this form: the characters “<code><b>char</b></code>”.</p>
+																		</li>
+																	</ol>
+																</li>
+															</ol>
+														</li>
+													</ol>
+												</li>
+											</ol>
+										</li>
+										<li>
+											<p>“<code><b> </b></code>” is the space.</p>
+										</li>
+										<li>
+											<p>“<code><b>**</b><i>environ</i></code>” is the init-declarator (see Section 6.7.1 of the C23 standard). A init-declarator can take a few different forms. This particular init-declarator has this form: a single init-declarator:</p>
+											<ol type="I">
+												<li>
+													<p>“<code><b>**</b><i>environ</i></code>” is the declarator (see Section 6.7.7.1 of the C23 standard). A declarator can take a few different forms. This particular declarator has this form: pointer, direct-declarator:</p>
+													<ol type="a">
+														<li>
+															<p>“<code><b>**</b></code>” is the pointer (see Section 6.7.7.1 of the C23 standard). A pointer can take a few different forms. This particular pointer has this form: asterisk, pointer:</p>
+															<ol type="i">
+																<li>
+																	<p>“<code><b>*</b></code>” is the asterisk.</p>
+																</li>
+																<li>
+																	<p>“<code><b>*</b></code>” is the pointer. A pointer can take a few different forms. This particular pointer has this form: a single asterisk.</p>
+																</li>
+															</ol>
+														</li>
+														<li>
+															<p>“<code><i>environ</i></code>” is the direct-declarator (see Section 6.7.7.1 of the C23 standard). A direct-declarator can take a few different forms. This particular direct-declarator has this form: a single identifier:</p>
+															<ol type="i">
+																<li>
+																	<p>“<code><i>environ</i></code>” is the identifier (see Section 6.4.2.1 of the C23 standard).</p>
+																</li>
+															</ol>
+														</li>
+													</ol>
+												</li>
+											</ol>
+										</li>
+										<li>
+											<p>“<code><b>;</b></code>” is the semicolon.</p>
+										</li>
+									</ol>
+								</li>
+							</ol>
+							<p>The important part of that chain of logic is the fact that “<code><i>environ</i></code>” is an identifier. When <a href="#environ-quote">the environ(7) quote that we are concerned about (<q class="quote-that-uses-single-quotes">By convention, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".</q>)</a> says “<i>environ</i>”, “<i>environ</i>” is an identifier. If you just write an identifier and nothing else, could that identifier be a valid expression? It turns out that the answer to that question is “yes”:</p>
+							<ul>
+								<li>According to 6.5.18 of the C23 standard, an expression could be a single assignment-expression.</li>
+								<li>According to 6.5.17 of the C23 standard, an assignment-expression could be a single conditional-expression.</li>
+								<li>According to 6.5.16 of the C23 standard, a conditional-expression could be a single logical-OR-expression.</li>
+								<li>According to 6.5.15 of the C23 standard, a logical-OR-expression could be a single logical-AND-expression.</li>
+								<li>According to 6.5.14 of the C23 standard, a logical-AND-expression could be a single inclusive-OR-expression.</li>
+								<li>According to 6.5.13 of the C23 standard, an inclusive-OR-expression could be a single exclusive-OR-expression.</li>
+								<li>According to 6.5.12 of the C23 standard, an exclusive-OR-expression could be a single AND-expression.</li>
+								<li>According to 6.5.11 of the C23 standard, an AND-expression could be a single equality-expression.</li>
+								<li>According to 6.5.10 of the C23 standard, an equality-expression could be a single relational-expression.</li>
+								<li>According to 6.5.9 of the C23 standard, a relational-expression could be a single shift-expression.</li>
+								<li>According to 6.5.8 of the C23 standard, a shift-expression could be a single additive-expression.</li>
+								<li>According to 6.5.7 of the C23 standard, an additive-expression could be a single multiplicative-expression.</li>
+								<li>According to 6.5.6 of the C23 standard, a multiplicative-expression could be a single cast-expression.</li>
+								<li>According to 6.5.5 of the C23 standard, a cast-expression could be a single unary-expression.</li>
+								<li>According to 6.5.4 of the C23 standard, a unary-expression could be a single postfix-expression.</li>
+								<li>According to 6.5.3 of the C23 standard, a postfix-expression could be a single primary-expression.</li>
+								<li>According to 6.5.2 of the C23 standard, a primary-expression could be a single identifier.</li>
+							</ul>
+							<p>As far as the C23 standard is concerned “<i>environ</i>” is an identifier. The above list demonstrates that a single identifier is an expression, but there is a catch:</p>
+							<figure id="C23-Section-6.5.2-quote">
+								<blockquote><p>The identifier in an identifier primary expression shall have a visible declaration as an ordinary identifier that declares an object or a function.</p></blockquote>
+								<figcaption>— The C23 standard, Section 6.5.2 “Primary expressions”, “Constraints”</figcaption>
+							</figure>
+							<p>That quote introduces a few different rules that limit whether or not a single identifier can really be a valid expression. The first rule is that there has to be a visible declaration for <code>environ</code> or else “<code>environ</code>” would not be a valid expression. <a href="#environ-synopsis">Luckily, there was a declaration for <code>environ</code> in the SYNOPSIS.</a> Is that declaration visible? The answer to that question depends on where the declaration, “<code><b>extern char **</b><i>environ</i><b>;</b></code>”, is placed within a C source code file (see Section 6.2.1 of the C23 standard). In this situation though, we’re not dealing with a C source code file. Instead, we’re dealing with a man page, and the C23 standard doesn’t specify how to interpret man pages. That being said, I think that it’s reasonable to say that <code>environ</code> is visible for every part of environ(7) that appears after that declaration. If <code>environ</code> wasn’t visible for the rest of the environ(7) man page, then that would imply that there are at least two different things that are both called “environ” but have different definitions. With the way that environ(7) is written, it’s clearly talking about a single thing that is named “environ”.</p>
+							<p>The second rule is that the declaration must be for an ordinary identifier. Section 6.2.3 of the C23 standard explains what an ordinary identifier is:</p>
+							<figure>
+								<blockquote>
+									<p>Thus, there are separate <i>name spaces</i> for various categories of identifiers, as follows:</p>
+									<ol id="em-dash-list">
+										<li><p><i>label names</i> (disambiguated by the syntax of the label declaration and use);</p></li>
+										<li><p>the <i>tags</i> of structures, unions, and enumerations (disambiguated by following any<a href="#C23-footnote-23"><sup>23)</sup></a> of the keywords <code><b>struct</b></code>, <code><b>union</b></code>, or <code><b>enum</b></code>);</p></li>
+										<li><p>the <i>members</i> of structures or unions; each structure or union has a separate name space for its members (disambiguated by the type of the expression used to access the member via the <code>.</code> or <code>-&gt;</code> operator);</p></li>
+										<li><p>standard attributes and attribute prefixes (disambiguated by the syntax of the attribute specifier and name of the attribute token) (6.7.13);</p></li>
+										<li><p>the trailing identifier in an attribute prefixed token; each attribute prefix has a separate name space for the implementation-defined attributes that it introduces (disambiguated by the attribute prefix and the trailing identifier token);</p></li>
+										<li><p>all other identifiers, called <i>ordinary identifiers</i> (declared in ordinary declarators or as enumeration constants).</p></li>
+									</ol>
+									<hr>
+									<dl id="side-by-side-dl">
+										<dt><sup id="C23-footnote-23">23)</sup></dt><dd>There is only one name space for tags even though three are possible.</dd>
+									</dl>
+								</blockquote>
+								<figcaption>— The C23 standard, Section 6.2.3 “Name spaces of identifiers”</figcaption>
+							</figure>
+							<p>Is “<code>environ</code>” a label name? No. In order to create a label, you have to use a colon (see Section 6.8.2 of the C23 standard). The declaration for <code>environ</code> (“<code><b>extern char **</b><i>environ</i><b>;</b></code>”) doesn’t contain any colons. Is “<code>environ</code>” one of the tags of a structure, a union or an enumeration? No. The keywords “<code><b>struct</b></code>”, “<code><b>union</b></code>” or “<code><b>enum</b></code>” don’t appear in the environ(7) man page at all. Is “<code>environ</code>” a one of the members of a structure or a union? No. The environ(7) man page doesn’t talk about structures or unions at all, and it doesn’t use the “<code>.</code>” or “<code>-&gt;</code>” operators at all. Is “<code>environ</code>” a standard attribute or an attribute prefix? No. In order to write an attribute-specifier, you need to write square brackets (see Section 6.7.13.2 of the C23 standard), but the environ(7) man page doesn’t contain any square brackets at all. Additionally, the names of the standard attributes are listed in Section 6.7.13.2 of the C23 standard: “<code><b>deprecated</b></code>”, “<code><b>fallthrough</b></code>”, “<code><b>maybe_unused</b></code>”, “<code><b>nodiscard</b></code>”, “<code><b>noreturn</b></code>”, “<code><b>_Noreturn</b></code>”, “<code><b>unsequenced</b></code>”, “<code><b>reproducible</b></code>”. “<code>environ</code>” is not on that list, so it’s not the name of a standard attribute. Is “<code>environ</code>” a trailing identifier in an attribute prefixed token? No. In order to write an attribute prefixed token, you need to write two consecutive colons (see Section 6.7.13.2 of the C23 standard). The environ(7) man page does not contain two consecutive colons anywhere. The answer to all of those previous questions was “no”. This means that “<code>environ</code>” is an ordinary expression.</p>
+							<p>The final rule is that the declaration for <code>environ</code> must be a declaration for an object or function. The declaration for <code>environ</code> (“<code><b>extern char **</b><i>environ</i><b>;</b></code>”) contains a declarator (“<code><b>**</b><i>environ</i></code>”). Here’s something that the C23 standard has to say about declarators:</p>
+							<figure>
+								<blockquote>
+									<p>Each declarator declares an identifier for a single object, function, or type, within a declaration.</p>
+								</blockquote>
+								<figcaption>— The C23 standard, Section 6.7.7.1 “General”, “Semantics”</figcaption>
+							</figure>
+							<p>The declaration for <code>environ</code> uses a declarator which means that <code>environ</code> must be an identifier for either a single object, a function or a type. However, the declaration in question doesn’t use the “<code><b>typedef</b></code>” keyword. As far as I can tell, the only situation where a declarator could be used to declare an identifier for a type is when the “<code><b>typedef</b></code>” keyword is used. This means that the declaration for <code>environ</code> must be declaring an object or a function.</p>
+							<p>At this point, we know that “<i>environ</i>” follows all of the rules from <a href="#C23-Section-6.5.2-quote">the previous quote from Section 6.5.2 of the C23 standard</a>. We now know that “<i>environ</i>” is indeed an expression as far as the C23 standard is concerned. What about “<i>name</i>” and “<i>value</i>”? In order to figure out whether or not  “<i>name</i>” and “<i>value</i>” are expressions, we need to take a look at <a href="#environ-quote">the previous quote from the environ(7) man page</a> again: <q class="quote-that-uses-single-quotes">By convention, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".</q> In order to understand what’s going on here, we can’t just look at “<i>name</i>” and “<i>value</i>” individually. Instead, we have to look at ‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’ as a whole:</p>
+							<ol type="1">
+								<li>
+									<p>‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’ is a primary-expression (see Section 6.5.2 of the C23 standard). A single primary-expression is a valid expression (see above). A primary-expression can take few different forms. This particular primary-expression has this form: a single string-literal:</p>
+									<ol type="A">
+										<li>
+											<p>‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’ is the string-literal (see Section 6.4.5 of the C23 standard). A string-literal can take few different forms. This particular string-literal has this form: double-quote, s-char-sequence, double-quote:</p>
+											<ol type="I">
+												<li>
+													<p>‘<code>"</code>’ is the first double-quote.</p>
+												</li>
+												<li>
+													<p>‘<code><i>name</i><b>=</b><i>value</i></code>’ is the s-char-sequence (see Section 6.4.5 of the C23 standard). An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+													<ol type="a">
+														<li>
+															<p>‘<code><i>name</i><b>=</b><i>valu</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+															<ol type="i">
+																<li>
+																	<p>‘<code><i>name</i><b>=</b><i>val</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																	<ol type="1">
+																		<li>
+																			<p>‘<code><i>name</i><b>=</b><i>va</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																			<ol type="A">
+																				<li>
+																					<p>‘<code><i>name</i><b>=</b><i>v</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																					<ol type="I">
+																						<li>
+																							<p>‘<code><i>name</i><b>=</b></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																							<ol type="a">
+																								<li>
+																									<p>‘<code><i>name</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																									<ol type="i">
+																										<li>
+																											<p>‘<code><i>nam</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																											<ol type="1">
+																												<li>
+																													<p>‘<code><i>na</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																													<ol type="A">
+																														<li>
+																															<p>‘<code><i>n</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: s-char-sequence, s-char:</p>
+																															<ol type="I">
+																																<li>
+																																	<p>‘<code><i>n</i></code>’ is the s-char-sequence. An s-char-sequence can take few different forms. This particular s-char-sequence has this form: a single s-char:</p>
+																																	<ol type="a">
+																																		<li>
+																																			<p>‘<code><i>n</i></code>’ is the s-char (see Section 6.4.5 of the C23 standard). An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline. See Section 5.2.1 of the C23 standard for more information about what characters are a part of the source character set.</p>
+																																		</li>
+																																	</ol>
+																																</li>
+																															</ol>
+																														</li>
+																														<li>
+																															<p>‘<code><i>a</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																														</li>
+																													</ol>
+																												</li>
+																												<li>
+																													<p>‘<code><i>m</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																												</li>
+																											</ol>
+																										</li>
+																										<li>
+																											<p>‘<code><i>e</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																										</li>
+																									</ol>
+																								</li>
+																								<li>
+																									<p>‘<code><b>=</b></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																								</li>
+																							</ol>
+																						</li>
+																						<li>
+																							<p>‘<code><i>v</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																						</li>
+																					</ol>
+																				</li>
+																				<li>
+																					<p>‘<code><i>a</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																				</li>
+																			</ol>
+																		<li>
+																			<p>‘<code><i>l</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																		</li>
+																	</ol>
+																</li>
+																<li>
+																	<p>‘<code><i>u</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+																</li>
+															</ol>
+														<li>
+															<p>‘<code><i>e</i></code>’ is the s-char. An s-char can take few different forms. This particular s-char has this form: any character from the source character set other than double-quote, backslash or newline.</p>
+														</li>
+													</ol>
+												</li>
+												<li>
+													<p>‘<code>"</code>’ is the second double-quote.</p>
+												</li>
+											</ol>
+										</li>
+									</ol>
+								</li>
+							</ol>
+							<p>‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’ as a whole is an expression, but it’s not written in italics. Instead, parts of it are written in italics and parts of it are not. “<i>name</i>” is written in italics. In this situation, “<i>name</i>” is an s-char-sequence that contains s-char-sequences and s-chars inside of it. “<i>value</i>” is also written in italics. “<i>value</i>” is simply five consecutive s-chars. The C23 standard never says that an s-char, an s-sequence or even a sequence of s-chars and s-char-sequences can ever be expressions. s-chars and s-char-sequences can appear inside expressions, but they are not expression in and of themselves. The text “<i>name</i>” and the text “<i>value</i>” do actually match C23’s rules for identifiers (see Section 6.4.2.1 of the C23 standard), and we already know that a single identifier can be a valid expression. That being said, the meaning of characters in C programs in context dependent (see the C23 standard’s fourth footnote). While “<i>name</i>” and “<i>value</i>” do match the syntax rules for identifiers, they are not identifiers in this context. Instead, “<i>name</i>” is an s-char-sequence (with stuff nested inside of it) and “<i>value</i>” is five s-chars. Even if “<i>name</i>” and “<i>value</i>” were identifiers, they still wouldn’t be valid expressions. In order for a single identifier to be a valid expression, there must be a declaration for that identifier (see <a href="#C23-Section-6.5.2-quote">this previous quote from Section 6.5.2  of the C23 standard</a>). The environ(7) man page doesn’t contain any declarations for “<i>name</i>” and “<i>value</i>” at all.</p>
+							<p>As far as the C23 standard is concerned, “<i>environ</i>” is indeed an expression, but “<i>name</i>” and “<i>value</i>” are not.</p>
+						</section>
+						<section>
+							<div role="heading" aria-level="8">According to the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, are “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” expressions?</div>
+							<p>According to the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, an lvalue is a specific type of expression:</p>
+							<figure>
+								<blockquote>
+									<p>An expression that identifies a memory space that holds a value is called an <em>lvalue</em>, because it is a location that can hold a value.</p>
+									<p>The standard kinds of lvalues are:</p>
+									<ul>
+										<li><p>A variable.</p></li>
+										<li><p>[…]</p></li>
+									</ul>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Lvalues.html" target="_blank" rel="external"><cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, Section 7.2 “Lvalues”</a></figcaption>
+							</figure>
+							<p>So, if “<i>environ</i>” is a variable, then it is an expression. Is “<i>environ</i>” a variable? To answer that question, we need to take a look at section 20 “Variables”:</p>
+							<figure>
+								<blockquote>
+									<p>Every variable used in a C program needs to be made known by a <em>declaration</em>.  It can be used only after it has been declared.</p>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Variables.html" target="_blank" rel="external"><cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, Section 20 “Variables”</a></figcaption>
+							</figure>
+							<figure>
+								<blockquote>
+									<p>Here’s what a variable declaration looks like:
+									</p>
+									<div class="GNU-C-example">
+									<pre class="GNU-C-example"><var>keywords</var> <var>basetype</var> <var>decorated-variable</var> <span>[</span>= <var>init</var><span>]</span>;
+</pre></div>
+									
+									<p>The <var>keywords</var> specify how to handle the scope of the variable
+									name and the allocation of its storage.  Most declarations have
+									no keywords because the defaults are right for them.
+									</p>
+									<p>C allows these keywords to come before or after <var>basetype</var>, or
+									even in the middle of it as in <code>unsigned static int</code>, but don’t
+									do that—it would surprise other programmers.  Always write the
+									keywords first.
+									</p>
+									<p>The <var>basetype</var> can be any of the predefined types of C, or a type
+									keyword defined with <code>typedef</code>.  It can also be <code>struct
+									<var>tag</var></code>, <code>union <var>tag</var></code>, or <code>enum <var>tag</var></code>.  In
+									addition, it can include type qualifiers such as <code>const</code> and
+									<code>volatile</code> (see <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Type-Qualifiers.html" target="_blank" rel="external">Type Qualifiers</a>).
+									</p>
+									<p>In the simplest case, <var>decorated-variable</var> is just the variable
+									name.  That declares the variable with the type specified by
+									<var>basetype</var>.  For instance,
+									</p>
+									<div class="GNU-C-example">
+									<pre class="GNU-C-example">int foo;
+</pre></div>
+									
+									<p>uses <code>int</code> as the <var>basetype</var> and <code>foo</code> as the
+									<var>decorated-variable</var>.  It declares <code>foo</code> with type
+									<code>int</code>.
+									</p>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Variable-Declarations.html" target="_blank" rel="external"><cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, Section 20.1 “Variable Declarations”</a></figcaption>
+							</figure>
+							<p><a href="#environ-synopsis">The SYNOPSIS section of the environ(7) man page</a> contains a declaration for a “<code>environ</code>” variable: “<code><b>extern char **</b><i>environ</i><b>;</b></code>”. The declaration uses one keyword. The keyword is “<code><b>extern</b></code>” (see <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Extern-Declarations.html" target="_blank" rel="external">Section 20.8 of the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite></a>). The declaration’s basetype is “<code><b>char</b></code>” which is one of C’s predefined types (see <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Signed-and-Unsigned-Types.html" target="_blank" rel="external">Section 11.1.2 of the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite></a>). The decorated-variable is “<code><b>** </b><i>environ</i></code>”. The optional “<code>= <var>init</var></code>” part is not included in the declaration.</p>
+							<p>In order to figure out how to interpret the decorated-variable (“<code><b>** </b><i>environ</i></code>”), we need to take a look at another part of the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>:</p>
+							<figure>
+								<blockquote>
+									<p>To declare a variable that is an array, write
+									<code><var>variable</var>[<var>length</var>]</code> for <var>decorated-variable</var>:
+									</p>
+									<div class="GNU-C-example">
+									<pre class="GNU-C-example">int foo[5];
+</pre></div>
+									
+									<p>To declare a variable that has a pointer type, write
+									<code>*<var>variable</var></code> for <var>decorated-variable</var>:
+									</p>
+									<div class="GNU-C-example">
+									<pre class="GNU-C-example">struct list_elt *foo;
+									</pre></div>
+									
+									<p>These constructs nest.  For instance,
+									</p>
+									<div class="GNU-C-example">
+									<pre class="GNU-C-example">int foo[3][5];
+									</pre></div>
+									
+									<p>declares <code>foo</code> as an array of 3 arrays of 5 integers each,
+									</p>
+									<div class="GNU-C-example">
+									<pre class="GNU-C-example">struct list_elt *foo[5];
+									</pre></div>
+									
+									<p>declares <code>foo</code> as an array of 5 pointers to structures, and
+									</p>
+									<div class="GNU-C-example">
+									<pre class="GNU-C-example">struct list_elt **foo;
+</pre></div>
+									
+									<p>declares <code>foo</code> as a pointer to a pointer to a structure.</p>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Variable-Declarations.html" target="_blank" rel="external"><cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, Section 20.1 “Variable Declarations”</a></figcaption>
+							</figure>
+							<p>With that, we can conclude that “<code><b>extern char **</b><i>environ</i><b>;</b></code>” declares a variable named <code>environ</code> that is a pointer to a pointer to a <code><b>char</b></code>. We now know that “<code>environ</code>” is a variable and that a single variable is a valid expression in <abbr title="GNU's Not Unix">GNU</abbr> C. What about “<i>name</i>” and “<i>value</i>”? To answer that question, we again have to look at <a href="#environ-quote">the larger context where the words “<i>name</i>” and “<i>value</i>” appear: <q class="quote-that-uses-single-quotes">By convention, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".</q></a> According to the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, ‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’ is a string constant:</p>
+							<figure>
+								<blockquote>
+									<p>A <em>string constant</em> represents a series of characters. It starts with ‘<samp>"</samp>’ and ends with ‘<samp>"</samp>’; in between are the contents of the string.</p>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/String-Constants.html" target="_blank" rel="external"><cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, Section 12.7 “String Constants”</a></figcaption>
+							</figure>
+							<p>It’s important to note that string constants are a type of expression:</p>
+							<figure>
+								<blockquote>
+									<p>An expression that identifies a memory space that holds a value is called an <em>lvalue</em>, because it is a location that can hold a value.</p>
+									<p>The standard kinds of lvalues are:</p>
+									<ul>
+										<li><p>A variable.</p></li>
+										<li><p>A pointer-dereference expression (see <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Pointer-Dereference.html" target="_blank" rel="external">Dereferencing Pointers</a>) using unary ‘<samp>*</samp>’, if its type is not a function type.</p></li>
+										<li><p>A structure field reference using ‘<samp>-&gt;</samp>’. This is always an lvalue since ‘<samp>-&gt;</samp>’ implies pointer dereference.</p></li>
+										<li><p>A union alternative reference (see <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Unions.html" target="_blank" rel="external">Unions</a>), on the same conditions as for structure fields.</p></li>
+										<li><p>An array-element reference using ‘<samp>[<span>…</span>]</samp>’, if the array is an lvalue.</p></li>
+										<li><p>A string constant (see <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/String-Constants.html" target="_blank" rel="external">String Constants</a>).</p></li>
+										<li><p>[…]</p></li>
+
+
+									</ul>
+								</blockquote>
+								<figcaption>— <a href="https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Lvalues.html" target="_blank" rel="external"><cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, Section 7.2 “Lvalues”</a></figcaption>
+							</figure>
+							<p>‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’ is a string constant which means that it is an lvalue which means that it is an expression. It’s important to emphasize that ‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’ as a whole is a string constant. I wasn’t able to find anything in the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite> that suggests that “<i>name</i>” and “<i>value</i>” are smaller expressions that are contained in that larger expression.</p>
+							<p>As far as the <cite><abbr title="GNU's Not Unix">GNU</abbr> C Language Intro and Reference Manual</cite>, “<i>environ</i>” is indeed an expression, but “<i>name</i>” and “<i>value</i>” are not.</p>
+						</section>
+						<section>
+							<div role="heading" aria-level="8">Conclusion to the “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” tangent</div>
+							<p><a href="#environ-quote">The quote from the environ(7) man page that we have been concerned about is <q class="quote-that-uses-single-quotes">By convention, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".</q></a> At this point, we now know the following about that quote:</p>
+							<ul>
+								<li><p>When that quote says “<i>environ</i>”, “<i>environ</i>” is an expression.</p></li>
+								<li><p>When that quote says “<i>name</i>”, “<i>name</i>” is not an expression.</p></li>
+								<li><p>When that quote says “<i>value</i>”, “<i>value</i>” is not an expression.</p></li>
+							</ul>
+						</section>
+					</section>
+					<section>
+						<div role="heading" aria-level="7">Back to analyzing quotes from the man-pages(7) man page</div>
+						<p>Before we went off on a tangent to figure out whether or not “<i>environ</i>”, “<i>name</i>” and “<i>value</i>” were expressions, we were working on trying to figure how to interpret the fact that those three words were written in italics. We were also working on figuring out how to interpret the fact that an equals sign was written in bold. Specifically, we had found <a href="#man-pages-quote">a quote from the man-pages(7) man page that said (in part) <q>Expressions, if not written on a separate indented line, should be specified in italics.</q></a> At this point, we now know how to interpret the fact that “<i>environ</i>” is written in italics. The italics indicate that “<i>environ</i>” is an expression.</p>
+						<p>That previous quote from the man-pages(7) man page also said <q>When showing example shell sessions, user input should be formatted in bold[…]</q> The equals sign in ‘"<i>name</i><b>=</b><i>value</i>"’ is formatted in bold, but that text is not part of an example shell session, so that particular part of the man-pages(7) man page does not help us. The previous quote from the man-pages(7) man-page also says <q>Any reference to another man page should be written with the name in bold, <i>always</i> followed by the section number, formatted in Roman (normal) font, without any separating spaces (e.g., <a href="https://man7.org/linux/man-pages/man2/intro.2.html" target="_blank" rel="external">intro(2)</a>). The bold equals sign that we are concerned about is not a reference to another man page, so this particular part is not helpful either.</q></p>
+						<p>The final part of that previous quote from the man-pages(7) man page is <q>Control characters should be written in bold face, with no quotes; for example, <b>^X</b>.</q> Is the equals sign in ‘"<i>name</i><b>=</b><i>value</i>"’ a control character? To figure that out, we unfortunately have to go on another tangent.</p>
+					</section>
+					<section>
+						<div role="heading" aria-level="7">Tangent: is “<b>=</b>” a control character?</div>
+						<p>The equals character that we are concerned about appears in ‘<code>"<i>name</i><b>=</b><i>value</i>"</code>’
+					</section>
+					{# TODO: At the end of the section that talks about why the relevant text is italicized and bolded, summarize the meaning of the italics and bold in the three terms. #}
+					{# TODO: Put these paragraphs into a subsection. #}
+					<p>At this point, we can prove that the statement “every environment variable has a name and a value” is true. In order to do so, we first need to prove that the statement “an environment variable that has a value must also have a name” is true. According to the getenv(3) and environ(7), the value of environment variables is stored in strings which have the form <code>"<i>name</i><b>=</b><i>value</i>"</code>. It never says that the name or equals sign is optional. The value can only possibly begin after the name and the equals sign. In other words, if the string doesn’t contain a name and an equals sign, then it does not contain a value.</p>
+					<p>Now, we do need to be careful here. environ(7) says <q class="quote-that-uses-single-quotes"><em>By convention</em>, the strings in <i>environ</i> have the form "<i>name</i><b>=</b><i>value</i>".</q> What happens if a string in <code>environ</code> doesn’t follow that convention? I haven’t found any authoritative documentation that tells us what happens in that situation. As far as I can tell, the correct interpretation for <code>environ</code> strings that don’t follow the <code>"<i>name</i><b>=</b><i>value</i>"</code> format is undefined. So, if the string <code>"asdf"</code> was put into <code>environ</code>, then different pieces of code could interpret that string in different ways. One piece of code might ignore it. Another piece of code might emit a warning about it. Another piece of code might interpret it as being an environment variable that has a value but not a name. This gives us a theoretical way in which someone could maybe create an environment variable that has a value but doesn’t have a name.</p>
+					<p>As far as I can tell, that’s the only potential method for creating environment variables that have values but do not have names. The problem with that potential method is that it relies on undocumented behavior. <a href="#ground-rules">Ground rule</a> B for this proof is “I’m only allowed to rely on documented behavior.” We can’t possibly create a environment variable that has a value but doesn’t have a name without breaking ground rule B. That fact allows us to declare that the statement “an environment variable that has a value must also have a name” is true.</p>
+					<p>At this point, we’ve proven that the statements “an environment variable that has a name must also have a value” and “an environment variable that has a value must also have a name” are both true. What about an environment variable that has no name and no value?</p>
+				</section>
+			</section>
+		</section>
+	</section>
+</section>
+{% endblock %}

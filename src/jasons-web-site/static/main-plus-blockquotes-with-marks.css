@@ -1,12 +1,21 @@
 @charset "utf-8";
 /*
 SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
-SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022, 2025)
+SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2022, 2025–2026)
 */
 @import url('main.css');
 
+/*
+TODO: This next part can be simplified once :not(foo, bar, baz) is supported. See the TODO comment that appears later on in this file.
+*/
 blockquote > *:first-child:not(table)::before
 {
+	content: open-quote;
+}
+blockquote > dl::before {
+	content: unset !important;
+}
+blockquote > dl:first-child > :first-child::before {
 	content: open-quote;
 }
 
@@ -20,6 +29,14 @@ blockquote > *:last-child:not(ul)::after,
 blockquote > *:last-child:not(figure)::after,
 blockquote > *:last-child > li:last-child > p:last-child::after,
 blockquote > figure:last-child > figcaption::after
+{
+	content: close-quote;
+}
+blockquote > dl::after {
+	content: unset !important;
+}
+blockquote > dl > :last-child:not(:has(> dl))::after,
+blockquote > dl > :last-child > dl:last-child > :last-child > :last-child::after
 {
 	content: close-quote;
 }
