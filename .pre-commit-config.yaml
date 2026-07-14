@@ -1,6 +1,6 @@
 # yamllint disable rule:line-length
 # SPDX-FileNotice: 🅭🄍1.0 This file is dedicated to the public domain using the CC0 1.0 Universal Public Domain Dedication <https://creativecommons.org/publicdomain/zero/1.0/>.
-# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022, 2025)
+# SPDX-FileContributor: Jason Yundt <swagfortress@gmail.com> (2021–2022, 2025–2026)
 # yamllint enable
 
 
@@ -9,12 +9,12 @@
 repos:
     -
         repo: https://github.com/adrienverge/yamllint
-        rev: v1.35.1
+        rev: v1.38.0
         hooks:
             - id: yamllint
     -
         repo: https://github.com/pre-commit/pre-commit-hooks
-        rev: v5.0.0
+        rev: v6.0.0
         hooks:
             - id: check-ast
             - id: check-case-conflict
@@ -42,19 +42,19 @@ repos:
                 types: ['text']
     -
         repo: https://github.com/igorshubovych/markdownlint-cli
-        rev: v0.44.0
+        rev: v0.49.0
         hooks:
             - id: markdownlint
     -
         repo: https://github.com/lovesegfault/beautysh
-        rev: v6.2.1
+        rev: v6.4.3
         hooks:
             -
                 id: beautysh
                 args: ['--tab', '--force-function-style', 'fnonly']
     -
         repo: https://github.com/PyCQA/autoflake
-        rev: v2.3.1
+        rev: v2.3.3
         hooks:
             - id: autoflake
     -
